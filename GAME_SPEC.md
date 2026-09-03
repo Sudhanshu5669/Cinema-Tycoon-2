@@ -26,37 +26,55 @@ Both desktop and mobile.
   system ever reads a raw key event directly.
 
 ## Art approach
-Hand-authored pixel art at **actual Stardew Valley sprite scale**, matching the
-user's supplied Stardew character-mod reference.
+Hand-authored **flat pixel art** in the style of the user's supplied Metkis
+reference: tall, slim figures, no outlines, muted palette, minimal shading.
 
 History, so no rejected direction gets retried:
 1. Eastward-styled 32x56 with distance-field lighting -> rejected, "glassy and
    weird". Cause: smooth normal-based falloff reads as moulded plastic.
-2. Stardew-styled 32x48 with flat cel shading -> still rejected. Cause: roughly
-   three times Stardew's real pixel count. The chunkiness IS the style; extra
-   resolution works against it.
-3. **Current: 16 x 32, actual Stardew scale.**
+2. Stardew-styled 32x48 with flat cel shading -> rejected. Cause: roughly three
+   times Stardew's real pixel count. The chunkiness IS the style.
+3. Stardew-styled 16x32 (actual Stardew scale) -> approved for the front and
+   back facings, then abandoned. The profile never landed: at 16px the face
+   collapses into a 3px stripe, and hair and jacket rendered at identical
+   luminance so the whole side view fused into one brown slab. Repeated attempts
+   to fix it by reshaping the head did not help, because the problem was the
+   style's dependence on a chunky face doing all the work.
+4. **Current: flat "tall figure", 16 x 48.** Chosen because it is
+   authorable — the profile reads from silhouette and proportion rather than
+   from facial detail there is no room for.
 
-What the reference dictates:
-- Hair is a big dark mass taking ~40% of the sprite height, and is the primary
-  silhouette feature.
-- **No neck.** The head sits directly on the shoulders.
-- Squat body block with one saturated vertical accent (here a red tie).
-- Stubby legs, small pale shoes.
-- Flat cel shading only: outline ring, one-pixel shadow edge, base, highlight.
-  No gradients anywhere.
-- Eyes are small solid dark blocks. No whites, no catchlights.
+What the reference dictates (measured, not guessed — the reference figures are
+13 x 50 native pixels):
+- **No outline anywhere.** Shapes sit flat against the background. This is the
+  single biggest departure from every previous pass.
+- Proportions: head 20% of height and **54% of body width**; torso 32%; hips
+  8%; legs and feet 40%. The width ratio is the one that matters — a first pass
+  at 67% read as a bobblehead with the vertical proportions already correct.
+- Two tones per garment at most, and no ramps. Light comes from the left, so
+  the near arm is lit and the far arm is shaded; that tonal split is the only
+  thing separating arm from torso, since there is no outline to do it.
+- The face carries **eyes only** — one dark pixel each. No nose, no mouth, no
+  whites, no catchlights. The profile gets a single-pixel nose bump.
+- There **is** a neck, one pixel row of it.
+- Legs are long and thin with a clear gap between them; feet are small and are
+  the darkest thing on the figure.
+- Muted, slightly cool register. Exactly one saturated accent per character.
 
 Locked art constants:
 - Internal render resolution: **640 x 360**
 - Tile grid: **16 x 16 px**
-- Character: **16 x 32 px** (exactly 2 tiles tall)
+- Character: **16 x 48 px** (3 tiles tall)
 - Presentation: **integer scale x3 -> 1920 x 1080**, nearest-neighbour
 - On-screen world: 40 x 22 tiles
 
-Sprites are authored as a **material map** — silhouette plus which material each
-region is (`art/player-front.mjs`); `tools/shade.mjs` applies the cel rule and
-`art/materials.mjs` holds the palettes. Art edits stay small reviewable diffs.
+Sprites are authored as an **indexed-colour ASCII grid** (`art/flat/player.mjs`)
+against a named palette (`art/flat/palette.mjs`); `tools/flat.mjs` maps
+characters to exact colours and validates every grid. There is no shading pass —
+this style leaves a shader nothing to decide, so the material/normal/cel
+machinery the Stardew pass needed (`art/materials.mjs`, `tools/shade.mjs`) is
+superseded. Those files and the 16x32 sprites are still in the tree, unreferenced
+by the flat pipeline, pending a decision to delete them.
 
 A separate lighting pass (`tools/light.mjs`, later a Phaser shader) accumulates
 coloured lights with quadratic falloff over an ambient tint for day/evening and

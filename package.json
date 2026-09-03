@@ -1,0 +1,32 @@
+{
+  "name": "cinema-tycoon",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build:art": "node tools/build-flat.mjs && node tools/build-walk.mjs",
+    "smoke": "node tools/smoke.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sudhanshu5669/Cinema-Tycoon-2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/Sudhanshu5669/Cinema-Tycoon-2/issues"
+  },
+  "homepage": "https://github.com/Sudhanshu5669/Cinema-Tycoon-2#readme",
+  "dependencies": {
+    "phaser": "^3.90.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.62.1",
+    "vite": "^7.3.6"
+  }
+}
