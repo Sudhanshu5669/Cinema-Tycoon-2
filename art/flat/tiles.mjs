@@ -403,68 +403,77 @@ export const BELT_COURSE = [
 // 16x16 cells; they are authored whole so the proportion is judged whole.
 
 /**
- * 16 x 32 — two tiles. Glass catches cold sky in its upper left, which is the
- * only "light" in the whole set allowed to look like a reflection. The sill
- * in the last two rows reuses the cornice's own lip/shadow tones (`l`/`L`) —
- * it is the same idea in miniature, a light-catching ledge with a hard
- * shadow under it — rather than inventing a second ledge language, and
- * protrudes 1px past the frame on each side so it reads as sitting proud of
- * the wall instead of just being a darker row of the frame itself.
+ * 32 x 32 — two tiles wide, two tall. Glass catches cold sky in its upper
+ * left, which is the only "light" in the whole set allowed to look like a
+ * reflection. The sill in the last two rows reuses the cornice's own
+ * lip/shadow tones (`l`/`L`) — it is the same idea in miniature, a
+ * light-catching ledge with a hard shadow under it — rather than inventing a
+ * second ledge language, and protrudes 1px past the frame on each side so it
+ * reads as sitting proud of the wall instead of just being a darker row of
+ * the frame itself.
  *
- * 14px wide out of the 16px tile (was 12) — **follow-up from user review**,
- * "too thin, doesn't look like a window". The margin either side of the
- * frame dropped from 2px to 1px, and each glass pane grew a pixel with it,
- * so the growth is in the actual glazed area, not just a thicker frame
- * around the same small panes — a wider border alone was tried first and
- * discarded because it read as a fatter frame around a still-tiny window,
- * not a bigger window. The mullion (`X`) stays a single pixel; a sash bar
- * really is thin against a full pane, and thickening it here would have
- * started eating into the "more glass" gain this pass exists for.
+ * Widened twice on user review. First 12px -> 14px of a single 16px tile
+ * ("too thin, doesn't look like a window") by shrinking the margin and
+ * growing the actual glazed area, not just the frame -- a wider border alone
+ * was tried and discarded for reading as a fatter frame around the same tiny
+ * panes. Then, **second follow-up**, "at least 24px so they look wide enough
+ * for players to pass through": the player sprite itself is 16px wide
+ * (`SPRITE_W`), so a window/door opening narrower than that always reads as
+ * a squeeze no matter how it's shaded. 24px isn't a multiple of the 16px
+ * tile grid every other tile answers to, so the grid-aligned target is 32px
+ * (two tiles) -- comfortably past the character's own width, not just
+ * past it. Every run grew proportionally to reach it (a one-off generation
+ * script, not hand-redrawn -- the same "generated once, then locked in as
+ * authored art" approach ROOF's own speckle uses) except runs of 1-2px,
+ * which stayed exactly their authored width: the mullion (`X`) is still a
+ * single pixel, because a sash bar doesn't get thicker just because the
+ * window did.
  */
 export const WINDOW = [
-  '.xxxxxxxxxxxxxx.',
-  '.xIIIIIIXiiiiix.',
-  '.xIIIIIIXiiiiix.',
-  '.xIIIIIIXiiiiix.',
-  '.xIIIIIIXiiiiix.',
-  '.xIIIIIIXiiiiix.',
-  '.xIIIIIIXiiiiix.',
-  '.xIIIIIIXiiiiix.',
-  '.xIIIIIIXiiiiix.',
-  '.xIIIIIIXiiiiix.',
-  '.xIIIIIIXiiiiix.',
-  '.xIIIIIIXiiiiix.',
-  '.xIIIIIIXiiiiix.',
-  '.xXXXXXXXXXXXXx.',
-  '.xiiiiiiXiiiiix.',
-  '.xiiiiiiXiiiiix.',
-  '.xiiiiiiXiiiiix.',
-  '.xiiiiiiXiiiiix.',
-  '.xiiiiiiXiiiiix.',
-  '.xiiiiiiXiiiiix.',
-  '.xiiiiiiXiiiiix.',
-  '.xiiiiiiXiiiiix.',
-  '.xiiiiiiXiiiiix.',
-  '.xiiiiiiXiiiiix.',
-  '.xiiiiiiXiiiiix.',
-  '.xiiiiiiXiiiiix.',
-  '.xiiiiiiXiiiiix.',
-  '.xiiiiiiXiiiiix.',
-  '.xxxxxxxxxxxxxx.',
-  '.XXXXXXXXXXXXXX.',
-  'llllllllllllllll',
-  '.LLLLLLLLLLLLLL.',
+  '.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.',
+  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
+  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
+  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
+  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
+  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
+  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
+  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
+  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
+  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
+  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
+  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
+  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
+  '.xXXXXXXXXXXXXXXXXXXXXXXXXXXXXx.',
+  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
+  '.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.',
+  '.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.',
+  'llllllllllllllllllllllllllllllll',
+  '.LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL.',
 ];
 
 /**
  * 32 x 32 — two tiles wide, two tall: a shopfront window, for a ground floor
  * that wants to look like it does business rather than just has a facade.
- * **Follow-up from user review**, "I want more [window]" — bigger and a
- * genuinely different fixture, not the same WINDOW repeated closer together,
- * the way a real shopfront reads differently from a row of upstairs windows.
- * Three panes over two thin mullions rather than WINDOW's one, since a single
- * pane this wide would either look like a wall of glass with no structure or
- * need a mullion thick enough to stop reading as a sash bar.
+ * Originally added bigger than WINDOW; a later pass widened WINDOW itself to
+ * the same 32px, so the two are now the same size and differ only in how
+ * they're subdivided — three panes over two thin mullions here, vs WINDOW's
+ * one, since a single pane this wide would either look like a wall of glass
+ * with no structure or need a mullion thick enough to stop reading as a sash
+ * bar. Kept as its own fixture for that variety (a real shopfront still
+ * reads differently from a row of upstairs windows), not for size.
  */
 export const WINDOW_WIDE = [
   '.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.',
@@ -502,68 +511,73 @@ export const WINDOW_WIDE = [
 ];
 
 /**
- * 16 x 48 — three tiles, exactly the character's height. This is the number
- * that has to be right before anything else: a door authored as a single
- * 16px tile is a third of the player's height and reads as a cat flap, and
- * every other proportion in the facade is set by how tall the way in is.
+ * 32 x 48 — two tiles wide, three tall, exactly the character's height. The
+ * height is the number that has to be right before anything else: a door
+ * authored as a single 16px tile is a third of the player's height and
+ * reads as a cat flap, and every other proportion in the facade is set by
+ * how tall the way in is.
  *
- * 14px wide (was 12), the same follow-up and the same fix as WINDOW's: the
- * margin either side dropped from 2px to 1px and every flat run inside grew
- * with it (the glass panes, the plain rail rows, the raised panel's face),
- * while every single-pixel mark that actually carries meaning — the frame
- * (`x`), the recessed reveal (`d`/`D`), the handle (`k`) — stayed exactly
- * one pixel and just moved outward with its run, so the door reads as a
- * genuinely bigger doorway rather than a stretched copy of the old one.
+ * Widened twice, the same two follow-ups as WINDOW's: 12px -> 14px of one
+ * 16px tile first, then, on "at least 24px so they look wide enough for
+ * players to pass through", the full jump to 32px (two tiles) -- 24px isn't
+ * a multiple of this project's 16px tile grid, so 32 is the nearest
+ * grid-aligned size past both 24px and the player's own 16px width. Every
+ * flat run grew proportionally to fill it (the glass panes, the plain rail
+ * rows, the raised panel's face) while every mark of 1-2px that actually
+ * carries meaning -- the frame (`x`), the recessed reveal (`d`/`D`), the
+ * handle (`k`), the corner accent's doubled `DD` -- stayed exactly the width
+ * it was authored at, so the door reads as a genuinely bigger doorway, not a
+ * stretched copy of the old one.
  */
 export const DOOR = [
-  '.xxxxxxxxxxxxxx.',
-  '.xxxxxxxxxxxxxx.',
-  '.xdddddddddddDx.',
-  '.xdddddddddddDx.',
-  '.xdddddddddddDx.',
-  '.xdIIIIIXiiiiDx.',
-  '.xdIIIIIXiiiiDx.',
-  '.xdIIIIIXiiiiDx.',
-  '.xdIIIIIXiiiiDx.',
-  '.xdIIIIIXiiiiDx.',
-  '.xdIIIIIXiiiiDx.',
-  '.xdIIIIIXiiiiDx.',
-  '.xdIIIIIXiiiiDx.',
-  '.xdIIIIIXiiiiDx.',
-  '.xdiiiiiXiiiiDx.',
-  '.xdiiiiiXiiiiDx.',
-  '.xdiiiiiXiiiiDx.',
-  '.xdiiiiiXiiiiDx.',
-  '.xdiiiiiXiiiiDx.',
-  '.xdiiiiiXiiiiDx.',
-  '.xdiiiiiXiiiiDx.',
-  '.xdiiiiiXiiiiDx.',
-  '.xdiiiiiXiiiiDx.',
-  '.xdiiiiiXiiiiDx.',
-  '.xdddddddddddDx.',
-  '.xdddddddddddDx.',
-  '.xddddddddddkDx.',
-  '.xddddddddddkDx.',
-  '.xdddddddddddDx.',
-  '.xdddddddddddDx.',
-  '.xdDDDDDDDDDDDx.',
-  '.xdDddddddddDDx.',
-  '.xdDddddddddDDx.',
-  '.xdDddddddddDDx.',
-  '.xdDddddddddDDx.',
-  '.xdDddddddddDDx.',
-  '.xdDddddddddDDx.',
-  '.xdDddddddddDDx.',
-  '.xdDddddddddDDx.',
-  '.xdDddddddddDDx.',
-  '.xdDddddddddDDx.',
-  '.xdDddddddddDDx.',
-  '.xdDddddddddDDx.',
-  '.xdDDDDDDDDDDDx.',
-  '.xdddddddddddDx.',
-  '.xdddddddddddDx.',
-  '.TTTTTTTTTTTTTT.',
-  '.TTTTTTTTTTTTTT.',
+  '.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.',
+  '.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.',
+  '.xdddddddddddddddddddddddddddDx.',
+  '.xdddddddddddddddddddddddddddDx.',
+  '.xdddddddddddddddddddddddddddDx.',
+  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
+  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
+  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
+  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
+  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
+  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
+  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
+  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
+  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
+  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
+  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
+  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
+  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
+  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
+  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
+  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
+  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
+  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
+  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
+  '.xdddddddddddddddddddddddddddDx.',
+  '.xdddddddddddddddddddddddddddDx.',
+  '.xddddddddddddddddddddddddddkDx.',
+  '.xddddddddddddddddddddddddddkDx.',
+  '.xdddddddddddddddddddddddddddDx.',
+  '.xdddddddddddddddddddddddddddDx.',
+  '.xdDDDDDDDDDDDDDDDDDDDDDDDDDDDx.',
+  '.xdDddddddddddddddddddddddddDDx.',
+  '.xdDddddddddddddddddddddddddDDx.',
+  '.xdDddddddddddddddddddddddddDDx.',
+  '.xdDddddddddddddddddddddddddDDx.',
+  '.xdDddddddddddddddddddddddddDDx.',
+  '.xdDddddddddddddddddddddddddDDx.',
+  '.xdDddddddddddddddddddddddddDDx.',
+  '.xdDddddddddddddddddddddddddDDx.',
+  '.xdDddddddddddddddddddddddddDDx.',
+  '.xdDddddddddddddddddddddddddDDx.',
+  '.xdDddddddddddddddddddddddddDDx.',
+  '.xdDddddddddddddddddddddddddDDx.',
+  '.xdDDDDDDDDDDDDDDDDDDDDDDDDDDDx.',
+  '.xdddddddddddddddddddddddddddDx.',
+  '.xdddddddddddddddddddddddddddDx.',
+  '.TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.',
+  '.TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.',
 ];
 
 /** Shopfront awning. Same red as the character's accent — it is the colour
