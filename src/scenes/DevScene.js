@@ -19,6 +19,7 @@ import { FollowCamera } from '../game/camera.js';
 import { TileMapRenderer } from '../game/tilemap/renderer.js';
 import { loadCityMap } from '../game/tilemap/mapLoader.js';
 import { clockLabel } from '../game/tilemap/sun.js';
+import { bakeOccludedLight } from '../game/occludedLight.js';
 
 const WORLD_W = INTERNAL_W * 3;
 const WORLD_H = INTERNAL_H * 3;
@@ -83,6 +84,7 @@ export class DevScene extends Phaser.Scene {
       fontFamily: 'monospace', fontSize: '10px', color: '#e0e0e0',
     }).setScrollFactor(0).setDepth(1e6);
 
+    this.buildLightingPrototype();
     this.exposeDevHooks();
     this.bindDevHotkeys();
     this.events.once('shutdown', () => {
@@ -223,6 +225,62 @@ export class DevScene extends Phaser.Scene {
     };
     window.addEventListener('keydown', onKeyDown);
     this.events.once('shutdown', () => window.removeEventListener('keydown', onKeyDown));
+  }
+
+  /**
+   * PROTOTYPE, not a real system yet -- src/game/occludedLight.js against a
+   * tiny walled room with a doorway, to test occlusion-aware lighting
+   * against the reference image the user asked about. Deliberately not
+   * city.json data or a real TileMapRenderer structure: this is throwaway,
+   * safe to delete entirely (this method + the import above) once a
+   * direction is confirmed, without touching anything tested. No collision,
+   * visual only -- it's here to answer "can the *look* be done", not to be a
+   * walkable room.
+   */
+  buildLightingPrototype() {
+    const ox = 1460, oy = 880; // open south pavement, clear of the platform, every streetlamp and the object layer's grass tuft
+    const w = 180, h = 140, t = 8; // room interior size, wall thickness -- big enough that neither light floods it solid
+    const doorX0 = 70, doorW = 28; // gap in the north wall -- the doorway
+
+    const g = this.add.graphics().setDepth(oy + h);
+    // Floor first, so the room reads as an enclosed space rather than just a
+    // shape of light floating over open pavement.
+    g.fillStyle(0x2a2530, 1);
+    g.fillRect(ox, oy, w, h);
+    g.fillStyle(0x54506a, 1); // walls: distinct from both the floor and the night sky behind them
+    g.fillRect(ox, oy, doorX0, t); // north wall, left of the door
+    g.fillRect(ox + doorX0 + doorW, oy, w - doorX0 - doorW, t); // north wall, right of the door
+    g.fillRect(ox, oy + h - t, w, t); // south wall
+    g.fillRect(ox, oy, t, h); // west wall
+    g.fillRect(ox + w - t, oy, t, h); // east wall
+    // A crate, to show *any* occluder works, not just the outer walls.
+    const crate = { x: ox + w - 46, y: oy + h - 46, w: 20, h: 20 };
+    g.fillStyle(0x3a2f28, 1);
+    g.fillRect(crate.x, crate.y, crate.w, crate.h);
+
+    const walls = [
+      { x1: ox, y1: oy, x2: ox + doorX0, y2: oy },
+      { x1: ox + doorX0 + doorW, y1: oy, x2: ox + w, y2: oy },
+      { x1: ox, y1: oy + h, x2: ox + w, y2: oy + h },
+      { x1: ox, y1: oy, x2: ox, y2: oy + h },
+      { x1: ox + w, y1: oy, x2: ox + w, y2: oy + h },
+      { x1: crate.x, y1: crate.y, x2: crate.x + crate.w, y2: crate.y },
+      { x1: crate.x + crate.w, y1: crate.y, x2: crate.x + crate.w, y2: crate.y + crate.h },
+      { x1: crate.x + crate.w, y1: crate.y + crate.h, x2: crate.x, y2: crate.y + crate.h },
+      { x1: crate.x, y1: crate.y + crate.h, x2: crate.x, y2: crate.y },
+    ];
+
+    // The main light: at the doorway itself, as if spilling in from outside.
+    bakeOccludedLight(this, {
+      x: ox + doorX0 + doorW / 2, y: oy - 2,
+      radius: 150, color: 0xffb060, segments: walls, intensity: 0.75, depth: oy + h + 1,
+    });
+    // A second, dimmer lantern inside the room -- shows the crate casting
+    // its own shadow, and two occluded lights overlapping believably.
+    bakeOccludedLight(this, {
+      x: ox + 30, y: oy + h - 50,
+      radius: 70, color: 0xffd8a0, segments: walls, intensity: 0.55, depth: oy + h + 1,
+    });
   }
 
   /** Dev-only outline of the camera deadzone: the box the player moves inside
