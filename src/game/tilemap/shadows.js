@@ -64,6 +64,10 @@ const PLAYER_SHADOW_REACH = 130;
  *  short) to standing right on top of it (bright, long) -- see updatePlayer. */
 const PLIGHT_MIN_LEN = 14;
 const PLIGHT_MAX_LEN = 70;
+/** Point-light player shadows: darkness range, same 0 (a light barely
+ *  reaching at all) to 1 (standing right on it) strength driving both. */
+const PLIGHT_MIN_ALPHA = 0.2;
+const PLIGHT_MAX_ALPHA = 0.65;
 
 export class ShadowLayer {
   /**
@@ -270,16 +274,20 @@ export class ShadowLayer {
    *   `player.sprite.frame.name` -- the shadow follows the actual walk pose
    * @param {number} heightPx the player sprite's height (SPRITE_H)
    * @param {number} hours drives the sun shadow, same as the static canvas
-   * @param {{x:number, y:number, intensity:number, radius:number, dist:number}[]} lightSources
-   *   from LightingLayer#shadowSources -- nearest lit point lights, already
-   *   filtered to ones actually close enough to be lighting the player
+   * @param {{light: import('../light.js').Light, strength: number}[]} lightSources
+   *   from LightingLayer#shadowSources -- every point light actually
+   *   touching the player right now, each with its own continuous strength
+   *   there (0 at that light's radius, up to its own peak intensity at its
+   *   centre). No ranking: every one casts its own shadow, independently.
    */
   updatePlayer(px, py, frameName, heightPx, hours, lightSources) {
     // Bucketed to whole px (sub-pixel jitter is invisible anyway) plus the
-    // hour bucket and every light source's rounded position/intensity, so an
+    // hour bucket and every light source's rounded strength there, so an
     // idle player under an unchanging sky redraws only on its own idle-blink
-    // frame change, not every single frame.
-    const lightKey = lightSources.map((s) => `${s.x},${s.y},${s.intensity.toFixed(2)}`).join('|');
+    // frame change, not every single frame. Strength alone (not the light's
+    // identity) is deliberate: it is a continuous function of position, so
+    // this key already changes exactly when the rendered result would.
+    const lightKey = lightSources.map((s) => s.strength.toFixed(2)).join('|');
     const bucket = `${Math.round(px)},${Math.round(py)},${frameName},${Math.round(hours * 20)},${lightKey}`;
     if (bucket === this._playerBucket) return;
     this._playerBucket = bucket;
@@ -294,30 +302,19 @@ export class ShadowLayer {
     const sun = shadowFor(hours, heightPx);
     if (sun) this._paintSpriteShadow(ctx, caster, sun, sun.alpha);
 
-    for (const src of lightSources) {
-      // Direction is away from the light's *ground* anchor (src.x, src.y --
-      // LightingLayer already resolved that, not the glow position), so its
-      // own magnitude is the right thing to normalize by -- src.dist is a
-      // different distance (to the glow position, what decides how strongly
-      // lit the player is) and must not be reused here, or the direction
-      // vector silently stops being unit length.
-      // Away from the light's true position -- no directional bias here.
-      // Unlike the sun (a fiction sun.js is free to keep "behind the viewer
-      // all day" specifically so its shadows always rake south into view), a
-      // streetlamp really is standing wherever it's standing: forcing every
-      // shadow toward south would point it *toward* a light that happens to
-      // be south of the player, which is backwards, not just stylised.
-      const ddx = px - src.x, ddy = py - src.y;
-      const dirDist = Math.max(1, Math.hypot(ddx, ddy));
-      const ux = ddx / dirDist, uy = ddy / dirDist;
-      // 1 standing at the light, 0 at the edge of its own radius -- both how
-      // far the shadow reaches and how dark it is fade out together, so a
-      // light barely strong enough to reach the player doesn't throw a full
-      // -strength shadow.
-      const proximity = clamp01(1 - src.dist / src.radius);
-      const len = PLIGHT_MIN_LEN + (PLIGHT_MAX_LEN - PLIGHT_MIN_LEN) * proximity;
-      const dx = ux * len, dy = uy * len;
-      const alpha = 0.2 + 0.45 * proximity * Math.min(1, src.intensity);
+    // Every light touching the player casts its own shadow, independently,
+    // scaled only by how strongly *that* light illuminates them (Light#
+    // illuminationAt -- 1 at the light's own centre, 0 at its radius,
+    // continuous). No ranking between lights and no directional bias: a
+    // streetlamp really is standing wherever it's standing, so the only
+    // physically honest thing to do is ask each light in turn which way its
+    // own shadow falls and how strong it is, then let them overlap exactly
+    // like real light would.
+    for (const { light, strength } of lightSources) {
+      const dir = light.directionFrom(px, py);
+      const len = PLIGHT_MIN_LEN + (PLIGHT_MAX_LEN - PLIGHT_MIN_LEN) * strength;
+      const dx = dir.x * len, dy = dir.y * len;
+      const alpha = PLIGHT_MIN_ALPHA + (PLIGHT_MAX_ALPHA - PLIGHT_MIN_ALPHA) * strength;
       this._paintSpriteShadow(ctx, caster, { dx, dy }, alpha);
     }
 
@@ -394,7 +391,6 @@ function clipHalfPlane(pts, inside, intersect) {
 
 function lerpAt(a, b, t) { return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }; }
 
-function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
 
 /** Shoelace formula. Used only to tell a real overlap apart from a zero-width
  *  sliver where two footprints merely touch along a shared edge. */

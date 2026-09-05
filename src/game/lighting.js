@@ -11,6 +11,13 @@
 // grow the look later (more lights, flicker, a lantern that follows the
 // player) rather than a one-off effect.
 //
+// Every light source in the scene is a `Light` (light.js) -- the same object
+// whether it's a window, the marquee, a streetlamp, or anything added later.
+// This module owns two things built on top of that: turning a `Light` into a
+// live Phaser Light2D instance and keeping it in sync with the hour, and
+// answering "which lights are actually touching this point right now" for
+// the shadow layer -- see shadowSources.
+//
 // No normal maps are bound, so every surface reads as flat-facing-the-camera
 // (Phaser's own default __NORMAL texture) -- consistent with this project's
 // no-shading-pass flat art; a light still falls off with distance and tints
@@ -23,6 +30,7 @@
 
 import Phaser from 'phaser';
 import { ambientFor, glowFor } from './tilemap/sun.js';
+import { Light } from './light.js';
 
 const { LIGHT_PIPELINE } = Phaser.Renderer.WebGL.Pipelines;
 
@@ -65,22 +73,30 @@ export function wireLight(gameObject) {
 export class LightingLayer {
   /**
    * @param {Phaser.Scene} scene
-   * @param {{x: number, y: number, kind: string}[]} points world-space light
-   *   sources, e.g. from TileMapRenderer's derived window/marquee anchors.
+   * @param {{x: number, y: number, gx?: number, gy?: number, kind: string}[]} points
+   *   world-space light sources, e.g. from TileMapRenderer's derived
+   *   window/marquee/streetlamp anchors. `gx, gy` is the ground anchor (see
+   *   Light) -- omitted for a light at street level already.
    */
   constructor(scene, points) {
     this.scene = scene;
-    this.points = points;
+    /** @type {Light[]} the one object model every light in the scene is
+     *  built from -- see light.js. */
+    this.lights = points.map((p) => new Light({
+      x: p.x, y: p.y, groundX: p.gx, groundY: p.gy,
+      radius: RADIUS[p.kind] ?? RADIUS.window, kind: p.kind,
+    }));
     /** Light2D has no Canvas-renderer equivalent -- degrade to "no dynamic
      *  lighting" rather than throwing if WebGL was unavailable. */
     this.active = scene.renderer?.type === Phaser.WEBGL;
     this._bucket = null;
-    this.lights = [];
+    /** @type {Phaser.GameObjects.Light[]} the live Light2D instance backing
+     *  each entry in `this.lights`, same index. Kept in sync in setHours. */
+    this._phaserLights = [];
 
     if (!this.active) return;
     scene.lights.enable();
-    this.lights = points.map((p) =>
-      scene.lights.addLight(p.x, p.y, RADIUS[p.kind] ?? RADIUS.window, 0xffffff, 0));
+    this._phaserLights = this.lights.map((l) => scene.lights.addLight(l.x, l.y, l.radius, 0xffffff, 0));
 
     // Camera-wide post FX -- impacts everything the camera renders, so this
     // is the one place that needs to set it up, not every scene that builds a
@@ -110,50 +126,39 @@ export class LightingLayer {
     this._bucket = bucket;
 
     this.scene.lights.setAmbientColor(ambientFor(hours));
-    this.points.forEach((p, i) => {
-      const { color, intensity } = glowFor(hours, p.kind);
-      this.lights[i].setColor(color).setIntensity(intensity);
+    this.lights.forEach((light, i) => {
+      const { color, intensity } = glowFor(hours, light.kind);
+      light.setColor(color).setIntensity(intensity);
+      this._phaserLights[i].setColor(color).setIntensity(intensity);
     });
   }
 
   /**
-   * The nearest lit point lights to (px, py), for casting the player's own
-   * shadow away from them at night -- a point light, unlike the sun, has a
-   * position, so which way the player's shadow falls depends on where they
-   * happen to be standing relative to it, not one shared angle for the whole
-   * scene. Only lights actually lit right now (intensity > 0, e.g. not a
-   * window at noon) and close enough to matter (inside their own radius --
-   * beyond it, a light isn't lighting the player, so it has no business
-   * casting their shadow either) are candidates.
+   * Every light currently illuminating (px, py) at all, each carrying its
+   * own continuous strength there (Light#illuminationAt) -- for casting the
+   * player's own shadow away from them at night. Deliberately not a "nearest
+   * N" ranking: real light doesn't pick a winner between sources, every one
+   * that reaches a point casts that point's shadow on its own, weighted only
+   * by its own strength there. A ranked cutoff has to reassign discretely
+   * the moment a third light overtakes the second, and every reassignment is
+   * a visible pop; weighting by illumination instead means a light's
+   * contribution is already ~0 right where a rank-based cutoff would
+   * otherwise have to switch it off, so nothing pops. In practice this is a
+   * small list -- only lights whose radius actually reaches the point at
+   * all qualify -- so no cap is needed for it to stay cheap.
    * @param {number} px @param {number} py
-   * @param {number} [maxCount=2] how many lights may shadow the player at
-   *   once -- capped low since this runs every frame the player moves.
-   * @returns {{x:number, y:number, intensity:number, radius:number, dist:number}[]}
-   *   nearest first.
+   * @returns {{light: Light, strength: number}[]}
    */
-  shadowSources(px, py, maxCount = 2) {
+  shadowSources(px, py) {
     if (!this.active) return [];
-    return this.points
-      .map((p, i) => {
-        const light = this.lights[i];
-        return {
-          // The ground anchor (gx, gy), not the glow position (x, y) -- a
-          // streetlamp's bulb sits up near the top of the post, and using
-          // its own elevated position as "where the light is" makes the
-          // player's shadow point away from a spot further back than the
-          // lamp actually stands on the ground. Falls back to (x, y) for any
-          // light point that doesn't carry a ground anchor.
-          x: p.gx ?? p.x, y: p.gy ?? p.y,
-          intensity: light.intensity, radius: light.radius,
-          // Distance (and so "is this light even reaching the player" and
-          // "how close") is against the *glow* position -- that's what the
-          // shader's own radius is centred on.
-          dist: Math.hypot(p.x - px, p.y - py),
-        };
-      })
-      .filter((s) => s.intensity > 0.05 && s.dist < s.radius)
-      .sort((a, b) => a.dist - b.dist)
-      .slice(0, maxCount);
+    return this.lights
+      .filter((l) => l.castsShadow)
+      .map((light) => ({ light, strength: light.illuminationAt(px, py) }))
+      .filter((s) => s.strength > 0.01)
+      // Strongest first -- a convenience for callers that want "the
+      // dominant one", not a cutoff: every entry above is still returned,
+      // nothing is excluded by this ordering.
+      .sort((a, b) => b.strength - a.strength);
   }
 
   /** Packed 0xRRGGBB, for the smoke test and debug readouts. */

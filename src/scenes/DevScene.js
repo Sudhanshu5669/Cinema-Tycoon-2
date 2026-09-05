@@ -156,7 +156,7 @@ export class DevScene extends Phaser.Scene {
         // actually active in the shader for the current camera view --
         // SYSTEMS #8's maxLights cap culls to the nearest, so these two
         // numbers diverge the moment a map out-grows one screen of lights.
-        totalLights: this.map.lighting?.points.length ?? 0,
+        totalLights: this.map.lighting?.lights.length ?? 0,
         // Identities (not just a count) of the lights the shader is actually
         // using this frame, so the smoke test can show the *set* changes with
         // the camera, not only how many are in it. getLights returns
@@ -197,8 +197,12 @@ export class DevScene extends Phaser.Scene {
       // Ground truth for the smoke test: a light's *bulb* position is a
       // renderer-internal offset from its map placement (near the top of a
       // streetlamp, not its base), so the test asks LightingLayer directly
-      // rather than re-deriving that offset by hand.
-      shadowSourcesAt: (px, py) => this.map.lighting?.shadowSources(px, py) ?? [],
+      // rather than re-deriving that offset by hand. Flattened to plain
+      // data (the light's ground anchor + its strength here), not the Light
+      // instance itself -- the test wants a position and a number, not the
+      // whole object.
+      shadowSourcesAt: (px, py) => (this.map.lighting?.shadowSources(px, py) ?? [])
+        .map(({ light, strength }) => ({ x: light.groundX, y: light.groundY, strength, kind: light.kind })),
     };
   }
 
@@ -208,8 +212,7 @@ export class DevScene extends Phaser.Scene {
   _lightIntensity(kind) {
     const lighting = this.map.lighting;
     if (!lighting) return 0;
-    const i = lighting.points.findIndex((p) => p.kind === kind);
-    return i === -1 ? 0 : lighting.lights[i].intensity;
+    return lighting.lights.find((l) => l.kind === kind)?.intensity ?? 0;
   }
 
   /** Jump straight to an hour -- shared by `__dev.setTime` and the hotkeys

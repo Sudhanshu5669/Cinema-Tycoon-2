@@ -344,6 +344,28 @@ check('...and away from a streetlamp that is south of the player, not toward it'
   awayNorth > 0.05 && awayNorth > towardNorth,
   `away ${awayNorth.toFixed(2)} toward ${towardNorth.toFixed(2)}`);
 
+// No popping walking between two lights (SYSTEMS #8's rewrite around
+// Light#illuminationAt, replacing a "nearest N" ranked cutoff): a ranking
+// has to reassign discretely the moment a third light overtakes the second,
+// visible as the shadow suddenly jumping. Weighting every light by its own
+// continuous strength instead means the strongest light's own strength
+// should change smoothly step to step, even as which lights qualify at all
+// changes underneath it (2 lit -> 3 -> 2 again, crossing between the north
+// pavement's evenly-spaced streetlamps).
+const topStrengthAt = async (x, y) => {
+  const sources = await page.evaluate(([px, py]) => window.__dev.shadowSourcesAt(px, py), [x, y]);
+  return sources[0]?.strength ?? 0;
+};
+const walkStrengths = [];
+for (let x = 136; x <= 352; x += 12) {
+  await page.evaluate(([px, py]) => window.__dev.warp(px, py), [x, 380]);
+  await page.waitForTimeout(30);
+  walkStrengths.push(await topStrengthAt(x, 380));
+}
+const maxJump = Math.max(...walkStrengths.slice(1).map((v, i) => Math.abs(v - walkStrengths[i])));
+check('walking between two streetlamps, the dominant light\'s strength changes smoothly (no pop)',
+  maxJump < 0.1, `max step-to-step jump ${maxJump.toFixed(3)} across ${walkStrengths.length} steps`);
+
 await lightAt(21.5);
 await page.evaluate(() => window.__dev.warp(176, 360));
 await page.waitForTimeout(120);
