@@ -25,6 +25,19 @@ export { TILE };
  */
 export const STEP = TILE;
 
+/**
+ * Shared between `mapLoader.js` (which measures a marquee/reader-board
+ * string against these to fail loudly if it overflows its band -- per user
+ * request, "make sure name doesn't overflow the board") and `renderer.js`
+ * (which draws at the same scale/margin it was validated against). Lives
+ * here, not in `renderer.js` itself, so the loader can import it without
+ * pulling in `renderer.js`'s own Phaser-coupled dependencies (atlas.js,
+ * lighting.js) and losing its "pure loader tests need no browser" property.
+ */
+export const MARQUEE_TEXT_SCALE = 2;
+/** Total horizontal margin (both sides combined) kept clear of the text. */
+export const MARQUEE_TEXT_MARGIN = 8;
+
 /** Depth band constants. Everything static and always-behind sits at the floor;
  *  everything always-in-front (roof overhangs, awnings, tree canopy) sits at the
  *  ceiling; the player and the y-sorted world structures share the middle and

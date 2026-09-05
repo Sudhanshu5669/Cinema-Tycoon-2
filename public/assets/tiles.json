@@ -619,12 +619,52 @@
       },
       "rotated": false,
       "trimmed": false
+    },
+    "cinemaDoor": {
+      "frame": {
+        "x": 536,
+        "y": 0,
+        "w": 24,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 48
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "candyStand": {
+      "frame": {
+        "x": 560,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 32
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false
     }
   },
   "meta": {
     "image": "tiles.png",
     "size": {
-      "w": 536,
+      "w": 584,
       "h": 48
     },
     "scale": 1

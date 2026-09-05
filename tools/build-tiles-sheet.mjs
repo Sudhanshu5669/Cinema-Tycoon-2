@@ -47,6 +47,7 @@ const RELIEF_STRENGTH = {
   door: 0.6,
   marquee: 0.5, signTower: 0.6, signCap: 0.6,
   boxOffice: 0.7, posterCase: 0.5,
+  cinemaDoor: 0.6, candyStand: 0.5,
 };
 
 // --- validate + raster -----------------------------------------------------

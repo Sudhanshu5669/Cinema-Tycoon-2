@@ -32,6 +32,8 @@
 // than one mistake at a time and deserves to hear about all of them.
 
 import { TILES_KEY } from './atlas.js';
+import { TILE, MARQUEE_TEXT_SCALE, MARQUEE_TEXT_MARGIN } from './projection.js';
+import { measureWidth } from './font.js';
 
 const LAYER_ROLES = ['ground', 'flat', 'object', 'overhead'];
 
@@ -119,6 +121,25 @@ export function loadCityMap(raw, scene) {
     for (const key of keys) if (r[key] !== undefined && !validTile(r[key])) errs.push(`${label}.${key}: unknown tile "${r[key]}"`);
   };
 
+  /**
+   * A sign string (a marquee's own name, a reader board's text) fits the
+   * pixel width its own band has to show it in, at the fixed scale/margin
+   * the renderer draws it at -- per user request, "make sure name doesn't
+   * overflow the board", checked here, once, before the renderer ever bakes
+   * a pixel, rather than silently clipping or overrunning the sign.
+   * `bandTiles` is the sign's own `fw` (tiles); `undefined`/absent text is
+   * fine (nothing to draw, nothing to overflow).
+   */
+  const checkSignText = (label, text, bandTiles) => {
+    if (text === undefined) return;
+    if (typeof text !== 'string' || !text.length) { errs.push(`${label}: must be a non-empty string, got ${JSON.stringify(text)}`); return; }
+    const avail = bandTiles * TILE - MARQUEE_TEXT_MARGIN;
+    const need = measureWidth(text, MARQUEE_TEXT_SCALE);
+    if (need > avail) {
+      errs.push(`${label}: "${text}" is ${need}px wide, ${avail}px available in a ${bandTiles}-tile band -- shorten it or widen the band`);
+    }
+  };
+
   (raw.platforms ?? []).forEach((p, i) => {
     const label = `platforms[${i}]`;
     checkFootprint(p, label, ['top', 'face']);
@@ -146,6 +167,8 @@ export function loadCityMap(raw, scene) {
       if (b.awning.tile !== undefined && !validTile(b.awning.tile)) {
         errs.push(`${label}.awning.tile: unknown tile "${b.awning.tile}"`);
       }
+      if (b.awning.h !== undefined && !posInt(b.awning.h)) errs.push(`${label}.awning.h must be a positive integer, got ${b.awning.h}`);
+      checkSignText(`${label}.awning.name`, b.awning.name, fw);
     }
     if (b.sign) {
       const { fx, h } = b.sign;
@@ -153,6 +176,15 @@ export function loadCityMap(raw, scene) {
         errs.push(`${label}.sign: fx=${fx} outside the building's own width ${b.w}`);
       }
       if (h !== undefined && !posInt(h)) errs.push(`${label}.sign.h must be a positive integer, got ${h}`);
+    }
+    if (b.readerBoard) {
+      const { fx, fw, h, up } = b.readerBoard;
+      if (!(Number.isInteger(fx) && Number.isInteger(fw) && fw > 0 && fx >= 0 && Number.isInteger(b.w) && fx + fw <= b.w)) {
+        errs.push(`${label}.readerBoard: fx=${fx} fw=${fw} runs past the building's own width ${b.w}`);
+      }
+      if (h !== undefined && !posInt(h)) errs.push(`${label}.readerBoard.h must be a positive integer, got ${h}`);
+      if (up !== undefined && !posInt(up)) errs.push(`${label}.readerBoard.up must be a positive integer, got ${up}`);
+      checkSignText(`${label}.readerBoard.text`, b.readerBoard.text, fw);
     }
   });
 

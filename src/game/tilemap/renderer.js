@@ -26,11 +26,23 @@
 // in projection.js makes every building taller without touching a map.
 
 import {
-  TILE, STEP, DEPTH_GROUND, DEPTH_OVERHEAD, footY, surfaceY,
+  TILE, STEP, DEPTH_GROUND, DEPTH_OVERHEAD, footY, surfaceY, MARQUEE_TEXT_SCALE,
 } from './projection.js';
 import { preloadTiles, tilesReady, bake, frameSize, TILES_KEY } from './atlas.js';
+import { measureWidth, CHAR_H } from './font.js';
 import { ShadowLayer } from './shadows.js';
 import { LightingLayer, wireLight } from '../lighting.js';
+
+// Marquee/reader-board signage colours: the warm bulb-glass family the
+// streetlamp already established (`art/flat/palette.mjs`'s `e`/`E`),
+// duplicated here as a literal hex rather than imported -- `src/` never
+// imports `art/` (Node-only authoring data), see font.js's own note on the
+// same boundary. The reader board's background is a dark neutral, not a
+// second saturated colour: the marquee's own red stays the one accent.
+const MARQUEE_TEXT_COLOR = '#d9c9a3';
+const READER_BG_COLOR = '#201c26';
+const READER_BORDER_COLOR = '#d9c9a3';
+const READER_BORDER = 2;
 
 export class TileMapRenderer {
   static preload(scene) { preloadTiles(scene); }
@@ -276,15 +288,60 @@ export class TileMapRenderer {
     // building that wants to read as a cinema specifically (its own
     // identity, not just "a shopfront") sets it to 'marquee' instead --
     // same footprint and light, a bulb-trimmed canopy tile in its place.
+    // `h` (tiles, default 1) grows the canopy itself downward from the same
+    // top edge, and `name` -- the cinema's own name, player-renameable in a
+    // future system, which is exactly why this draws it from data at
+    // runtime rather than baking a fixed name into the tile art the way
+    // SIGN_TOWER deliberately stays blank -- bakes centred on top of it in
+    // the warm bulb tone, at the fixed scale mapLoader.js already validated
+    // it against so it can never overflow the band it's drawn on.
     if (b.awning) {
-      const awKey = bake(this.scene, b.awning.fw * TILE, TILE, (g) =>
-        g.fill(b.awning.tile ?? 'awning', 0, 0, b.awning.fw * TILE, TILE));
+      const awH = (b.awning.h ?? 1) * TILE;
+      const awW = b.awning.fw * TILE;
+      const awKey = bake(this.scene, awW, awH, (g) => {
+        g.fill(b.awning.tile ?? 'awning', 0, 0, awW, awH);
+        if (b.awning.name) {
+          const tw = measureWidth(b.awning.name, MARQUEE_TEXT_SCALE);
+          const th = CHAR_H * MARQUEE_TEXT_SCALE;
+          g.text(b.awning.name, (awW - tw) / 2, (awH - th) / 2, MARQUEE_TEXT_SCALE, MARQUEE_TEXT_COLOR);
+        }
+      });
       const awY = frontY - (b.awning.up ?? 3) * TILE;
       this._place(awKey, (b.x + b.awning.fx) * TILE, awY, DEPTH_OVERHEAD);
       this._lights.push({
-        x: (b.x + b.awning.fx) * TILE + (b.awning.fw * TILE) / 2,
-        y: awY + TILE / 2,
-        gx: (b.x + b.awning.fx) * TILE + (b.awning.fw * TILE) / 2, gy: frontY,
+        x: (b.x + b.awning.fx) * TILE + awW / 2,
+        y: awY + awH / 2,
+        gx: (b.x + b.awning.fx) * TILE + awW / 2, gy: frontY,
+        kind: 'marquee',
+      });
+    }
+
+    // A horizontal reader board -- "NOW SHOWING" and (eventually, once
+    // SYSTEMS #18's film-booking system exists to drive it) whatever's
+    // actually playing. A flat bordered panel, not an authored tile: signage
+    // whose whole point is data-driven text has no business being repeating
+    // atlas art (see atlas.js's `rect`/`text`, added for exactly this).
+    // Positioned like the awning (`fx` tiles from the left) but anchored by
+    // the top edge (`up` tiles above the pavement, default flush with the
+    // roofline) since it mounts higher up the face, not at door height.
+    if (b.readerBoard) {
+      const rb = b.readerBoard;
+      const rbW = rb.fw * TILE, rbH = (rb.h ?? 2) * STEP;
+      const rbKey = bake(this.scene, rbW, rbH, (g) => {
+        g.rect(READER_BORDER_COLOR, 0, 0, rbW, rbH);
+        g.rect(READER_BG_COLOR, READER_BORDER, READER_BORDER, rbW - READER_BORDER * 2, rbH - READER_BORDER * 2);
+        if (rb.text) {
+          const tw = measureWidth(rb.text, MARQUEE_TEXT_SCALE);
+          const th = CHAR_H * MARQUEE_TEXT_SCALE;
+          g.text(rb.text, (rbW - tw) / 2, (rbH - th) / 2, MARQUEE_TEXT_SCALE, MARQUEE_TEXT_COLOR);
+        }
+      });
+      const rbTop = frontY - (rb.up ?? storeys) * TILE;
+      this._place(rbKey, (b.x + rb.fx) * TILE, rbTop, DEPTH_OVERHEAD);
+      this._lights.push({
+        x: (b.x + rb.fx) * TILE + rbW / 2,
+        y: rbTop + rbH / 2,
+        gx: (b.x + rb.fx) * TILE + rbW / 2, gy: frontY,
         kind: 'marquee',
       });
     }

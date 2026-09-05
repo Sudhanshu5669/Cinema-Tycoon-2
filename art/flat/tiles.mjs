@@ -706,6 +706,69 @@ export const DOOR = [
 ];
 
 /**
+ * DOOR, recoloured -- per user reference ("make the cinema look kinda like
+ * this", a red double-doored theatre entrance), not a reshape. Every `d`/`D`
+ * (the generic residential door's wood-brown) becomes `v`/`V`, the marquee's
+ * own accent, reused rather than adding a colour a door has no business
+ * introducing on its own; DOOR's existing central mullion (`X`, originally
+ * just a sash bar down the middle of the glass) now doubles for free as the
+ * seam between two theatre-door leaves once it's this colour, so the
+ * geometry needed no changes at all to read as a double door. Same 24x48
+ * footprint as DOOR -- a straight swap in a building's own `facade` entry,
+ * nothing about placement or the loader's validation changes.
+ */
+export const CINEMA_DOOR = [
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.xvvvvvvvvvvvvvvvvvvvVx.',
+  '.xvvvvvvvvvvvvvvvvvvvVx.',
+  '.xvvvvvvvvvvvvvvvvvvvVx.',
+  '.xvIIIIIIIIIXiiiiiiiiVx.',
+  '.xvIIIIIIIIIXiiiiiiiiVx.',
+  '.xvIIIIIIIIIXiiiiiiiiVx.',
+  '.xvIIIIIIIIIXiiiiiiiiVx.',
+  '.xvIIIIIIIIIXiiiiiiiiVx.',
+  '.xvIIIIIIIIIXiiiiiiiiVx.',
+  '.xvIIIIIIIIIXiiiiiiiiVx.',
+  '.xvIIIIIIIIIXiiiiiiiiVx.',
+  '.xvIIIIIIIIIXiiiiiiiiVx.',
+  '.xviiiiiiiiiXiiiiiiiiVx.',
+  '.xviiiiiiiiiXiiiiiiiiVx.',
+  '.xviiiiiiiiiXiiiiiiiiVx.',
+  '.xviiiiiiiiiXiiiiiiiiVx.',
+  '.xviiiiiiiiiXiiiiiiiiVx.',
+  '.xviiiiiiiiiXiiiiiiiiVx.',
+  '.xviiiiiiiiiXiiiiiiiiVx.',
+  '.xviiiiiiiiiXiiiiiiiiVx.',
+  '.xviiiiiiiiiXiiiiiiiiVx.',
+  '.xviiiiiiiiiXiiiiiiiiVx.',
+  '.xvvvvvvvvvvvvvvvvvvvVx.',
+  '.xvvvvvvvvvvvvvvvvvvvVx.',
+  '.xvvvvvvvvvvvvvvvvvvkVx.',
+  '.xvvvvvvvvvvvvvvvvvvkVx.',
+  '.xvvvvvvvvvvvvvvvvvvvVx.',
+  '.xvvvvvvvvvvvvvvvvvvvVx.',
+  '.xvVVVVVVVVVVVVVVVVVVVx.',
+  '.xvVvvvvvvvvvvvvvvvvVVx.',
+  '.xvVvvvvvvvvvvvvvvvvVVx.',
+  '.xvVvvvvvvvvvvvvvvvvVVx.',
+  '.xvVvvvvvvvvvvvvvvvvVVx.',
+  '.xvVvvvvvvvvvvvvvvvvVVx.',
+  '.xvVvvvvvvvvvvvvvvvvVVx.',
+  '.xvVvvvvvvvvvvvvvvvvVVx.',
+  '.xvVvvvvvvvvvvvvvvvvVVx.',
+  '.xvVvvvvvvvvvvvvvvvvVVx.',
+  '.xvVvvvvvvvvvvvvvvvvVVx.',
+  '.xvVvvvvvvvvvvvvvvvvVVx.',
+  '.xvVvvvvvvvvvvvvvvvvVVx.',
+  '.xvVVVVVVVVVVVVVVVVVVVx.',
+  '.xvvvvvvvvvvvvvvvvvvvVx.',
+  '.xvvvvvvvvvvvvvvvvvvvVx.',
+  '.TTTTTTTTTTTTTTTTTTTTTT.',
+  '.TTTTTTTTTTTTTTTTTTTTTT.',
+];
+
+/**
  * 24 x 32 -- a ticket booth window, sized like WINDOW (same width, same
  * "placed once at a pixel offset" FEATURE rules) but its own thing entirely:
  * per user request, "make different types of tiles for the entry" of a
@@ -805,6 +868,52 @@ export const POSTER_CASE = [
   '.xdddddddddddDx.',
   '.xdddddddddddDx.',
   '.DDDDDDDDDDDDDD.',
+];
+
+/**
+ * 24 x 32 -- a concession stand: a candy-stripe hood (the awning's own
+ * `v`/`s` pattern, reused rather than a new colour, since the reference this
+ * whole entrance pass is matching shows exactly that stripe on its own
+ * snack counter) over a display window holding two muted product blobs
+ * (`j`/`J`, the poster paper's tones doing service a second time as a
+ * candy-jar silhouette rather than adding a saturated colour a snack stand
+ * has no real claim to over the marquee). Same base/sill family as
+ * BOX_OFFICE for visual consistency between the two kiosks flanking the
+ * same door.
+ */
+export const CANDY_STAND = [
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.xvvvvssssvvvvssssvvvvx.',
+  '.xvvvvssssvvvvssssvvvvx.',
+  '.xvvvvssssvvvvssssvvvvx.',
+  '.XXXXXXXXXXXXXXXXXXXXXX.',
+  '.xiiiiiiiiiiiiiiiiiiiix.',
+  '.xiiijjjjjiiiijjjjjiiix.',
+  '.xiiijjjjjiiiijjjjjiiix.',
+  '.xiiiJJJJJiiiiJJJJJiiix.',
+  '.xiiiiiiiiiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiiiiiix.',
+  '.xiiiiiiiiiiiiiiiiiiiix.',
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.XXXXXXXXXXXXXXXXXXXXXX.',
+  'llllllllllllllllllllllll',
+  '.LLLLLLLLLLLLLLLLLLLLLL.',
+  '.xdddddddddkdddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.XXXXXXXXXXXXXXXXXXXXXX.',
 ];
 
 /** Shopfront awning. Same red as the character's accent — it is the colour
@@ -991,4 +1100,5 @@ export const TILES = {
 export const FEATURES = {
   window: WINDOW, windowWide: WINDOW_WIDE, door: DOOR, lampPost: LAMP_POST,
   boxOffice: BOX_OFFICE, posterCase: POSTER_CASE,
+  cinemaDoor: CINEMA_DOOR, candyStand: CANDY_STAND,
 };

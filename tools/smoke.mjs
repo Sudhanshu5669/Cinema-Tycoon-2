@@ -442,6 +442,20 @@ check('an out-of-bounds building fails loudly, naming the entry',
   badBoundsErr instanceof CityMapError && /buildings\[0\]/.test(badBoundsErr.message),
   badBoundsErr?.message.split('\n')[1]);
 
+// Per user request, "make sure name doesn't overflow the board": a marquee
+// name too wide for its own awning band fails loudly at load time, the same
+// as every other hand-edited field here -- never a silent clip or overrun
+// once the renderer actually bakes it.
+let badNameErr = null;
+try {
+  loadCityMap({ w: 4, h: 3, buildings: [{
+    x: 0, y: 0, w: 4, h: 1, awning: { fx: 0, fw: 2, name: 'WAY TOO LONG A NAME FOR THIS' },
+  }] });
+} catch (e) { badNameErr = e; }
+check('a marquee name that overflows its band fails loudly, naming the entry',
+  badNameErr instanceof CityMapError && /buildings\[0\]\.awning\.name/.test(badNameErr.message),
+  badNameErr?.message.split('\n')[1]);
+
 // In the browser: an unknown tile name is only catchable against the atlas
 // actually loaded, so this half needs a live scene.
 const badTileErr = await page.evaluate(() => {

@@ -78,14 +78,14 @@
       "x": 38, "y": 13, "w": 24, "h": 5, "storeys": 6, "roofDepth": 4,
       "face": "brick", "base": "brick", "top": "roof",
       "facade": [
-        { "tile": "door", "fx": 12, "fy": 0 },
+        { "tile": "cinemaDoor", "fx": 12, "fy": 0 },
         { "tile": "boxOffice", "fx": 8, "fy": 0 }, { "tile": "posterCase", "fx": 10, "fy": 0 }, { "tile": "posterCase", "fx": 14, "fy": 0 },
+        { "tile": "candyStand", "fx": 17, "fy": 0 },
         { "tile": "window", "fx": 0, "fy": 1 }, { "tile": "window", "fx": 3, "fy": 1 }, { "tile": "window", "fx": 6, "fy": 1 },
-        { "tile": "windowWide", "fx": 15, "fy": 1 }, { "tile": "window", "fx": 18, "fy": 1 }, { "tile": "window", "fx": 21, "fy": 1 },
-        { "tile": "window", "fx": 0, "fy": 4 }, { "tile": "window", "fx": 4, "fy": 4 }, { "tile": "window", "fx": 8, "fy": 4 },
-        { "tile": "window", "fx": 12, "fy": 4 }, { "tile": "window", "fx": 16, "fy": 4 }, { "tile": "window", "fx": 20, "fy": 4 }
+        { "tile": "windowWide", "fx": 15, "fy": 1 }, { "tile": "window", "fx": 21, "fy": 1 }
       ],
-      "awning": { "fx": 5, "fw": 16, "up": 3, "tile": "marquee" },
+      "awning": { "fx": 5, "fw": 16, "up": 4, "h": 2, "tile": "marquee", "name": "PIXEL CINEMA" },
+      "readerBoard": { "fx": 5, "fw": 16, "h": 2, "up": 6, "text": "NOW SHOWING" },
       "sign": { "fx": 20, "h": 3 }
     },
     {

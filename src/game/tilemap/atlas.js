@@ -8,8 +8,16 @@
 // milliseconds and the result is one static texture with no per-frame cost.
 
 import { TILE } from './projection.js';
+import { drawText } from './font.js';
 
 export const TILES_KEY = 'tiles';
+
+/** The flat-facing-camera normal Phaser's own default `__NORMAL` texture is
+ *  -- what "no relief" looks like to the Light2D shader. Used to seed a
+ *  bake's normal canvas so a procedural fill/text draw (which paints only
+ *  the diffuse layer, see `rect`/`text` below) reads as ordinary flat colour
+ *  instead of the shader sampling whatever that canvas defaulted to. */
+const FLAT_NORMAL = 'rgb(128,128,255)';
 
 let bakeSeq = 0;
 
@@ -43,7 +51,16 @@ export function frameSize(scene, name) {
  * Bake a w x h canvas texture. `paint` is called with a small painter:
  *   p.tile(name, dx, dy)              one frame at a pixel offset
  *   p.fill(name, x0, y0, w, h)        tile a frame across a rect (clipped)
+ *   p.rect(color, x0, y0, w, h)       a flat filled rect, no atlas frame
+ *   p.text(str, x0, y0, scale, color) baked, data-driven signage (font.js)
  * Returns a unique texture key; add it with scene.add.image(x, y, key).
+ *
+ * `rect`/`text` are for signage that has no business being authored as a
+ * repeating atlas tile -- a sign's solid backing panel, or a name nobody
+ * drew in advance because it comes from data (a cinema's own marquee text,
+ * SYSTEMS #6's sixth follow-up). They only ever paint the diffuse canvas;
+ * see `FLAT_NORMAL` below for why that is safe rather than a second
+ * "no normal map" bug like the one this whole function exists to fix.
  *
  * Compositing many tiles into one flat canvas is exactly what would normally
  * throw away every one of their normal maps: the result is a brand new
@@ -71,6 +88,13 @@ export function bake(scene, w, h, paint) {
     ncanvas.width = canvas.width;
     ncanvas.height = canvas.height;
     nctx = ncanvas.getContext('2d');
+    // Seed flat before anything is painted: every *existing* caller fills its
+    // whole rect via tile()/fill() in lockstep anyway, so this changes
+    // nothing for them, but rect()/text() below only ever touch the diffuse
+    // canvas -- without this, their opaque pixels would carry whatever this
+    // canvas defaults to (transparent black) as their "normal", not flat.
+    nctx.fillStyle = FLAT_NORMAL;
+    nctx.fillRect(0, 0, ncanvas.width, ncanvas.height);
   }
 
   const draw = (name, dx, dy) => {
@@ -89,6 +113,13 @@ export function bake(scene, w, h, paint) {
       for (let y = 0; y < rh; y += f.cutHeight) {
         for (let x = 0; x < rw; x += f.cutWidth) draw(name, x0 + x, y0 + y);
       }
+    },
+    rect(color, x0, y0, rw, rh) {
+      ctx.fillStyle = color;
+      ctx.fillRect(Math.round(x0), Math.round(y0), Math.round(rw), Math.round(rh));
+    },
+    text(str, x0, y0, scale, color) {
+      drawText(ctx, str, x0, y0, scale, color);
     },
   });
   canvas.refresh();
