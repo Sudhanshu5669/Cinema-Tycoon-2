@@ -17,11 +17,14 @@ import { Input, KeyboardSource, VirtualStickSource, isTouchDevice } from '../cor
 import { Player, registerAnimations, TEXTURE } from '../game/player.js';
 import { FollowCamera } from '../game/camera.js';
 import { TileMapRenderer } from '../game/tilemap/renderer.js';
-import { DEV_MAP } from '../game/tilemap/devmap.js';
+import { loadCityMap } from '../game/tilemap/mapLoader.js';
 import { clockLabel } from '../game/tilemap/sun.js';
 
 const WORLD_W = INTERNAL_W * 3;
 const WORLD_H = INTERNAL_H * 3;
+/** SYSTEMS #9: the city is a hand-editable JSON file, loaded like any other
+ *  asset -- never a code change to add a building or move a streetlamp. */
+const CITY_KEY = 'city';
 
 /** Where the dev day starts: late afternoon, a long shadow to the east that
  *  agrees with the west-lit flat tiles. `__dev.setTime` / `__dev.autoTime`
@@ -39,11 +42,15 @@ export class DevScene extends Phaser.Scene {
       frameHeight: 48,
     });
     TileMapRenderer.preload(this);
+    this.load.json(CITY_KEY, 'assets/city.json');
   }
 
   create() {
     this.cameras.main.setBackgroundColor('#1b1b22');
-    this.map = new TileMapRenderer(this, DEV_MAP).build();
+    // Bad data fails loudly here, at boot, naming the offending entry --
+    // never silently three files deep inside the renderer.
+    const cityMap = loadCityMap(this.cache.json.get(CITY_KEY), this);
+    this.map = new TileMapRenderer(this, cityMap).build();
     this.hours = START_HOUR;
     this.autoTime = false;
     this.map.setHours(this.hours);
@@ -130,6 +137,18 @@ export class DevScene extends Phaser.Scene {
         ambientColor: this.map.lighting?.ambientColor ?? 0xffffff,
         windowGlow: this._lightIntensity('window'),
         marqueeGlow: this._lightIntensity('marquee'),
+        streetlampGlow: this._lightIntensity('streetlamp'),
+        // Total light points defined across the whole map vs. how many are
+        // actually active in the shader for the current camera view --
+        // SYSTEMS #8's maxLights cap culls to the nearest, so these two
+        // numbers diverge the moment a map out-grows one screen of lights.
+        totalLights: this.map.lighting?.points.length ?? 0,
+        // Identities (not just a count) of the lights the shader is actually
+        // using this frame, so the smoke test can show the *set* changes with
+        // the camera, not only how many are in it. getLights returns
+        // { light, distance } wrappers, not the Light itself.
+        activeLightKeys: this.map.lighting?.active
+          ? this.lights.getLights(this.cameras.main).map((v) => `${v.light.x},${v.light.y}`).sort() : [],
       }),
       probe: (x, y) => ({
         height: this.map.heightAt(x, y),
@@ -142,6 +161,9 @@ export class DevScene extends Phaser.Scene {
         this.map.setHours(this.hours);
       },
       autoTime: (on) => { this.autoTime = on !== false; },
+      // SYSTEMS #9. Validating a tile name needs the live atlas, so this half
+      // of the loader's validation is only exercisable through a real scene.
+      loadCityMap: (raw) => loadCityMap(raw, this),
     };
   }
 

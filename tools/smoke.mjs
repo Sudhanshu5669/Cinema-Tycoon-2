@@ -13,6 +13,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
 import { shadowFor, ambientFor, glowFor } from '../src/game/tilemap/sun.js';
+import { loadCityMap, CityMapError } from '../src/game/tilemap/mapLoader.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const OUT = path.join(ROOT, 'review/smoke');
@@ -254,6 +255,70 @@ await lightAt(21.5);
 await page.evaluate(() => window.__dev.warp(176, 360));
 await page.waitForTimeout(120);
 await page.screenshot({ path: path.join(OUT, 'tiles-lighting-night.png') });
+
+// --- city data schema + loader (SYSTEMS #9) ---------------------------------
+// Pure model first, no browser: a hand-editable JSON map (bands/stripes/cells
+// sugar, same idea as public/assets/city.json) expands into the full-grid
+// shape TileMapRenderer wants, and bad data fails loudly and specifically --
+// the same discipline tools/flat.mjs's validateGrid holds sprite art to.
+const tinyRaw = {
+  w: 4, h: 3,
+  ground: { default: 'road', bands: [{ y0: 1, y1: 1, tile: 'pave' }], cells: [{ x: 2, y: 2, tile: 'kerb' }] },
+  flat: { stripes: [{ y: 0, tile: 'roadLine', step: 2 }] },
+  buildings: [{ x: 0, y: 0, w: 2, h: 1, storeys: 3 }],
+};
+const tiny = loadCityMap(tinyRaw); // no scene -- tile names unchecked, structure still validated
+const groundData = tiny.layers.find((l) => l.role === 'ground').data;
+const flatData = tiny.layers.find((l) => l.role === 'flat').data;
+check('loader expands a band across its full row range',
+  groundData[1].every((t) => t === 'pave'), groundData[1].join(','));
+check('loader applies a sparse cell on top of the band/default fill',
+  groundData[2][2] === 'kerb' && groundData[0][0] === 'road');
+check('loader expands a stripe at its step, leaving the gaps null',
+  flatData[0][0] === 'roadLine' && flatData[0][1] === null && flatData[0][2] === 'roadLine');
+check('loader passes buildings through', tiny.buildings.length === 1 && tiny.buildings[0].storeys === 3);
+
+let badBoundsErr = null;
+try { loadCityMap({ w: 4, h: 3, buildings: [{ x: 3, y: 0, w: 2, h: 1 }] }); }
+catch (e) { badBoundsErr = e; }
+check('an out-of-bounds building fails loudly, naming the entry',
+  badBoundsErr instanceof CityMapError && /buildings\[0\]/.test(badBoundsErr.message),
+  badBoundsErr?.message.split('\n')[1]);
+
+// In the browser: an unknown tile name is only catchable against the atlas
+// actually loaded, so this half needs a live scene.
+const badTileErr = await page.evaluate(() => {
+  try { window.__dev.loadCityMap({ w: 2, h: 2, ground: { default: 'not-a-real-tile' } }); return null; }
+  catch (e) { return e.message; }
+});
+check('an unknown tile name fails loudly against the live atlas',
+  badTileErr && /not-a-real-tile/.test(badTileErr), badTileErr?.split('\n')[1]);
+
+// The live city itself: SYSTEMS #8's shader is deliberately given more total
+// light sources (every window, the marquee, every streetlamp) than fit in one
+// screen at once, to actually show its limit rather than assert it never gets
+// hit. maxLights caps the shader's per-frame cost, not how large a city can
+// be: LightsManager culls to the nearest `maxLights` lights to the *camera*
+// every frame, so which lights are lit is a function of where you're
+// standing, not a global count.
+const cityLightsAt = async (x, y) => {
+  await page.evaluate(([wx, wy]) => window.__dev.warp(wx, wy), [x, y]);
+  await page.waitForTimeout(150);
+  return page.evaluate(() => window.__dev.tiles());
+};
+const [westEnd, eastEnd] = [await cityLightsAt(80, 400), await cityLightsAt(1800, 400)];
+check('the city defines far more lights than fit on one screen',
+  westEnd.totalLights > 40, `totalLights ${westEnd.totalLights}`);
+check('the shader still only lights the nearest maxLights of them',
+  westEnd.activeLightKeys.length <= 16 && eastEnd.activeLightKeys.length <= 16,
+  `west ${westEnd.activeLightKeys.length} east ${eastEnd.activeLightKeys.length}`);
+check('which lights are active is a function of the camera, not a fixed list',
+  westEnd.activeLightKeys.every((k) => !eastEnd.activeLightKeys.includes(k)),
+  `${westEnd.activeLightKeys.length} lit at the west end share none of the ${eastEnd.activeLightKeys.length} lit 1720px away at the east end`);
+await cityLightsAt(80, 400);
+await page.screenshot({ path: path.join(OUT, 'city-lights-west.png') });
+await cityLightsAt(1800, 400);
+await page.screenshot({ path: path.join(OUT, 'city-lights-east.png') });
 
 await page.evaluate(() => window.__dev.setTime(15));
 await page.waitForTimeout(150);

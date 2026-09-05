@@ -1,14 +1,15 @@
 // Tile renderer -- SYSTEMS #6.
 //
-// Consumes a data map (see devmap.js for the shape and the reasoning behind it)
-// and builds a set of static Phaser objects, each given a depth so the player
-// sorts correctly against it. Nothing here runs per frame; only the player's
-// depth changes as it moves, and the player owns that.
+// Consumes a data map -- SYSTEMS #9's mapLoader.js expands the hand-editable
+// city JSON (public/assets/city.json) into exactly this shape -- and builds a
+// set of static Phaser objects, each given a depth so the player sorts
+// correctly against it. Nothing here runs per frame; only the player's depth
+// changes as it moves, and the player owns that.
 //
-// The map has three ingredients:
+// The map has four ingredients:
 //   height   an integer elevation per cell -- the solid terrain. 0 is street
 //            level. Buildings and platforms stamp their footprint into it so
-//            faces and (later) collision agree on where the solid stuff is.
+//            faces and collision (#7) agree on where the solid stuff is.
 //   layers   ordered tile grids with a role: 'ground' and 'flat' are the street
 //            surface (always behind everything, baked into one image); 'object'
 //            is a y-sorted footprint prop; 'overhead' always draws over entities.
@@ -17,6 +18,8 @@
 //            building is a tall step whose face is a composed storeyed wall
 //            (cornice, wall, ground-floor material, plinth) with windows and a
 //            door placed on it -- an oblique face rather than a flat facade.
+//   streetlamps
+//            point-placed props (SYSTEMS #8) -- see _buildStreetlamp.
 //
 // Faces project straight down the screen (south only) -- no horizontal skew --
 // so the projection stays compatible with a four-facing character. Raising STEP
@@ -89,6 +92,7 @@ export class TileMapRenderer {
     this._buildGround();
     for (const p of this.map.platforms ?? []) this._buildPlatform(p);
     for (const b of this.map.buildings ?? []) this._buildBuilding(b);
+    for (const s of this.map.streetlamps ?? []) this._buildStreetlamp(s);
     this._buildLoose();
     this.shadows = new ShadowLayer(
       this.scene, this._casters, this._surfaces, this.pixelWidth, this.pixelHeight,
@@ -243,6 +247,39 @@ export class TileMapRenderer {
 
     this.structures.push({ kind: 'building', worldRect: worldRect(b), storeys,
       roofDepth: frontY, faceDepth: frontY, faceTop: faceTop - roofH });
+  }
+
+  /**
+   * A streetlamp: `{ x, y }` tile coords of its base. Point-placed sugar like
+   * a platform or building, not a per-cell layer tile, since its image is
+   * taller than one tile and its ground contact is what depth-sorts it.
+   * Registers a caster (so it throws a raking shadow like anything else
+   * raised) and a `streetlamp` light point at the bulb -- SYSTEMS #8.
+   */
+  _buildStreetlamp(p) {
+    const size = frameSize(this.scene, 'lampPost');
+    const baseY = footY(p.y);
+    const img = this.scene.add
+      .image(p.x * TILE + TILE / 2, baseY, TILES_KEY, 'lampPost')
+      .setOrigin(0.5, 1);
+    img.setDepth(baseY);
+    wireLight(img);
+    this.objects.push(img);
+
+    this._casters.push({
+      rect: { x: p.x * TILE, y: p.y * TILE, w: TILE, h: TILE },
+      heightPx: size.h,
+    });
+
+    // Bulb centre within the feature image, top-down. Mirrors LAMP_BULB_DY in
+    // art/flat/tiles.mjs -- not imported directly, since runtime code only
+    // ever consults the baked atlas, never the raw ASCII art (see atlas.js).
+    const LAMP_BULB_DY = 6;
+    this._lights.push({
+      x: p.x * TILE + TILE / 2,
+      y: baseY - size.h + LAMP_BULB_DY,
+      kind: 'streetlamp',
+    });
   }
 
   /** 'object' and 'overhead' layers: one image per cell. */

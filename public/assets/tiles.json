@@ -359,12 +359,32 @@
       },
       "rotated": false,
       "trimmed": false
+    },
+    "lampPost": {
+      "frame": {
+        "x": 288,
+        "y": 0,
+        "w": 16,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 48
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false
     }
   },
   "meta": {
     "image": "tiles.png",
     "size": {
-      "w": 288,
+      "w": 304,
       "h": 48
     },
     "scale": 1

@@ -139,6 +139,9 @@ const GLOW_CURVES = {
   // "one saturated accent per character" rule), on its own timer -- switched
   // on earlier than residents turn their lights on, brighter once lit.
   marquee: { from: DUSK - 2, to: DAWN, color: 0xff4d6d, intensity: 1.7 },
+  // Streetlamps: on a photocell, not a resident's hand -- a sharper, earlier
+  // on/off than windows and the palest colour of the three light kinds.
+  streetlamp: { from: DUSK - 1, to: DAWN + 0.25, color: 0xfff0c0, intensity: 1.3 },
 };
 
 /**

@@ -28,7 +28,7 @@ const { LIGHT_PIPELINE } = Phaser.Renderer.WebGL.Pipelines;
 
 /** Falloff radius per light kind, in world px. Not hour-dependent, so it
  *  lives here rather than in sun.js's time-of-day curves. */
-const RADIUS = { window: 56, marquee: 100 };
+const RADIUS = { window: 56, marquee: 100, streetlamp: 76 };
 
 /**
  * Opts one drawable into the lighting shader. Safe to call unconditionally --

@@ -447,6 +447,67 @@ export const AWNING = [
   '................',
 ];
 
+/**
+ * 16 x 48 — three tiles, a streetlamp standing at street height. Its glass is
+ * baked warm-pale rather than the windows' cold blue: at runtime this is a
+ * light *source* (SYSTEMS #8 registers a Light at its bulb), so the tile only
+ * has to look right unlit, in daylight, when the shader adds nothing.
+ * `LAMP_BULB_DY` is the bulb's centre, in px down from the top of this image
+ * — the renderer's hook for placing that light without re-deriving it from
+ * the art by eye.
+ */
+export const LAMP_BULB_DY = 6;
+export const LAMP_POST = [
+  '......EEEE......',
+  '......EEEE......',
+  '......EEEE......',
+  '......eeee......',
+  '......eeee......',
+  '......eeee......',
+  '......eeee......',
+  '......eeee......',
+  '......eeee......',
+  '......eeee......',
+  '.......EE.......',
+  '.......EE.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+  '.......hH.......',
+];
+
 /** Draw order is the map's business, not the tile's — these are just names. */
 export const TILES = {
   road: ROAD, roadLine: ROAD_LINE, pave: PAVE, paveCrack: PAVE_CRACK,
@@ -458,4 +519,4 @@ export const TILES = {
 };
 
 /** Multi-tile. Each is a whole number of tiles and slices cleanly. */
-export const FEATURES = { window: WINDOW, door: DOOR };
+export const FEATURES = { window: WINDOW, door: DOOR, lampPost: LAMP_POST };

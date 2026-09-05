@@ -115,4 +115,12 @@ export const TILE_PALETTE = {
   T: '#3d3946',
   u: '#3e3a47', // plinth, on the shaded return
   U: '#332f3b',
+
+  // Streetlamp. Warm cream glass, not the windows' cold blue -- it's the
+  // shader's job to actually light it at night, this is just what the glass
+  // looks like unlit, in daylight.
+  h: '#4a4650', // pole, lit side
+  H: '#38343d', // pole, shaded side
+  e: '#d9c9a3', // bulb glass
+  E: '#2f2b33', // cap and bracket, dark metal
 };
