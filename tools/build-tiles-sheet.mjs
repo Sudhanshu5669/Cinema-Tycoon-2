@@ -53,8 +53,15 @@ const frames = [];
 for (const [name, grid] of Object.entries({ ...TILES, ...FEATURES })) {
   const h = grid.length;
   const w = grid[0]?.length ?? 0;
-  if (h % TH !== 0) errs.push(`${name}: ${h} rows, not a whole number of ${TH}px tiles`);
-  if (w % TW !== 0) errs.push(`${name}: ${w} cols, not a whole number of ${TW}px tiles`);
+  // Whole-tile sizing is a real constraint for TILES -- they repeat-tile via
+  // atlas.js's fill(), which walks a rect in TW/TH steps -- but not for
+  // FEATURES: a window or door is placed once at an arbitrary pixel offset
+  // (g.tile(), never fill()), so its own width/height only has to be
+  // whatever the art calls for (WINDOW is 24px wide, not a multiple of 16).
+  if (name in TILES) {
+    if (h % TH !== 0) errs.push(`${name}: ${h} rows, not a whole number of ${TH}px tiles`);
+    if (w % TW !== 0) errs.push(`${name}: ${w} cols, not a whole number of ${TW}px tiles`);
+  }
   errs.push(...validateGrid(name, grid, w, h, TILE_PALETTE));
   frames.push({
     name, w, h,

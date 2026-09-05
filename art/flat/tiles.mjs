@@ -403,8 +403,12 @@ export const BELT_COURSE = [
 // 16x16 cells; they are authored whole so the proportion is judged whole.
 
 /**
- * 32 x 32 — two tiles wide, two tall. Glass catches cold sky in its upper
- * left, which is the only "light" in the whole set allowed to look like a
+ * 24 x 32 -- not a whole number of 16px tiles wide, which is fine: unlike
+ * TILES, a FEATURE is placed once at an arbitrary pixel offset (atlas.js's
+ * `tile()`, never the repeat-tiling `fill()`), so nothing requires its width
+ * to divide TILE evenly -- see build-tiles-sheet.mjs's validation, which
+ * only enforces that for TILES. Glass catches cold sky in its upper left,
+ * which is the only "light" in the whole set allowed to look like a
  * reflection. The sill in the last two rows reuses the cornice's own
  * lip/shadow tones (`l`/`L`) — it is the same idea in miniature, a
  * light-catching ledge with a hard shadow under it — rather than inventing a
@@ -412,68 +416,69 @@ export const BELT_COURSE = [
  * reads as sitting proud of the wall instead of just being a darker row of
  * the frame itself.
  *
- * Widened twice on user review. First 12px -> 14px of a single 16px tile
- * ("too thin, doesn't look like a window") by shrinking the margin and
+ * Widened three times on user review. First 12px -> 14px of a single 16px
+ * tile ("too thin, doesn't look like a window") by shrinking the margin and
  * growing the actual glazed area, not just the frame -- a wider border alone
  * was tried and discarded for reading as a fatter frame around the same tiny
- * panes. Then, **second follow-up**, "at least 24px so they look wide enough
- * for players to pass through": the player sprite itself is 16px wide
- * (`SPRITE_W`), so a window/door opening narrower than that always reads as
- * a squeeze no matter how it's shaded. 24px isn't a multiple of the 16px
- * tile grid every other tile answers to, so the grid-aligned target is 32px
- * (two tiles) -- comfortably past the character's own width, not just
- * past it. Every run grew proportionally to reach it (a one-off generation
- * script, not hand-redrawn -- the same "generated once, then locked in as
- * authored art" approach ROOF's own speckle uses) except runs of 1-2px,
- * which stayed exactly their authored width: the mullion (`X`) is still a
- * single pixel, because a sash bar doesn't get thicker just because the
- * window did.
+ * panes. Then, on "at least 24px so they look wide enough for players to
+ * pass through" (the player sprite is 16px wide, `SPRITE_W`, so anything
+ * narrower always read as a squeeze), a first pass jumped straight to 32px,
+ * reasoning 24 wasn't a multiple of the tile grid so the grid-aligned target
+ * was two whole tiles -- overshooting what was actually asked for, and the
+ * user caught it: "32 is too wide... I feel 24 was perfect." The tile-grid
+ * reasoning was true but beside the point -- nothing about a FEATURE's own
+ * width has to respect that grid, only where it's *placed* does (see the top
+ * of this comment). 24px it is. Every run grew proportionally to reach
+ * whichever width was current (a one-off generation script, not
+ * hand-redrawn -- the same "generated once, then locked in as authored art"
+ * approach ROOF's own speckle uses) except runs of 1-2px, which stayed
+ * exactly their authored width: the mullion (`X`) is still a single pixel,
+ * because a sash bar doesn't get thicker just because the window did.
  */
 export const WINDOW = [
-  '.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.',
-  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
-  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
-  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
-  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
-  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
-  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
-  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
-  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
-  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
-  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
-  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
-  '.xIIIIIIIIIIIIIIIXiiiiiiiiiiiix.',
-  '.xXXXXXXXXXXXXXXXXXXXXXXXXXXXXx.',
-  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiXiiiiiiiiiiiix.',
-  '.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.',
-  '.XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX.',
-  'llllllllllllllllllllllllllllllll',
-  '.LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL.',
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.xIIIIIIIIIIXiiiiiiiiix.',
+  '.xIIIIIIIIIIXiiiiiiiiix.',
+  '.xIIIIIIIIIIXiiiiiiiiix.',
+  '.xIIIIIIIIIIXiiiiiiiiix.',
+  '.xIIIIIIIIIIXiiiiiiiiix.',
+  '.xIIIIIIIIIIXiiiiiiiiix.',
+  '.xIIIIIIIIIIXiiiiiiiiix.',
+  '.xIIIIIIIIIIXiiiiiiiiix.',
+  '.xIIIIIIIIIIXiiiiiiiiix.',
+  '.xIIIIIIIIIIXiiiiiiiiix.',
+  '.xIIIIIIIIIIXiiiiiiiiix.',
+  '.xIIIIIIIIIIXiiiiiiiiix.',
+  '.xXXXXXXXXXXXXXXXXXXXXx.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.XXXXXXXXXXXXXXXXXXXXXX.',
+  'llllllllllllllllllllllll',
+  '.LLLLLLLLLLLLLLLLLLLLLL.',
 ];
 
 /**
  * 32 x 32 — two tiles wide, two tall: a shopfront window, for a ground floor
  * that wants to look like it does business rather than just has a facade.
- * Originally added bigger than WINDOW; a later pass widened WINDOW itself to
- * the same 32px, so the two are now the same size and differ only in how
- * they're subdivided — three panes over two thin mullions here, vs WINDOW's
- * one, since a single pane this wide would either look like a wall of glass
- * with no structure or need a mullion thick enough to stop reading as a sash
- * bar. Kept as its own fixture for that variety (a real shopfront still
- * reads differently from a row of upstairs windows), not for size.
+ * Briefly the same size as plain WINDOW when a pass widened that one to 32px
+ * too; WINDOW settled at 24px instead (see its own comment), so this is
+ * genuinely bigger again, the way a shopfront window should read next to a
+ * row of upstairs ones. Three panes over two thin mullions, since a single
+ * pane this wide would either look like a wall of glass with no structure or
+ * need a mullion thick enough to stop reading as a sash bar.
  */
 export const WINDOW_WIDE = [
   '.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.',
@@ -511,73 +516,75 @@ export const WINDOW_WIDE = [
 ];
 
 /**
- * 32 x 48 — two tiles wide, three tall, exactly the character's height. The
- * height is the number that has to be right before anything else: a door
- * authored as a single 16px tile is a third of the player's height and
- * reads as a cat flap, and every other proportion in the facade is set by
- * how tall the way in is.
+ * 24 x 48 — not a whole tile-multiple wide, same reasoning as WINDOW's own
+ * comment: a FEATURE is placed once at a pixel offset, not repeat-tiled, so
+ * only TILES answer to the 16px grid. 48px tall is three tiles, exactly the
+ * character's height -- the number that has to be right before anything
+ * else, since a door authored as a single 16px tile is a third of the
+ * player's height and reads as a cat flap, and every other proportion in the
+ * facade is set by how tall the way in is.
  *
- * Widened twice, the same two follow-ups as WINDOW's: 12px -> 14px of one
- * 16px tile first, then, on "at least 24px so they look wide enough for
- * players to pass through", the full jump to 32px (two tiles) -- 24px isn't
- * a multiple of this project's 16px tile grid, so 32 is the nearest
- * grid-aligned size past both 24px and the player's own 16px width. Every
- * flat run grew proportionally to fill it (the glass panes, the plain rail
- * rows, the raised panel's face) while every mark of 1-2px that actually
- * carries meaning -- the frame (`x`), the recessed reveal (`d`/`D`), the
- * handle (`k`), the corner accent's doubled `DD` -- stayed exactly the width
- * it was authored at, so the door reads as a genuinely bigger doorway, not a
- * stretched copy of the old one.
+ * Widened three times, the same follow-ups as WINDOW's: 12px -> 14px of one
+ * 16px tile first, then a first attempt at "at least 24px so they look wide
+ * enough for players to pass through" overshot to 32px (reasoning the tile
+ * grid demanded it, which was true but irrelevant -- see WINDOW's comment),
+ * and landed on the actually-requested 24px once corrected. Every flat run
+ * grew proportionally to fill whichever width was current (the glass panes,
+ * the plain rail rows, the raised panel's face) while every mark of 1-2px
+ * that actually carries meaning -- the frame (`x`), the recessed reveal
+ * (`d`/`D`), the handle (`k`), the corner accent's doubled `DD` -- stayed
+ * exactly the width it was authored at, so the door reads as a genuinely
+ * bigger doorway, not a stretched copy of the old one.
  */
 export const DOOR = [
-  '.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.',
-  '.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.',
-  '.xdddddddddddddddddddddddddddDx.',
-  '.xdddddddddddddddddddddddddddDx.',
-  '.xdddddddddddddddddddddddddddDx.',
-  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
-  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
-  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
-  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
-  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
-  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
-  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
-  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
-  '.xdIIIIIIIIIIIIIIXiiiiiiiiiiiDx.',
-  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
-  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
-  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
-  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
-  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
-  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
-  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
-  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
-  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
-  '.xdiiiiiiiiiiiiiiXiiiiiiiiiiiDx.',
-  '.xdddddddddddddddddddddddddddDx.',
-  '.xdddddddddddddddddddddddddddDx.',
-  '.xddddddddddddddddddddddddddkDx.',
-  '.xddddddddddddddddddddddddddkDx.',
-  '.xdddddddddddddddddddddddddddDx.',
-  '.xdddddddddddddddddddddddddddDx.',
-  '.xdDDDDDDDDDDDDDDDDDDDDDDDDDDDx.',
-  '.xdDddddddddddddddddddddddddDDx.',
-  '.xdDddddddddddddddddddddddddDDx.',
-  '.xdDddddddddddddddddddddddddDDx.',
-  '.xdDddddddddddddddddddddddddDDx.',
-  '.xdDddddddddddddddddddddddddDDx.',
-  '.xdDddddddddddddddddddddddddDDx.',
-  '.xdDddddddddddddddddddddddddDDx.',
-  '.xdDddddddddddddddddddddddddDDx.',
-  '.xdDddddddddddddddddddddddddDDx.',
-  '.xdDddddddddddddddddddddddddDDx.',
-  '.xdDddddddddddddddddddddddddDDx.',
-  '.xdDddddddddddddddddddddddddDDx.',
-  '.xdDDDDDDDDDDDDDDDDDDDDDDDDDDDx.',
-  '.xdddddddddddddddddddddddddddDx.',
-  '.xdddddddddddddddddddddddddddDx.',
-  '.TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.',
-  '.TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.',
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdIIIIIIIIIXiiiiiiiiDx.',
+  '.xdIIIIIIIIIXiiiiiiiiDx.',
+  '.xdIIIIIIIIIXiiiiiiiiDx.',
+  '.xdIIIIIIIIIXiiiiiiiiDx.',
+  '.xdIIIIIIIIIXiiiiiiiiDx.',
+  '.xdIIIIIIIIIXiiiiiiiiDx.',
+  '.xdIIIIIIIIIXiiiiiiiiDx.',
+  '.xdIIIIIIIIIXiiiiiiiiDx.',
+  '.xdIIIIIIIIIXiiiiiiiiDx.',
+  '.xdiiiiiiiiiXiiiiiiiiDx.',
+  '.xdiiiiiiiiiXiiiiiiiiDx.',
+  '.xdiiiiiiiiiXiiiiiiiiDx.',
+  '.xdiiiiiiiiiXiiiiiiiiDx.',
+  '.xdiiiiiiiiiXiiiiiiiiDx.',
+  '.xdiiiiiiiiiXiiiiiiiiDx.',
+  '.xdiiiiiiiiiXiiiiiiiiDx.',
+  '.xdiiiiiiiiiXiiiiiiiiDx.',
+  '.xdiiiiiiiiiXiiiiiiiiDx.',
+  '.xdiiiiiiiiiXiiiiiiiiDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xddddddddddddddddddkDx.',
+  '.xddddddddddddddddddkDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdDDDDDDDDDDDDDDDDDDDx.',
+  '.xdDddddddddddddddddDDx.',
+  '.xdDddddddddddddddddDDx.',
+  '.xdDddddddddddddddddDDx.',
+  '.xdDddddddddddddddddDDx.',
+  '.xdDddddddddddddddddDDx.',
+  '.xdDddddddddddddddddDDx.',
+  '.xdDddddddddddddddddDDx.',
+  '.xdDddddddddddddddddDDx.',
+  '.xdDddddddddddddddddDDx.',
+  '.xdDddddddddddddddddDDx.',
+  '.xdDddddddddddddddddDDx.',
+  '.xdDddddddddddddddddDDx.',
+  '.xdDDDDDDDDDDDDDDDDDDDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.TTTTTTTTTTTTTTTTTTTTTT.',
+  '.TTTTTTTTTTTTTTTTTTTTTT.',
 ];
 
 /** Shopfront awning. Same red as the character's accent — it is the colour

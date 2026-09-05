@@ -26,8 +26,13 @@ const art = {};
 for (const [name, grid] of Object.entries({ ...TILES, ...FEATURES })) {
   const h = grid.length;
   const w = grid[0]?.length ?? 0;
-  if (h % TH !== 0) errs.push(`${name}: ${h} rows, not a whole number of ${TH}px tiles`);
-  if (w % TW !== 0) errs.push(`${name}: ${w} cols, not a whole number of ${TW}px tiles`);
+  // See build-tiles-sheet.mjs: whole-tile sizing only matters for TILES,
+  // which repeat-tile via fill(); a FEATURE is placed once at an arbitrary
+  // pixel offset and can be whatever width/height its art calls for.
+  if (name in TILES) {
+    if (h % TH !== 0) errs.push(`${name}: ${h} rows, not a whole number of ${TH}px tiles`);
+    if (w % TW !== 0) errs.push(`${name}: ${w} cols, not a whole number of ${TW}px tiles`);
+  }
   errs.push(...validateGrid(name, grid, w, h, TILE_PALETTE));
   art[name] = raster(grid, TILE_PALETTE);
 }
