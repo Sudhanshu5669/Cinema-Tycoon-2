@@ -59,6 +59,9 @@ export class TileMapRenderer {
     /** Elevated tops (roof caps, platform tops) a shadow can land on -- see
      *  shadows.js for why these need their own footprint -> screen mapping. */
     this._surfaces = [];
+    /** Building/platform front walls the player's own shadow can climb --
+     *  see shadows.js's wallFaces param and _paintOntoWalls. */
+    this._wallFaces = [];
     /** @type {ShadowLayer | null} set by build(). */
     this.shadows = null;
     /** World-space light sources derived from facade data (window tiles,
@@ -90,6 +93,28 @@ export class TileMapRenderer {
   get pixelWidth() { return this.w * TILE; }
   get pixelHeight() { return this.h * TILE; }
 
+  /** True once the tile atlas's normal map actually loaded and attached --
+   *  the regression guard for tools/normals.mjs's whole premise: a broken or
+   *  missing load here doesn't error, it just silently degrades every tile
+   *  back to flat-facing-camera lighting, exactly the "no relief" failure
+   *  this system exists to fix. */
+  get normalMapped() {
+    return (this.scene.textures.get(TILES_KEY).dataSource?.length ?? 0) > 0;
+  }
+
+  /** Same guard, but for a *baked* composite (a building face, a roof, the
+   *  ground) rather than the raw atlas -- a separate code path (atlas.js's
+   *  bake() re-attaching the normal map via Texture#setDataSource once
+   *  painting is done) that the check above can't see: the atlas load could
+   *  succeed while a bake still drops it. True if any baked object's own
+   *  texture carries a normal map. */
+  get bakedNormalMapped() {
+    return this.objects.some((o) => (
+      typeof o.texture?.key === 'string' && o.texture.key.startsWith('tilebake-')
+      && (o.texture.dataSource?.length ?? 0) > 0
+    ));
+  }
+
   // --- build -------------------------------------------------------------
 
   build() {
@@ -100,7 +125,8 @@ export class TileMapRenderer {
     for (const s of this.map.streetlamps ?? []) this._buildStreetlamp(s);
     this._buildLoose();
     this.shadows = new ShadowLayer(
-      this.scene, this._casters, this._spriteCasters, this._surfaces, this.pixelWidth, this.pixelHeight,
+      this.scene, this._casters, this._spriteCasters, this._surfaces, this._wallFaces,
+      this.pixelWidth, this.pixelHeight,
     );
     this.shadows.setHours(this.hours);
     this.lighting = new LightingLayer(this.scene, this._lights);
@@ -169,6 +195,7 @@ export class TileMapRenderer {
     const faceKey = bake(this.scene, p.w * TILE, e * STEP, (g) =>
       g.fill(p.face ?? 'plinth', 0, 0, p.w * TILE, e * STEP));
     this._place(faceKey, p.x * TILE, faceTop, frontY);
+    this._wallFaces.push({ x0: p.x * TILE, x1: (p.x + p.w) * TILE, faceTop, frontY });
 
     const casterIndex = this._casters.length;
     this._casters.push({ rect: worldRect(p), heightPx: e * STEP });
@@ -223,7 +250,7 @@ export class TileMapRenderer {
         const size = frameSize(this.scene, d.tile);
         const localY = faceH - (d.fy ?? 0) * TILE - size.h;
         g.tile(d.tile, d.fx * TILE, localY);
-        if (d.tile === 'window') {
+        if (d.tile === 'window' || d.tile === 'windowWide') {
           this._lights.push({
             x: b.x * TILE + d.fx * TILE + size.w / 2,
             y: faceTop + localY + size.h / 2,
@@ -241,6 +268,7 @@ export class TileMapRenderer {
       }
     });
     this._place(faceKey, b.x * TILE, faceTop, frontY);
+    this._wallFaces.push({ x0: b.x * TILE, x1: (b.x + b.w) * TILE, faceTop, frontY });
 
     // Awning -- overhead, so the player walks under it. Doubles as the
     // marquee light: the one saturated colour accent on the street.
@@ -387,13 +415,25 @@ function stamp(g, r, value) {
  * Top-to-bottom list of 16px row frames for a storeys-tall face. Cornice owns
  * the top, plinth the bottom, the ground-floor material one course above the
  * plinth, wall the rest. Degrades cleanly for very short buildings.
+ *
+ * **Follow-up from user review**, "not enough depth to the building tiles":
+ * a plaster wall run four rows or taller gets one middle row swapped for
+ * `beltCourse` -- the same light-lip/hard-shadow idea the cornice already
+ * carries, repeated partway up the facade so a tall run of identical wall
+ * rows reads as two storeys instead of one flat plane. Row count and total
+ * height are untouched (this replaces a row's content, not its slot), and
+ * it's plaster-only: a brick facade already breaks up its own flat run via
+ * coursing, and this ledge is coloured for plaster, so it would read as a
+ * mismatch dropped into a brick wall rather than a floor division.
  */
 function faceRowPlan(storeys, wall, base) {
   if (storeys <= 1) return ['cornice'];
   if (storeys === 2) return ['cornice', 'plinth'];
   if (storeys === 3) return ['cornice', base, 'plinth'];
+  const wallRows = storeys - 3;
   const rows = ['cornice'];
-  for (let i = 0; i < storeys - 3; i++) rows.push(wall);
+  for (let i = 0; i < wallRows; i++) rows.push(wall);
+  if (wall === 'wall' && wallRows >= 4) rows[1 + Math.floor(wallRows / 2)] = 'beltCourse';
   rows.push(base, 'plinth');
   return rows;
 }

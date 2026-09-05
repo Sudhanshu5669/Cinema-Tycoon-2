@@ -124,3 +124,45 @@ export const TILE_PALETTE = {
   e: '#d9c9a3', // bulb glass
   E: '#2f2b33', // cap and bracket, dark metal
 };
+
+/**
+ * Relative surface height per tile-palette character, in arbitrary units --
+ * what `tools/normals.mjs` derives every tile's normal map from, for the
+ * live Light2D pipeline (SYSTEMS #8) to actually shade with, instead of
+ * every surface reading flat-facing-camera the way an unbound normal map
+ * defaults to. This works *because* every character here already has one
+ * fixed, intentional meaning (mortar is always recessed, a lip is always
+ * raised) -- the usual hard problem with deriving a normal map is that a
+ * finished image can't say what a colour's height was meant to be, and we
+ * never have that problem, because we never start from a finished image.
+ *
+ * A character missing here defaults to 0 (flush with the wall) -- most of
+ * the palette is deliberately absent: WALL's speckle, ROOF's gravel grain
+ * and PAVE/ROAD/GRASS are stochastic texture, not a structural edge, and
+ * giving every fleck its own bump reads as noisy grain under a moving light
+ * rather than a real surface, so they stay flat for now (this table can
+ * always grow later). Every value here is small and the transitions across
+ * it are sharp (one or two pixels), not a smooth ramp -- the failure mode on
+ * record for this project (see GAME_SPEC's rejected direction #1, a smooth
+ * normal-based falloff on the character reading as "glassy, moulded
+ * plastic") came from gentle, continuous gradients, not from bump mapping
+ * itself; a crisp, low-amplitude step reads as an edge, not a blob.
+ */
+export const TILE_HEIGHT = {
+  // Cornice / belt course: the lip juts out, the wall sets back sharply
+  // right under it (the cast shadow already baked into `L`/`n` is a real
+  // step back, not just a darker tone), then returns to flush. `o`/`N` are
+  // the same shapes' shaded-return copies.
+  l: 3, L: -2, n: -1, o: 3, N: -2,
+  // Brick coursing: the mortar groove is recessed, every brick face flush.
+  B: -1, Y: -1,
+  // Window / door frame: proud of the wall; the reveal steps in and the
+  // glass sits deepest, behind it.
+  x: 1, X: -1, I: -2, i: -2,
+  // Doors: the recess line grooves in, the handle is a real knob.
+  D: -1, k: 2,
+  // Plinth: the stone course steps out from the wall face above it.
+  t: 1, T: 1, u: 1, U: 1,
+  // Kerb: a raised top edge, then a real drop to road level.
+  c: 1, C: -3,
+};

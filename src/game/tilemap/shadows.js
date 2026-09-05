@@ -51,6 +51,32 @@
 // own position, so unlike the sun, the direction is different every time the
 // player moves relative to it, and more than one nearby lamp can each throw
 // their own shadow, exactly as real point-source light does.
+//
+// A shadow painted only on the ground canvas has the same problem the ground
+// bake solved for roofs and platform tops: any part of it that lands north of
+// a building's or platform's front wall sits, in screen space, exactly where
+// that wall's own image is drawn -- at a far higher depth -- so it simply
+// vanishes under a building instead of falling across it the way a real
+// shadow would. The sun can never cause this (shadowFor's dy is always
+// southward, away from every wall it could climb), but a nearby point light
+// can throw the player's shadow in any direction, including straight at a
+// wall behind them.
+//
+// Climbing the wall needs a different *canvas* (held at a depth above the
+// wall's own image instead of below it) but, less obviously, also a
+// different *angle* -- carrying the ground shear's own (dx, dy) straight up
+// the wall keeps it leaning at the same shallow diagonal it had on the
+// pavement, which reads as wrong the moment it crosses the base line. A wall
+// is a plane of constant world Y; a light ray's horizontal (X, Y) direction
+// away from a caster doesn't depend on which height along the caster it
+// started from, so *every* row of the caster's silhouette reaches that plane
+// at the very same point -- only how high up it lands differs, by exactly as
+// much of the shadow's own length as it had left to spend when it got there.
+// In other words, the lean stops dead at the wall: what's left of the
+// shadow's reach keeps going, but straight up, not sideways. _paintOntoWalls
+// computes that crossing point and re-derives a second, purely-vertical
+// transform for the part of the silhouette beyond it, rather than reusing
+// the ground shear unchanged.
 
 import { DEPTH_SHADOW } from './projection.js';
 import { shadowFor } from './sun.js';
@@ -68,6 +94,10 @@ const PLIGHT_MAX_LEN = 70;
  *  reaching at all) to 1 (standing right on it) strength driving both. */
 const PLIGHT_MIN_ALPHA = 0.2;
 const PLIGHT_MAX_ALPHA = 0.65;
+/** Horizontal slack (px) when testing whether the player's shadow could reach
+ *  a wall's width -- generous enough to cover the sprite's own width and the
+ *  shear's sideways drift without needing the exact silhouette bounds. */
+const WALL_HIT_MARGIN = 24;
 
 export class ShadowLayer {
   /**
@@ -89,9 +119,18 @@ export class ShadowLayer {
    *   caster's `rect`; `screen` is where that surface is actually drawn -- a
    *   plain shift for a platform top, shifted-and-squashed for a
    *   foreshortened roof.
+   * @param {{ x0: number, x1: number, faceTop: number, frontY: number }[]} wallFaces
+   *   Every building/platform front wall the *player's* shadow might climb --
+   *   `x0, x1` its world-x span, `faceTop..frontY` the world-y range its own
+   *   face image occupies (frontY is the ground-contact row, same value the
+   *   face image's own depth uses). Player-only for now, same reasoning as
+   *   spriteCasters above not being clipped onto `surfaces`: box casters'
+   *   shadows only ever rake south, away from any wall behind them, so this
+   *   case doesn't come up for anything but a point light throwing the
+   *   player's shadow toward one.
    * @param {number} worldW @param {number} worldH
    */
-  constructor(scene, casters, spriteCasters, surfaces, worldW, worldH) {
+  constructor(scene, casters, spriteCasters, surfaces, wallFaces, worldW, worldH) {
     this.scene = scene;
     this.casters = casters;
     this.spriteCasters = spriteCasters;
@@ -119,6 +158,22 @@ export class ShadowLayer {
       const image = scene.add.image(surface.screen.x, surface.screen.y, key)
         .setOrigin(0, 0).setDepth(surface.depth);
       return { surface, key, canvas, image };
+    });
+
+    // One small canvas + image per wall a player shadow might climb, held
+    // just above that wall's own face image (frontY + 0.4, below the roof's
+    // own +0.5 nudge though the two never actually overlap on screen) --
+    // see the header comment and _paintOntoWalls. Starts hidden: most walls
+    // never have a shadow climbing them on a given frame.
+    this.wallLayers = wallFaces.map((wall, i) => {
+      const key = `${this.key}-wall-${i}`;
+      if (scene.textures.exists(key)) scene.textures.remove(key);
+      const w = Math.max(1, Math.round(wall.x1 - wall.x0));
+      const h = Math.max(1, Math.round(wall.frontY - wall.faceTop));
+      const canvas = scene.textures.createCanvas(key, w, h);
+      const image = scene.add.image(wall.x0, wall.faceTop, key)
+        .setOrigin(0, 0).setDepth(wall.frontY + 0.4).setVisible(false);
+      return { wall, key, canvas, image, w, h };
     });
 
     this._bucket = null;
@@ -299,8 +354,17 @@ export class ShadowLayer {
     const ctx = this.playerCanvas.getContext();
     ctx.clearRect(0, 0, half * 2, half * 2);
 
+    // Every wall the shadow actually lands on this frame -- collected as we
+    // go so a wall nobody's shadow reaches any more gets hidden again below,
+    // instead of keeping last frame's mark on it.
+    const touchedWalls = new Set();
+    const cast = (offset, alpha) => {
+      this._paintSpriteShadow(ctx, caster, offset, alpha);
+      this._paintOntoWalls(px, py, offset, alpha, frameName, heightPx, touchedWalls);
+    };
+
     const sun = shadowFor(hours, heightPx);
-    if (sun) this._paintSpriteShadow(ctx, caster, sun, sun.alpha);
+    if (sun) cast(sun, sun.alpha);
 
     // Every light touching the player casts its own shadow, independently,
     // scaled only by how strongly *that* light illuminates them (Light#
@@ -313,12 +377,67 @@ export class ShadowLayer {
     for (const { light, strength } of lightSources) {
       const dir = light.directionFrom(px, py);
       const len = PLIGHT_MIN_LEN + (PLIGHT_MAX_LEN - PLIGHT_MIN_LEN) * strength;
-      const dx = dir.x * len, dy = dir.y * len;
       const alpha = PLIGHT_MIN_ALPHA + (PLIGHT_MAX_ALPHA - PLIGHT_MIN_ALPHA) * strength;
-      this._paintSpriteShadow(ctx, caster, { dx, dy }, alpha);
+      cast({ dx: dir.x * len, dy: dir.y * len }, alpha);
     }
 
     this.playerCanvas.refresh();
+    for (const wl of this.wallLayers) {
+      if (touchedWalls.has(wl)) { wl.canvas.refresh(); wl.image.setVisible(true); }
+      else if (wl.image.visible) wl.image.setVisible(false);
+    }
+  }
+
+  /**
+   * Carries one of the player's shadow casts (sun or a point light) onto any
+   * wall it climbs, past the point where it crosses that wall's base row --
+   * see the header comment for the derivation this follows: past that
+   * crossing, every row of the silhouette shares the same X (a wall is a
+   * plane of constant world Y, and the ray's XY direction away from the
+   * caster doesn't depend on which height along the caster it started from),
+   * so the lean stops there and whatever reach is left continues straight up.
+   *
+   * A shadow can only climb a wall by pointing at it, north (screen-up), so
+   * this is a no-op for the sun (its dy is always south -- shadowFor -- so
+   * the check below simply never passes) and for most point-light directions
+   * too. `touchedWalls` is shared across every cast this frame: the first
+   * cast to reach a given wall clears it, later casts (another light, say)
+   * layer onto the same cleared canvas instead of re-clearing it.
+   */
+  _paintOntoWalls(px, py, { dx, dy }, alpha, frameName, heightPx, touchedWalls) {
+    if (dy >= 0) return;
+    const len = Math.hypot(dx, dy);
+    for (const wl of this.wallLayers) {
+      const { x0, x1, faceTop, frontY } = wl.wall;
+      // The wall's own contact row has to sit between the caster and the
+      // shadow's tip -- otherwise this shadow never reaches that far, or the
+      // wall is somewhere else entirely (behind the caster, say). `t` is how
+      // far along the (dx, dy) reach that crossing sits, 0 (right at the
+      // caster's feet) to 1 (right at the shadow's untouched tip).
+      if (frontY > py || frontY < py + dy) continue;
+      const t = (frontY - py) / dy;
+      const crossX = px + dx * t;
+      if (crossX < x0 - WALL_HIT_MARGIN || crossX > x1 + WALL_HIT_MARGIN) continue;
+      if (!touchedWalls.has(wl)) {
+        wl.canvas.getContext().clearRect(0, 0, wl.w, wl.h);
+        touchedWalls.add(wl);
+      }
+      // Past the crossing the shadow no longer leans -- every row shares
+      // `crossX` -- so what's left of its length (len * (1 - t), the same
+      // magnitude it would have kept spending on the lean) becomes pure
+      // rise instead. climbTopY is where the caster's own topmost row (the
+      // farthest-reaching point of its silhouette) ends up; rows between
+      // there and the crossing interpolate linearly, same as the ground
+      // shear does between the caster's base and its own top.
+      const { canvas, w } = this._silhouetteFor('player', frameName);
+      const climbTopY = frontY - len * (1 - t);
+      const wctx = wl.canvas.getContext();
+      wctx.save();
+      wctx.setTransform(1, 0, 0, len / heightPx, crossX - x0, climbTopY - faceTop);
+      wctx.globalAlpha = alpha;
+      wctx.drawImage(canvas, -w / 2, 0);
+      wctx.restore();
+    }
   }
 
   destroy() {
@@ -327,6 +446,10 @@ export class ShadowLayer {
     for (const layer of this.surfaceLayers) {
       layer.image.destroy();
       if (this.scene.textures.exists(layer.key)) this.scene.textures.remove(layer.key);
+    }
+    for (const wl of this.wallLayers) {
+      wl.image.destroy();
+      if (this.scene.textures.exists(wl.key)) this.scene.textures.remove(wl.key);
     }
     this.playerImage.destroy();
     if (this.scene.textures.exists(this.playerKey)) this.scene.textures.remove(this.playerKey);

@@ -143,11 +143,20 @@ export class DevScene extends Phaser.Scene {
         // Whether any roof cap or platform top is currently catching a
         // neighbour's cast shadow -- see shadows.js for the per-surface layers.
         roofShadowHit: this.map.shadows?.surfaceLayers.some((l) => l.image.visible) ?? false,
+        // Whether the player's own shadow is currently climbing any wall --
+        // see shadows.js's wallLayers / _paintOntoWalls.
+        wallShadowHit: this.map.shadows?.wallLayers.some((l) => l.image.visible) ?? false,
         // SYSTEMS #8. `lightingActive` confirms Phaser's Light2D pipeline is
         // actually engaged (false would mean a silent Canvas-renderer
         // degrade, not a broken hour model) rather than reading window/
         // marquee intensity of 0 for the wrong reason.
         lightingActive: this.map.lighting?.active ?? false,
+        // The tile atlas's normal map (tools/normals.mjs) actually bound,
+        // not silently missing -- see TileMapRenderer#normalMapped.
+        normalMapped: this.map.normalMapped,
+        // Same, but for a baked composite (a building face, a roof) -- a
+        // separate code path, see TileMapRenderer#bakedNormalMapped.
+        bakedNormalMapped: this.map.bakedNormalMapped,
         ambientColor: this.map.lighting?.ambientColor ?? 0xffffff,
         windowGlow: this._lightIntensity('window'),
         marqueeGlow: this._lightIntensity('marquee'),

@@ -80,7 +80,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "kerb": {
+    "paveStain": {
       "frame": {
         "x": 64,
         "y": 0,
@@ -100,7 +100,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "grass": {
+    "kerb": {
       "frame": {
         "x": 80,
         "y": 0,
@@ -120,7 +120,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "wall": {
+    "grass": {
       "frame": {
         "x": 96,
         "y": 0,
@@ -140,7 +140,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "wallEdge": {
+    "wall": {
       "frame": {
         "x": 112,
         "y": 0,
@@ -160,7 +160,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "brick": {
+    "wallEdge": {
       "frame": {
         "x": 128,
         "y": 0,
@@ -180,7 +180,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "brickEdge": {
+    "brick": {
       "frame": {
         "x": 144,
         "y": 0,
@@ -200,7 +200,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "roof": {
+    "brickEdge": {
       "frame": {
         "x": 160,
         "y": 0,
@@ -220,7 +220,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "cornice": {
+    "roof": {
       "frame": {
         "x": 176,
         "y": 0,
@@ -240,7 +240,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "corniceEdge": {
+    "cornice": {
       "frame": {
         "x": 192,
         "y": 0,
@@ -260,7 +260,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "plinth": {
+    "corniceEdge": {
       "frame": {
         "x": 208,
         "y": 0,
@@ -280,7 +280,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "plinthEdge": {
+    "plinth": {
       "frame": {
         "x": 224,
         "y": 0,
@@ -300,7 +300,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "awning": {
+    "plinthEdge": {
       "frame": {
         "x": 240,
         "y": 0,
@@ -320,9 +320,49 @@
       "rotated": false,
       "trimmed": false
     },
-    "window": {
+    "beltCourse": {
       "frame": {
         "x": 256,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "awning": {
+      "frame": {
+        "x": 272,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "window": {
+      "frame": {
+        "x": 288,
         "y": 0,
         "w": 16,
         "h": 32
@@ -340,9 +380,29 @@
       "rotated": false,
       "trimmed": false
     },
+    "windowWide": {
+      "frame": {
+        "x": 304,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 32
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false
+    },
     "door": {
       "frame": {
-        "x": 272,
+        "x": 336,
         "y": 0,
         "w": 16,
         "h": 48
@@ -362,7 +422,7 @@
     },
     "lampPost": {
       "frame": {
-        "x": 288,
+        "x": 352,
         "y": 0,
         "w": 16,
         "h": 48
@@ -384,7 +444,7 @@
   "meta": {
     "image": "tiles.png",
     "size": {
-      "w": 304,
+      "w": 368,
       "h": 48
     },
     "scale": 1

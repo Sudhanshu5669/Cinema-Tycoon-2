@@ -21,7 +21,11 @@
       { "x": 90, "y": 22, "tile": "paveCrack" },
       { "x": 101, "y": 26, "tile": "paveCrack" },
       { "x": 95, "y": 55, "tile": "paveCrack" },
-      { "x": 105, "y": 48, "tile": "paveCrack" }
+      { "x": 105, "y": 48, "tile": "paveCrack" },
+      { "x": 15, "y": 40, "tile": "paveStain" },
+      { "x": 33, "y": 55, "tile": "paveStain" },
+      { "x": 58, "y": 62, "tile": "paveStain" },
+      { "x": 95, "y": 45, "tile": "paveStain" }
     ]
   },
   "flat": {
@@ -52,7 +56,8 @@
         { "tile": "window", "fx": 2, "fy": 1 }, { "tile": "window", "fx": 5, "fy": 1 },
         { "tile": "window", "fx": 8, "fy": 1 }, { "tile": "window", "fx": 13, "fy": 1 },
         { "tile": "window", "fx": 16, "fy": 1 }, { "tile": "window", "fx": 19, "fy": 1 },
-        { "tile": "window", "fx": 4, "fy": 4 }, { "tile": "window", "fx": 10, "fy": 4 }, { "tile": "window", "fx": 16, "fy": 4 }
+        { "tile": "window", "fx": 4, "fy": 4 }, { "tile": "window", "fx": 10, "fy": 4 }, { "tile": "window", "fx": 16, "fy": 4 },
+        { "tile": "windowWide", "fx": 19, "fy": 4 }
       ],
       "awning": { "fx": 6, "fw": 10, "up": 3 }
     },
@@ -70,9 +75,11 @@
       "face": "brick", "base": "brick", "top": "roof",
       "facade": [
         { "tile": "door", "fx": 12, "fy": 0 },
-        { "tile": "window", "fx": 3, "fy": 1 }, { "tile": "window", "fx": 21, "fy": 1 },
+        { "tile": "window", "fx": 3, "fy": 1 }, { "tile": "window", "fx": 7, "fy": 1 },
+        { "tile": "windowWide", "fx": 17, "fy": 1 }, { "tile": "window", "fx": 22, "fy": 1 },
         { "tile": "window", "fx": 3, "fy": 4 }, { "tile": "window", "fx": 8, "fy": 4 },
-        { "tile": "window", "fx": 16, "fy": 4 }, { "tile": "window", "fx": 21, "fy": 4 }
+        { "tile": "window", "fx": 12, "fy": 4 }, { "tile": "window", "fx": 16, "fy": 4 },
+        { "tile": "window", "fx": 21, "fy": 4 }
       ]
     },
     {

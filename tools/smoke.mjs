@@ -255,6 +255,16 @@ const lightAt = async (h) => {
 };
 const [litNoon, litNight] = [await lightAt(12), await lightAt(23)];
 check('the Light2D pipeline is actually active, not silently degraded', litNoon.lightingActive === true);
+// tools/normals.mjs derives the tile atlas's normal map from the same ASCII
+// grids the diffuse art reads, and atlas.js's bake() re-attaches it to every
+// baked composite (a building's face, its roof, the ground, a platform) via
+// Texture#setDataSource -- both steps fail silently, not loudly, so this is
+// the regression guard: a broken load or a bake that forgot to carry the
+// normal map through degrades every tile back to flat-facing-camera
+// lighting without ever erroring.
+check('the tile atlas\'s normal map is actually bound, not silently missing', litNoon.normalMapped === true);
+check('a baked building face also carries its normal map, not just the raw atlas',
+  litNoon.bakedNormalMapped === true);
 check('scene ambient colour is brighter at noon than at night',
   luma(litNoon.ambientColor) > luma(litNight.ambientColor),
   `noon ${litNoon.ambientColor.toString(16)} night ${litNight.ambientColor.toString(16)}`);
@@ -365,6 +375,26 @@ for (let x = 136; x <= 352; x += 12) {
 const maxJump = Math.max(...walkStrengths.slice(1).map((v, i) => Math.abs(v - walkStrengths[i])));
 check('walking between two streetlamps, the dominant light\'s strength changes smoothly (no pop)',
   maxJump < 0.1, `max step-to-step jump ${maxJump.toFixed(3)} across ${walkStrengths.length} steps`);
+
+// A point-light player shadow can point at a building behind the player
+// (the sun's own shadow never can -- shadowFor's dy is always southward), and
+// that shadow needs to fall across the wall instead of vanishing under it the
+// moment it crosses the wall's own base row -- see shadows.js's wallLayers /
+// _paintOntoWalls. Standing close under the first building (x0-352, front
+// wall at world y 288) with its own north lamp (tile 8,24 -> world 136,400,
+// well within streetlamp radius 220) puts the lamp-cast shadow squarely into
+// the wall behind the player.
+await page.evaluate(() => { window.__dev.setTime(22); window.__dev.warp(136, 330); });
+await page.waitForTimeout(150);
+check('a nearby point light throws the player\'s shadow onto the wall behind them',
+  (await page.evaluate(() => window.__dev.tiles())).wallShadowHit);
+// Stepping back out of the lamp's reach (and the wall's), the shadow has
+// nothing to climb -- this is the regression check for a wall layer left
+// stuck visible from a previous frame's shadow.
+await page.evaluate(() => window.__dev.warp(900, 500));
+await page.waitForTimeout(150);
+check('...and stops climbing it once the player walks away',
+  !(await page.evaluate(() => window.__dev.tiles())).wallShadowHit);
 
 await lightAt(21.5);
 await page.evaluate(() => window.__dev.warp(176, 360));

@@ -75,16 +75,27 @@ down the screen — rather than a flat facade glued under a top-down roof. The
 face height per elevation level (`STEP`) is a renderer knob, not a locked
 constant. This was a deliberate call ("versatile enough to have levels if
 needed"); flat maps still author flat, the capability is just there. Tile art
-is a later "art second" pass — the renderer runs on the SYSTEMS #0 placeholder
-tiles for now.
+started as the SYSTEMS #0 placeholder set and later got a surface detail/
+variety pass (window sills, wall/roof texture, brick colour variety, a
+pavement stain tile) — see SYSTEMS.md #6.
 
 Sprites are authored as an **indexed-colour ASCII grid** (`art/flat/player.mjs`)
 against a named palette (`art/flat/palette.mjs`); `tools/flat.mjs` maps
-characters to exact colours and validates every grid. There is no shading pass —
-this style leaves a shader nothing to decide, so the material/normal/cel
-machinery the Stardew pass needed (`art/materials.mjs`, `tools/shade.mjs`) is
-superseded. Those files and the 16x32 sprites are still in the tree, unreferenced
-by the flat pipeline, pending a decision to delete them.
+characters to exact colours and validates every grid. The *player sprite*
+itself has no shading pass — every pixel is an authored exact colour, no
+gradient, no normal-based falloff — which is a real, deliberate constraint on
+that one piece of art specifically: an earlier attempt at normal-based
+lighting on the character (rejected direction #1 above) read as "glassy and
+moulded plastic". That is not a project-wide ban on shaders or normal maps —
+the *tile* art now uses exactly that (see SYSTEMS.md #6's normal-map system:
+`art/flat/palette.mjs`'s `TILE_HEIGHT` + `tools/normals.mjs`), deliberately
+designed around the same failure mode rather than avoided because of it (small
+height deltas, sharp transitions, not the smooth continuous falloff that read
+as plastic). The Stardew-era material/normal/cel machinery
+(`art/materials.mjs`, `tools/shade.mjs`) is superseded for a different reason —
+it doesn't match this flat *style* — not because normal maps themselves are
+off the table. Those files and the 16x32 sprites are still in the tree,
+unreferenced by either pipeline, pending a decision to delete them.
 
 The live scene runs on a real per-fragment shader (SYSTEMS #8, `src/game/
 lighting.js` -- Phaser's own `Light2D` pipeline, not a bespoke one), a

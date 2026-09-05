@@ -25,8 +25,10 @@ const errs = [];
 const art = {};
 for (const [name, grid] of Object.entries({ ...TILES, ...FEATURES })) {
   const h = grid.length;
+  const w = grid[0]?.length ?? 0;
   if (h % TH !== 0) errs.push(`${name}: ${h} rows, not a whole number of ${TH}px tiles`);
-  errs.push(...validateGrid(name, grid, TW, h, TILE_PALETTE));
+  if (w % TW !== 0) errs.push(`${name}: ${w} cols, not a whole number of ${TW}px tiles`);
+  errs.push(...validateGrid(name, grid, w, h, TILE_PALETTE));
   art[name] = raster(grid, TILE_PALETTE);
 }
 if (errs.length) { console.error('FAILED:\n  ' + errs.join('\n  ')); process.exit(1); }
@@ -124,10 +126,11 @@ tileNames.forEach((name, i) => {
 
 let fx = 24;
 for (const [name, grid] of Object.entries(FEATURES)) {
-  sh.blit(art[name], fx, featTop, S);
-  const label = `${name.toUpperCase()} 16X${grid.length}`;
-  drawText(sh, label, fx, featTop + grid.length * S + 6, 2, DIM);
-  fx += TW * S + 40;
+  const bmp = art[name];
+  sh.blit(bmp, fx, featTop, S);
+  const label = `${name.toUpperCase()} ${bmp.w}X${bmp.h}`;
+  drawText(sh, label, fx, featTop + bmp.h * S + 6, 2, DIM);
+  fx += bmp.w * S + 40;
 }
 // The scene at 1:1 beside the features, because a tile set that only works
 // blown up is not a tile set.
