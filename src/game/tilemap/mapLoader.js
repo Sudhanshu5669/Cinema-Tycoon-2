@@ -8,15 +8,19 @@
 // compact, hand-editable JSON schema --
 //
 //   { w, h,
-//     ground|flat|object|overhead: { default?, bands?, stripes?, cells? },
+//     ground|flat|object|overhead: { default?, bands?, vbands?, stripes?, cells? },
 //     platforms: [...], buildings: [...], streetlamps: [...] }
 //
 // -- expanded into the renderer's full-grid shape. `bands` fills a row range
-// with one tile (a pavement, a road); `stripes` repeats a tile every `step`
-// columns along one row (a dashed centre line); `cells` are one-off overrides
-// (a cracked slab); later entries win where they overlap, in that order.
-// `platforms`/`buildings`/`streetlamps` are already close to hand-editable as
-// structured lists, so they pass through with validation only.
+// with one tile (a pavement, a road); `vbands` is the same thing turned
+// sideways, a column range across every row (a cross street cutting through
+// the sidewalk/road bands beneath it) -- added alongside a small road system,
+// the first time this schema needed anything but a single east-west street;
+// `stripes` repeats a tile every `step` columns along one row (a dashed
+// centre line); `cells` are one-off overrides (a cracked slab); later entries
+// win where they overlap, in that order (bands, then vbands, then stripes,
+// then cells). `platforms`/`buildings`/`streetlamps` are already close to
+// hand-editable as structured lists, so they pass through with validation only.
 //
 // Validation matters here specifically because this file is meant to be
 // hand-edited: a typo'd tile name or an out-of-bounds building should fail
@@ -76,6 +80,14 @@ export function loadCityMap(raw, scene) {
       }
       if (!validTile(b.tile)) { errs.push(`${label}: unknown tile "${b.tile}"`); continue; }
       for (let y = b.y0; y <= b.y1; y++) data[y].fill(b.tile);
+    }
+    for (const [i, vb] of (spec.vbands ?? []).entries()) {
+      const label = `${role}.vbands[${i}]`;
+      if (!(Number.isInteger(vb.x0) && Number.isInteger(vb.x1) && vb.x0 <= vb.x1 && vb.x0 >= 0 && vb.x1 < w)) {
+        errs.push(`${label}: bad column range x0=${vb.x0} x1=${vb.x1} for a map ${w} tiles wide`); continue;
+      }
+      if (!validTile(vb.tile)) { errs.push(`${label}: unknown tile "${vb.tile}"`); continue; }
+      for (let y = 0; y < h; y++) for (let x = vb.x0; x <= vb.x1; x++) data[y][x] = vb.tile;
     }
     for (const [i, s] of (spec.stripes ?? []).entries()) {
       const label = `${role}.stripes[${i}]`;

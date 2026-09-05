@@ -408,7 +408,10 @@ await page.screenshot({ path: path.join(OUT, 'tiles-lighting-night.png') });
 // the same discipline tools/flat.mjs's validateGrid holds sprite art to.
 const tinyRaw = {
   w: 4, h: 3,
-  ground: { default: 'road', bands: [{ y0: 1, y1: 1, tile: 'pave' }], cells: [{ x: 2, y: 2, tile: 'kerb' }] },
+  ground: {
+    default: 'road', bands: [{ y0: 1, y1: 1, tile: 'pave' }],
+    vbands: [{ x0: 3, x1: 3, tile: 'road' }], cells: [{ x: 2, y: 2, tile: 'kerb' }],
+  },
   flat: { stripes: [{ y: 0, tile: 'roadLine', step: 2 }] },
   buildings: [{ x: 0, y: 0, w: 2, h: 1, storeys: 3 }],
 };
@@ -416,9 +419,18 @@ const tiny = loadCityMap(tinyRaw); // no scene -- tile names unchecked, structur
 const groundData = tiny.layers.find((l) => l.role === 'ground').data;
 const flatData = tiny.layers.find((l) => l.role === 'flat').data;
 check('loader expands a band across its full row range',
-  groundData[1].every((t) => t === 'pave'), groundData[1].join(','));
+  // Excluding the last column, which the vband test below deliberately
+  // overrides back to 'road' -- that override is itself the next check.
+  groundData[1].slice(0, 3).every((t) => t === 'pave'), groundData[1].join(','));
 check('loader applies a sparse cell on top of the band/default fill',
   groundData[2][2] === 'kerb' && groundData[0][0] === 'road');
+// A cross street: vbands does to columns what bands does to rows, so a
+// vband down the last column overrides the horizontal pave band that same
+// column would otherwise have gotten from row 1 -- the same "a cross street
+// cuts through the sidewalk band beneath it" shape city.json now uses.
+check('loader expands a vband across its full column range, overriding bands under it',
+  groundData[0][3] === 'road' && groundData[1][3] === 'road' && groundData[2][3] === 'road',
+  `${groundData[0][3]},${groundData[1][3]},${groundData[2][3]}`);
 check('loader expands a stripe at its step, leaving the gaps null',
   flatData[0][0] === 'roadLine' && flatData[0][1] === null && flatData[0][2] === 'roadLine');
 check('loader passes buildings through', tiny.buildings.length === 1 && tiny.buildings[0].storeys === 3);

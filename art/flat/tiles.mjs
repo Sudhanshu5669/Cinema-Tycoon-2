@@ -59,6 +59,36 @@ export const ROAD_LINE = [
   'aaaaazaaaaaaaaaa',
 ];
 
+/**
+ * A zebra-crossing stripe -- unlike ROAD_LINE's thin dash, this is meant to
+ * fill most of the tile: a crosswalk's bars run parallel to traffic (so a
+ * whole tile-width of a lane reads as one bar) and repeat across the
+ * crossing, not along it, so several of these get placed a row apart rather
+ * than end to end. Worn (`m`, never white -- see ROAD_LINE) with a scatter
+ * of asphalt showing through, same idea as the pavement's own wear, so a
+ * whole crossing doesn't read as one flat rectangle. Small margin top and
+ * bottom keeps a hard edge from butting directly against a neighbouring
+ * plain road row.
+ */
+export const CROSSWALK = [
+  'aaaaaaaaaaaaaaaa',
+  'aaaaAaaaaaaaazaa',
+  'mmmmmmmmmmmmmmam',
+  'mmmmmammmmmmmmmm',
+  'mmmmammmmmmmmmAm',
+  'mAmmmmmmmmmmmmam',
+  'aammmmmmmmmmmmmm',
+  'Ammmmmammmmmmmmm',
+  'mmmmmmammmAmmmmm',
+  'ammmmmmmmAmmmmmm',
+  'mmmmmmmmmmmmmaAm',
+  'mmmmmmmAAmmmmmmm',
+  'ammAmmmmmmmmmmmm',
+  'mmmAmmmmmmmmammm',
+  'aaaaaaaaaaaaaaaa',
+  'aaaaazaaaaaaaaaa',
+];
+
 /** 8px slabs. The seam is one pixel and one step darker — any more and the
  *  pavement reads as tiling, which is exactly what it must not do. */
 export const PAVE = [
@@ -671,7 +701,7 @@ export const LAMP_POST = [
 
 /** Draw order is the map's business, not the tile's — these are just names. */
 export const TILES = {
-  road: ROAD, roadLine: ROAD_LINE, pave: PAVE, paveCrack: PAVE_CRACK, paveStain: PAVE_STAIN,
+  road: ROAD, roadLine: ROAD_LINE, crosswalk: CROSSWALK, pave: PAVE, paveCrack: PAVE_CRACK, paveStain: PAVE_STAIN,
   kerb: KERB, grass: GRASS,
   wall: WALL, wallEdge: WALL_EDGE, brick: BRICK, brickEdge: BRICK_EDGE,
   roof: ROOF, cornice: CORNICE, corniceEdge: CORNICE_EDGE,
