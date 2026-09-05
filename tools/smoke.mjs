@@ -273,11 +273,22 @@ check('marquee glow is off at noon and on at night',
 // present. Sampling a small spread of distances along the same direction and
 // taking the max is what a real screen reading would do (see the shape with
 // your eyes, not one pixel of it) and is what these checks do too.
-const maxShadowAlong = async (dx, dy, lens = [10, 16, 22, 30, 40]) => {
-  const mag = Math.hypot(dx, dy) || 1;
-  const ux = dx / mag, uy = dy / mag;
-  const vals = await Promise.all(lens.map((len) =>
-    page.evaluate((v) => window.__dev.playerShadowAt(v.x, v.y), { x: ux * len, y: uy * len })));
+// A point-light shadow also has a floor on its southward component (see
+// shadows.js's PLIGHT_MIN_SOUTH) -- a light exactly level with the player is
+// ordinary, not an edge case, once a light has its own position instead of
+// one shared sun angle, and a shadow with no reach into this 3/4 view reads
+// as broken. That floor only ever rotates a direction *toward* south, never
+// away, so `angles` (degrees, rotating toward +y) gives this the same
+// tolerance against that deliberate bend that `lens` gives it against the
+// silhouette's own gaps.
+const maxShadowAlong = async (dx, dy, lens = [10, 16, 22, 30, 40], angles = [0]) => {
+  const baseAngle = Math.atan2(dy, dx);
+  const vals = await Promise.all(angles.flatMap((deg) => {
+    const a = baseAngle + (deg * Math.PI) / 180;
+    const ux = Math.cos(a), uy = Math.sin(a);
+    return lens.map((len) =>
+      page.evaluate((v) => window.__dev.playerShadowAt(v.x, v.y), { x: ux * len, y: uy * len }));
+  }));
   return Math.max(...vals);
 };
 
@@ -309,7 +320,8 @@ await page.waitForTimeout(200);
 const nearestLamp = (await page.evaluate(() => window.__dev.shadowSourcesAt(170, 400)))[0];
 const lampDir = { x: 170 - nearestLamp.x, y: 400 - nearestLamp.y };
 const [awayFromLamp, towardLamp] = await Promise.all([
-  maxShadowAlong(lampDir.x, lampDir.y), maxShadowAlong(-lampDir.x, -lampDir.y),
+  maxShadowAlong(lampDir.x, lampDir.y, undefined, [0, 15, 30]),
+  maxShadowAlong(-lampDir.x, -lampDir.y),
 ]);
 check('the player casts a shadow away from a nearby streetlamp',
   awayFromLamp > 0.05 && awayFromLamp > towardLamp,

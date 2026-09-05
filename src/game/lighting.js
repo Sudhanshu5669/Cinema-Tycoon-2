@@ -136,8 +136,20 @@ export class LightingLayer {
     return this.points
       .map((p, i) => {
         const light = this.lights[i];
-        return { x: p.x, y: p.y, intensity: light.intensity, radius: light.radius,
-          dist: Math.hypot(p.x - px, p.y - py) };
+        return {
+          // The ground anchor (gx, gy), not the glow position (x, y) -- a
+          // streetlamp's bulb sits up near the top of the post, and using
+          // its own elevated position as "where the light is" makes the
+          // player's shadow point away from a spot further back than the
+          // lamp actually stands on the ground. Falls back to (x, y) for any
+          // light point that doesn't carry a ground anchor.
+          x: p.gx ?? p.x, y: p.gy ?? p.y,
+          intensity: light.intensity, radius: light.radius,
+          // Distance (and so "is this light even reaching the player" and
+          // "how close") is against the *glow* position -- that's what the
+          // shader's own radius is centred on.
+          dist: Math.hypot(p.x - px, p.y - py),
+        };
       })
       .filter((s) => s.intensity > 0.05 && s.dist < s.radius)
       .sort((a, b) => a.dist - b.dist)

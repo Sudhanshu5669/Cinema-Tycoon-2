@@ -227,6 +227,14 @@ export class TileMapRenderer {
           this._lights.push({
             x: b.x * TILE + d.fx * TILE + size.w / 2,
             y: faceTop + localY + size.h / 2,
+            // Ground anchor, for casting the player's shadow away from this
+            // light -- straight down the wall to the pavement, not the
+            // window's own (possibly upper-storey) position. Using the glow
+            // position itself here would mean a light mounted high up reads
+            // as standing further back than it really is on the ground, and
+            // skews the shadow's direction to match -- see gy on the
+            // streetlamp below for the same mistake, actually made once.
+            gx: b.x * TILE + d.fx * TILE + size.w / 2, gy: frontY,
             kind: 'window',
           });
         }
@@ -244,6 +252,7 @@ export class TileMapRenderer {
       this._lights.push({
         x: (b.x + b.awning.fx) * TILE + (b.awning.fw * TILE) / 2,
         y: awY + TILE / 2,
+        gx: (b.x + b.awning.fx) * TILE + (b.awning.fw * TILE) / 2, gy: frontY,
         kind: 'marquee',
       });
     }
@@ -302,6 +311,14 @@ export class TileMapRenderer {
     this._lights.push({
       x: p.x * TILE + TILE / 2,
       y: baseY - size.h + LAMP_BULB_DY,
+      // Ground anchor: the pole's own base, not the elevated bulb above.
+      // A bulb sitting up near the top of the post is still standing over
+      // the same patch of ground the pole meets -- using its screen y (well
+      // north of the base, being higher up the pole) as if that were where
+      // the light stood would make the player's shadow point away from a
+      // spot several tiles further back than the lamp really is, visibly
+      // wrong the moment the player stands right next to the post itself.
+      gx: p.x * TILE + TILE / 2, gy: baseY,
       kind: 'streetlamp',
     });
   }
