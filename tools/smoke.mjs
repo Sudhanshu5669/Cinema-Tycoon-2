@@ -312,20 +312,37 @@ check('the player casts a shadow along the sun\'s own direction, not the opposit
 // away from it is asked of LightingLayer rather than re-derived by hand).
 // The shadow should fall away from the lamp, not toward it, regardless of any
 // second light also reaching this far (hence a comparative check, not an
-// exact on/off one).
+// exact on/off one). Offset a little south of the lamp's own row, not level
+// with it -- level is a real, correctly-handled case (see shadows.js's
+// dy = 0 guard) but its shadow is a near-horizontal sliver by nature, a
+// needlessly fussy reading for what this check is actually after.
 await page.evaluate(() => window.__dev.setTime(22));
 await page.waitForTimeout(150);
-await page.evaluate(() => window.__dev.warp(170, 400));
+await page.evaluate(() => window.__dev.warp(170, 430));
 await page.waitForTimeout(200);
-const nearestLamp = (await page.evaluate(() => window.__dev.shadowSourcesAt(170, 400)))[0];
-const lampDir = { x: 170 - nearestLamp.x, y: 400 - nearestLamp.y };
+const nearestLamp = (await page.evaluate(() => window.__dev.shadowSourcesAt(170, 430)))[0];
+const lampDir = { x: 170 - nearestLamp.x, y: 430 - nearestLamp.y };
 const [awayFromLamp, towardLamp] = await Promise.all([
-  maxShadowAlong(lampDir.x, lampDir.y, undefined, [0, 15, 30]),
-  maxShadowAlong(-lampDir.x, -lampDir.y),
+  maxShadowAlong(lampDir.x, lampDir.y), maxShadowAlong(-lampDir.x, -lampDir.y),
 ]);
 check('the player casts a shadow away from a nearby streetlamp',
   awayFromLamp > 0.05 && awayFromLamp > towardLamp,
   `away ${awayFromLamp.toFixed(2)} toward ${towardLamp.toFixed(2)}`);
+
+// And the reverse: standing north of the lamp, the shadow should point
+// further north (away from it), not south -- exactly the direction a
+// southward bias (tried and reverted, see shadows.js's own note) would have
+// gotten backwards, so this is the regression check for that specifically.
+await page.evaluate(() => window.__dev.warp(170, 370));
+await page.waitForTimeout(200);
+const lampFromNorth = (await page.evaluate(() => window.__dev.shadowSourcesAt(170, 370)))[0];
+const northDir = { x: 170 - lampFromNorth.x, y: 370 - lampFromNorth.y };
+const [awayNorth, towardNorth] = await Promise.all([
+  maxShadowAlong(northDir.x, northDir.y), maxShadowAlong(-northDir.x, -northDir.y),
+]);
+check('...and away from a streetlamp that is south of the player, not toward it',
+  awayNorth > 0.05 && awayNorth > towardNorth,
+  `away ${awayNorth.toFixed(2)} toward ${towardNorth.toFixed(2)}`);
 
 await lightAt(21.5);
 await page.evaluate(() => window.__dev.warp(176, 360));

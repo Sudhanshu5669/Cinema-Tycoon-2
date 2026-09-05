@@ -64,17 +64,6 @@ const PLAYER_SHADOW_REACH = 130;
  *  short) to standing right on top of it (bright, long) -- see updatePlayer. */
 const PLIGHT_MIN_LEN = 14;
 const PLIGHT_MAX_LEN = 70;
-/** Minimum southward (toward-camera) component of a point-light shadow's own
- *  unit direction -- the same deliberate cheat sun.js's own header already
- *  explains for the sun ("kept low and behind the viewer all day: shadows
- *  always rake south... where they can be seen"). A point light doesn't get
- *  to cheat its position the way sun.js cheats the sun's, but the shadow it
- *  throws still has to read in this 3/4 view: without this floor, a light
- *  exactly level with the player (ordinary the moment a light has its own
- *  position instead of one shared angle -- walking any lit street puts you
- *  level with a lamp constantly) casts a shadow with no reach into the
- *  screen at all, a degenerate sliver rather than a believable shape. */
-const PLIGHT_MIN_SOUTH = 0.35;
 
 export class ShadowLayer {
   /**
@@ -312,18 +301,15 @@ export class ShadowLayer {
       // different distance (to the glow position, what decides how strongly
       // lit the player is) and must not be reused here, or the direction
       // vector silently stops being unit length.
+      // Away from the light's true position -- no directional bias here.
+      // Unlike the sun (a fiction sun.js is free to keep "behind the viewer
+      // all day" specifically so its shadows always rake south into view), a
+      // streetlamp really is standing wherever it's standing: forcing every
+      // shadow toward south would point it *toward* a light that happens to
+      // be south of the player, which is backwards, not just stylised.
       const ddx = px - src.x, ddy = py - src.y;
       const dirDist = Math.max(1, Math.hypot(ddx, ddy));
-      let ux = ddx / dirDist, uy = ddy / dirDist;
-      // Floor the southward component (see PLIGHT_MIN_SOUTH) and renormalize
-      // so the vector stays unit length -- otherwise raising uy alone would
-      // quietly make the shadow reach further than `len` is about to say it
-      // does.
-      if (uy < PLIGHT_MIN_SOUTH) {
-        uy = PLIGHT_MIN_SOUTH;
-        const mag = Math.hypot(ux, uy) || 1;
-        ux /= mag; uy /= mag;
-      }
+      const ux = ddx / dirDist, uy = ddy / dirDist;
       // 1 standing at the light, 0 at the edge of its own radius -- both how
       // far the shadow reaches and how dark it is fade out together, so a
       // light barely strong enough to reach the player doesn't throw a full
