@@ -115,6 +115,19 @@ export class TileMapRenderer {
     this.lighting?.setHours(hours);
   }
 
+  /**
+   * The player's own shadow(s) -- from the sun, same as everything else, and
+   * from whichever nearby point lights are actually lighting them right now.
+   * Call every frame; both layers underneath throttle their own redraws.
+   * @param {number} px @param {number} py world position (origin 0.5, 1)
+   * @param {string} frameName current sprite frame, e.g. `sprite.frame.name`
+   * @param {number} heightPx the player sprite's height
+   */
+  updatePlayer(px, py, frameName, heightPx) {
+    const sources = this.lighting?.shadowSources(px, py) ?? [];
+    this.shadows?.updatePlayer(px, py, frameName, heightPx, this.hours, sources);
+  }
+
   _place(key, x, y, depth) {
     const img = this.scene.add.image(x, y, key).setOrigin(0, 0);
     img.setDepth(depth);

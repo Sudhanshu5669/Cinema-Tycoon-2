@@ -265,6 +265,56 @@ check('marquee glow is off at noon and on at night',
   litNoon.marqueeGlow === 0 && litNight.marqueeGlow > 0,
   `noon ${litNoon.marqueeGlow} night ${litNight.marqueeGlow}`);
 
+// --- the player casts a shadow too, from the sun and from nearby lights -----
+// The player's own silhouette has real gaps in it (the legs, per GAME_SPEC's
+// own art direction, are "long and thin with a clear gap between them"), and
+// those gaps carry through into the shadow -- a single exact-pixel sample can
+// land right in one and read as unlit even where the shadow is genuinely
+// present. Sampling a small spread of distances along the same direction and
+// taking the max is what a real screen reading would do (see the shape with
+// your eyes, not one pixel of it) and is what these checks do too.
+const maxShadowAlong = async (dx, dy, lens = [10, 16, 22, 30, 40]) => {
+  const mag = Math.hypot(dx, dy) || 1;
+  const ux = dx / mag, uy = dy / mag;
+  const vals = await Promise.all(lens.map((len) =>
+    page.evaluate((v) => window.__dev.playerShadowAt(v.x, v.y), { x: ux * len, y: uy * len })));
+  return Math.max(...vals);
+};
+
+// Hour 15: well before any GLOW_CURVES onset (earliest is DUSK-2), so every
+// point light is off regardless of proximity -- a clean sun-only reading.
+await page.evaluate(() => window.__dev.setTime(15));
+await page.waitForTimeout(150);
+await page.evaluate(() => window.__dev.warp(700, 360));
+await page.waitForTimeout(200);
+const sun = shadowFor(15, 48);
+const [withSun, oppositeSun] = await Promise.all([
+  maxShadowAlong(sun.dx, sun.dy), maxShadowAlong(-sun.dx, -sun.dy),
+]);
+check('the player casts a shadow along the sun\'s own direction, not the opposite way',
+  withSun > 0.05 && withSun > oppositeSun,
+  `with-sun ${withSun.toFixed(2)} opposite ${oppositeSun.toFixed(2)}`);
+
+// Night, standing next to a streetlamp (public/assets/city.json's first
+// north lamp, tile (8,24) -> world (136,400) at the base -- the light itself
+// sits up near the bulb, a renderer-internal offset, so the exact direction
+// away from it is asked of LightingLayer rather than re-derived by hand).
+// The shadow should fall away from the lamp, not toward it, regardless of any
+// second light also reaching this far (hence a comparative check, not an
+// exact on/off one).
+await page.evaluate(() => window.__dev.setTime(22));
+await page.waitForTimeout(150);
+await page.evaluate(() => window.__dev.warp(170, 400));
+await page.waitForTimeout(200);
+const nearestLamp = (await page.evaluate(() => window.__dev.shadowSourcesAt(170, 400)))[0];
+const lampDir = { x: 170 - nearestLamp.x, y: 400 - nearestLamp.y };
+const [awayFromLamp, towardLamp] = await Promise.all([
+  maxShadowAlong(lampDir.x, lampDir.y), maxShadowAlong(-lampDir.x, -lampDir.y),
+]);
+check('the player casts a shadow away from a nearby streetlamp',
+  awayFromLamp > 0.05 && awayFromLamp > towardLamp,
+  `away ${awayFromLamp.toFixed(2)} toward ${towardLamp.toFixed(2)}`);
+
 await lightAt(21.5);
 await page.evaluate(() => window.__dev.warp(176, 360));
 await page.waitForTimeout(120);

@@ -12,7 +12,7 @@
 // fits on screen.
 
 import Phaser from 'phaser';
-import { INTERNAL_W, INTERNAL_H, SPRITE_W } from '../core/config.js';
+import { INTERNAL_W, INTERNAL_H, SPRITE_W, SPRITE_H } from '../core/config.js';
 import { Input, KeyboardSource, VirtualStickSource, isTouchDevice } from '../core/input/index.js';
 import { Player, registerAnimations, TEXTURE } from '../game/player.js';
 import { FollowCamera } from '../game/camera.js';
@@ -183,6 +183,22 @@ export class DevScene extends Phaser.Scene {
         for (let i = 0; i < x1 - x0; i++) if (data[i * 4 + 3] > 0) xs.push(x0 + i);
         return xs;
       },
+      // Alpha (0..1) of the player's own shadow canvas at a world-space
+      // offset from the player's current position -- the player-shadow
+      // canvas is recentred on the player every redraw, so this is always
+      // "how dark is the ground `(dx, dy)` away from where I'm standing".
+      playerShadowAt: (dx, dy) => {
+        const c = this.map.shadows.playerCanvas;
+        const half = c.width / 2;
+        const x = Math.round(half + dx), y = Math.round(half + dy);
+        if (x < 0 || y < 0 || x >= c.width || y >= c.height) return 0;
+        return c.getContext().getImageData(x, y, 1, 1).data[3] / 255;
+      },
+      // Ground truth for the smoke test: a light's *bulb* position is a
+      // renderer-internal offset from its map placement (near the top of a
+      // streetlamp, not its base), so the test asks LightingLayer directly
+      // rather than re-deriving that offset by hand.
+      shadowSourcesAt: (px, py) => this.map.lighting?.shadowSources(px, py) ?? [],
     };
   }
 
@@ -316,6 +332,10 @@ export class DevScene extends Phaser.Scene {
     if (this.autoTime) this.hours = (this.hours + dt * (24 / DAY_SECONDS)) % 24;
     // Cheap when the hour has not moved into a new bake bucket.
     this.map.setHours(this.hours);
+    // The player's own shadow(s) -- from the sun and from nearby point
+    // lights. Runs every frame; ShadowLayer.updatePlayer throttles its own
+    // redraw, this doesn't need to.
+    this.map.updatePlayer(this.player.x, this.player.y, this.player.sprite.frame.name, SPRITE_H);
 
     const a = this.input_.axis;
     const view = this.cameras.main;

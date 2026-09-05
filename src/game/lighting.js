@@ -116,6 +116,34 @@ export class LightingLayer {
     });
   }
 
+  /**
+   * The nearest lit point lights to (px, py), for casting the player's own
+   * shadow away from them at night -- a point light, unlike the sun, has a
+   * position, so which way the player's shadow falls depends on where they
+   * happen to be standing relative to it, not one shared angle for the whole
+   * scene. Only lights actually lit right now (intensity > 0, e.g. not a
+   * window at noon) and close enough to matter (inside their own radius --
+   * beyond it, a light isn't lighting the player, so it has no business
+   * casting their shadow either) are candidates.
+   * @param {number} px @param {number} py
+   * @param {number} [maxCount=2] how many lights may shadow the player at
+   *   once -- capped low since this runs every frame the player moves.
+   * @returns {{x:number, y:number, intensity:number, radius:number, dist:number}[]}
+   *   nearest first.
+   */
+  shadowSources(px, py, maxCount = 2) {
+    if (!this.active) return [];
+    return this.points
+      .map((p, i) => {
+        const light = this.lights[i];
+        return { x: p.x, y: p.y, intensity: light.intensity, radius: light.radius,
+          dist: Math.hypot(p.x - px, p.y - py) };
+      })
+      .filter((s) => s.intensity > 0.05 && s.dist < s.radius)
+      .sort((a, b) => a.dist - b.dist)
+      .slice(0, maxCount);
+  }
+
   /** Packed 0xRRGGBB, for the smoke test and debug readouts. */
   get ambientColor() {
     if (!this.active) return 0xffffff;

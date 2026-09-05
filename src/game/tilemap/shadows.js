@@ -34,9 +34,36 @@
 //
 // The bake is throttled to ~0.05h steps, so even a fast day/night cycle only
 // redraws the canvases a few times a second.
+//
+// The player is a third kind of caster, and deliberately not baked into the
+// same canvas as the other two: it moves every frame, while buildings,
+// platforms and streetlamps never do. Repainting the whole world-sized
+// static canvas on every step the player takes would redo all of that
+// unmoving work for nothing. Instead updatePlayer() owns one small canvas,
+// just big enough for the longest shadow the player can throw, recentred on
+// the player each time -- so redrawing it costs a couple of drawImage calls
+// on a few hundred px of canvas, not the whole map. It draws two kinds of
+// shadow, both reusing the same sprite-silhouette + shear technique as a
+// streetlamp: one from the sun (shadowFor, the same shared angle everything
+// else uses, live only while the sun actually casts one) and up to a
+// couple more from whichever point lights (LightingLayer#shadowSources) are
+// currently close enough to be lighting the player at all -- a light has its
+// own position, so unlike the sun, the direction is different every time the
+// player moves relative to it, and more than one nearby lamp can each throw
+// their own shadow, exactly as real point-source light does.
 
 import { DEPTH_SHADOW } from './projection.js';
 import { shadowFor } from './sun.js';
+
+/** Half-size of the player's own shadow canvas, world px. Comfortably past
+ *  the longest shadow either the sun or a point light throws below (a sun
+ *  shadow tops out around 2.6x the caster's height -- SPRITE_H is 48 -- and
+ *  point-light shadows are capped well under that, see PLIGHT_MAX_LEN). */
+const PLAYER_SHADOW_REACH = 130;
+/** Point-light player shadows: length range (px) from a light's edge (dim,
+ *  short) to standing right on top of it (bright, long) -- see updatePlayer. */
+const PLIGHT_MIN_LEN = 14;
+const PLIGHT_MAX_LEN = 70;
 
 export class ShadowLayer {
   /**
@@ -91,6 +118,18 @@ export class ShadowLayer {
     });
 
     this._bucket = null;
+
+    // The player's own shadow(s) -- see the header comment for why this is a
+    // separate, small, frequently-redrawn canvas rather than folded into the
+    // one above. Sized for the longest shadow either a sun or a point light
+    // here ever throws (PLAYER_SHADOW_REACH), recentred on the player instead
+    // of the world, so the canvas itself can stay tiny.
+    this.playerKey = `${this.key}-player`;
+    if (scene.textures.exists(this.playerKey)) scene.textures.remove(this.playerKey);
+    const ps = PLAYER_SHADOW_REACH * 2;
+    this.playerCanvas = scene.textures.createCanvas(this.playerKey, ps, ps);
+    this.playerImage = scene.add.image(0, 0, this.playerKey).setOrigin(0, 0).setDepth(DEPTH_SHADOW + 1);
+    this._playerBucket = null;
   }
 
   /** @param {number} hours */
@@ -195,7 +234,7 @@ export class ShadowLayer {
    * of a footprint. That is exactly one affine shear + scale, so the whole
    * projection is a single canvas transform, not a per-pixel loop.
    */
-  _paintSpriteShadow(ctx, caster, { dx, dy }) {
+  _paintSpriteShadow(ctx, caster, { dx, dy }, alpha = 1) {
     const { canvas, w, h } = this._silhouetteFor(caster.textureKey, caster.frameName);
     const H = caster.heightPx || h;
     ctx.save();
@@ -204,8 +243,62 @@ export class ShadowLayer {
     // particular matrix sends the base to (x, y) untouched and the top to
     // (x, y) + (dx, dy).
     ctx.setTransform(1, 0, -dx / H, -dy / H, caster.x + dx, caster.y + dy);
+    ctx.globalAlpha = alpha;
     ctx.drawImage(canvas, -w / 2, 0);
     ctx.restore();
+  }
+
+  /**
+   * Redraws the player's own shadow(s) -- called every frame the player
+   * might have moved, not throttled by the hour bucket the way the static
+   * canvas above is. See the header comment for why this is a separate,
+   * small, recentred canvas rather than folded into that one.
+   *
+   * @param {number} px @param {number} py world position, the same anchor
+   *   the player's own sprite uses (origin 0.5, 1)
+   * @param {string} frameName current animation frame, e.g. from
+   *   `player.sprite.frame.name` -- the shadow follows the actual walk pose
+   * @param {number} heightPx the player sprite's height (SPRITE_H)
+   * @param {number} hours drives the sun shadow, same as the static canvas
+   * @param {{x:number, y:number, intensity:number, radius:number, dist:number}[]} lightSources
+   *   from LightingLayer#shadowSources -- nearest lit point lights, already
+   *   filtered to ones actually close enough to be lighting the player
+   */
+  updatePlayer(px, py, frameName, heightPx, hours, lightSources) {
+    // Bucketed to whole px (sub-pixel jitter is invisible anyway) plus the
+    // hour bucket and every light source's rounded position/intensity, so an
+    // idle player under an unchanging sky redraws only on its own idle-blink
+    // frame change, not every single frame.
+    const lightKey = lightSources.map((s) => `${s.x},${s.y},${s.intensity.toFixed(2)}`).join('|');
+    const bucket = `${Math.round(px)},${Math.round(py)},${frameName},${Math.round(hours * 20)},${lightKey}`;
+    if (bucket === this._playerBucket) return;
+    this._playerBucket = bucket;
+
+    const half = PLAYER_SHADOW_REACH;
+    this.playerImage.setPosition(px - half, py - half);
+    const caster = { x: half, y: half, textureKey: 'player', frameName, heightPx };
+
+    const ctx = this.playerCanvas.getContext();
+    ctx.clearRect(0, 0, half * 2, half * 2);
+
+    const sun = shadowFor(hours, heightPx);
+    if (sun) this._paintSpriteShadow(ctx, caster, sun, sun.alpha);
+
+    for (const src of lightSources) {
+      const ddx = px - src.x, ddy = py - src.y;
+      const dist = Math.max(1, src.dist);
+      // 1 standing at the light, 0 at the edge of its own radius -- both how
+      // far the shadow reaches and how dark it is fade out together, so a
+      // light barely strong enough to reach the player doesn't throw a full
+      // -strength shadow.
+      const proximity = clamp01(1 - dist / src.radius);
+      const len = PLIGHT_MIN_LEN + (PLIGHT_MAX_LEN - PLIGHT_MIN_LEN) * proximity;
+      const dx = (ddx / dist) * len, dy = (ddy / dist) * len;
+      const alpha = 0.2 + 0.45 * proximity * Math.min(1, src.intensity);
+      this._paintSpriteShadow(ctx, caster, { dx, dy }, alpha);
+    }
+
+    this.playerCanvas.refresh();
   }
 
   destroy() {
@@ -215,6 +308,8 @@ export class ShadowLayer {
       layer.image.destroy();
       if (this.scene.textures.exists(layer.key)) this.scene.textures.remove(layer.key);
     }
+    this.playerImage.destroy();
+    if (this.scene.textures.exists(this.playerKey)) this.scene.textures.remove(this.playerKey);
     this._silhouettes.clear();
   }
 }
@@ -275,6 +370,8 @@ function clipHalfPlane(pts, inside, intersect) {
 }
 
 function lerpAt(a, b, t) { return { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t }; }
+
+function clamp01(v) { return v < 0 ? 0 : v > 1 ? 1 : v; }
 
 /** Shoelace formula. Used only to tell a real overlap apart from a zero-width
  *  sliver where two footprints merely touch along a shared edge. */
