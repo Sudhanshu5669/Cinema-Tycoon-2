@@ -449,11 +449,11 @@ check('an out-of-bounds building fails loudly, naming the entry',
 let badNameErr = null;
 try {
   loadCityMap({ w: 4, h: 3, buildings: [{
-    x: 0, y: 0, w: 4, h: 1, awning: { fx: 0, fw: 2, name: 'WAY TOO LONG A NAME FOR THIS' },
+    x: 0, y: 0, w: 4, h: 1, panels: [{ fx: 0, fw: 2, text: 'WAY TOO LONG A NAME FOR THIS' }],
   }] });
 } catch (e) { badNameErr = e; }
-check('a marquee name that overflows its band fails loudly, naming the entry',
-  badNameErr instanceof CityMapError && /buildings\[0\]\.awning\.name/.test(badNameErr.message),
+check('a panel name that overflows its band fails loudly, naming the entry',
+  badNameErr instanceof CityMapError && /buildings\[0\]\.panels\[0\]/.test(badNameErr.message),
   badNameErr?.message.split('\n')[1]);
 
 // In the browser: an unknown tile name is only catchable against the atlas

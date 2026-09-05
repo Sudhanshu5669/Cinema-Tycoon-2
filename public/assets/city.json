@@ -75,7 +75,7 @@
       ]
     },
     {
-      "x": 38, "y": 13, "w": 24, "h": 5, "storeys": 6, "roofDepth": 4,
+      "x": 38, "y": 13, "w": 24, "h": 5, "storeys": 8, "roofDepth": 4,
       "face": "brick", "base": "brick", "top": "roof",
       "facade": [
         { "tile": "cinemaDoor", "fx": 12, "fy": 0 },
@@ -84,8 +84,11 @@
         { "tile": "window", "fx": 0, "fy": 1 }, { "tile": "window", "fx": 3, "fy": 1 }, { "tile": "window", "fx": 6, "fy": 1 },
         { "tile": "windowWide", "fx": 15, "fy": 1 }, { "tile": "window", "fx": 21, "fy": 1 }
       ],
-      "awning": { "fx": 5, "fw": 16, "up": 4, "h": 2, "tile": "marquee", "name": "PIXEL CINEMA" },
-      "readerBoard": { "fx": 5, "fw": 16, "h": 2, "up": 6, "text": "NOW SHOWING" },
+      "awning": { "fx": 5, "fw": 16, "up": 3, "h": 1, "tile": "marquee" },
+      "panels": [
+        { "fx": 5, "fw": 16, "h": 2, "up": 5, "text": "PIXEL CINEMA", "bg": "#e8dcc0", "border": "#d9c9a3", "color": "#7a2e2b" },
+        { "fx": 5, "fw": 16, "h": 3, "up": 8, "text": "NOW SHOWING", "bg": "#1c2438", "border": "#d9c9a3", "color": "#cfe6ea" }
+      ],
       "sign": { "fx": 20, "h": 3 }
     },
     {

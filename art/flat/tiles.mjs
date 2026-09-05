@@ -713,9 +713,17 @@ export const DOOR = [
  * introducing on its own; DOOR's existing central mullion (`X`, originally
  * just a sash bar down the middle of the glass) now doubles for free as the
  * seam between two theatre-door leaves once it's this colour, so the
- * geometry needed no changes at all to read as a double door. Same 24x48
- * footprint as DOOR -- a straight swap in a building's own `facade` entry,
- * nothing about placement or the loader's validation changes.
+ * geometry needed no changes at all to read as a double door. The glass
+ * itself is warm amber (`M`/`R`), not the ordinary window's cold `I`/`i` --
+ * **second follow-up, against the reference again**: a flat, un-recessed
+ * door with cold glass was one of the concrete misses the user called out
+ * ("this does not look like the reference at all"), so the glass now reads
+ * as lit from inside rather than a dark reflective pane, and `renderer.js`'s
+ * `_buildBuilding` draws a darker recessed alcove behind this tile
+ * specifically (see `ALCOVE_COLOR`) so the doorway sits inset in the wall
+ * instead of glued flush to it. Same 24x48 footprint as DOOR -- a straight
+ * swap in a building's own `facade` entry, nothing about placement or the
+ * loader's validation changes.
  */
 export const CINEMA_DOOR = [
   '.xxxxxxxxxxxxxxxxxxxxxx.',
@@ -723,25 +731,25 @@ export const CINEMA_DOOR = [
   '.xvvvvvvvvvvvvvvvvvvvVx.',
   '.xvvvvvvvvvvvvvvvvvvvVx.',
   '.xvvvvvvvvvvvvvvvvvvvVx.',
-  '.xvIIIIIIIIIXiiiiiiiiVx.',
-  '.xvIIIIIIIIIXiiiiiiiiVx.',
-  '.xvIIIIIIIIIXiiiiiiiiVx.',
-  '.xvIIIIIIIIIXiiiiiiiiVx.',
-  '.xvIIIIIIIIIXiiiiiiiiVx.',
-  '.xvIIIIIIIIIXiiiiiiiiVx.',
-  '.xvIIIIIIIIIXiiiiiiiiVx.',
-  '.xvIIIIIIIIIXiiiiiiiiVx.',
-  '.xvIIIIIIIIIXiiiiiiiiVx.',
-  '.xviiiiiiiiiXiiiiiiiiVx.',
-  '.xviiiiiiiiiXiiiiiiiiVx.',
-  '.xviiiiiiiiiXiiiiiiiiVx.',
-  '.xviiiiiiiiiXiiiiiiiiVx.',
-  '.xviiiiiiiiiXiiiiiiiiVx.',
-  '.xviiiiiiiiiXiiiiiiiiVx.',
-  '.xviiiiiiiiiXiiiiiiiiVx.',
-  '.xviiiiiiiiiXiiiiiiiiVx.',
-  '.xviiiiiiiiiXiiiiiiiiVx.',
-  '.xviiiiiiiiiXiiiiiiiiVx.',
+  '.xvMMMMMMMMMXRRRRRRRRVx.',
+  '.xvMMMMMMMMMXRRRRRRRRVx.',
+  '.xvMMMMMMMMMXRRRRRRRRVx.',
+  '.xvMMMMMMMMMXRRRRRRRRVx.',
+  '.xvMMMMMMMMMXRRRRRRRRVx.',
+  '.xvMMMMMMMMMXRRRRRRRRVx.',
+  '.xvMMMMMMMMMXRRRRRRRRVx.',
+  '.xvMMMMMMMMMXRRRRRRRRVx.',
+  '.xvMMMMMMMMMXRRRRRRRRVx.',
+  '.xvRRRRRRRRRXRRRRRRRRVx.',
+  '.xvRRRRRRRRRXRRRRRRRRVx.',
+  '.xvRRRRRRRRRXRRRRRRRRVx.',
+  '.xvRRRRRRRRRXRRRRRRRRVx.',
+  '.xvRRRRRRRRRXRRRRRRRRVx.',
+  '.xvRRRRRRRRRXRRRRRRRRVx.',
+  '.xvRRRRRRRRRXRRRRRRRRVx.',
+  '.xvRRRRRRRRRXRRRRRRRRVx.',
+  '.xvRRRRRRRRRXRRRRRRRRVx.',
+  '.xvRRRRRRRRRXRRRRRRRRVx.',
   '.xvvvvvvvvvvvvvvvvvvvVx.',
   '.xvvvvvvvvvvvvvvvvvvvVx.',
   '.xvvvvvvvvvvvvvvvvvvkVx.',
@@ -823,35 +831,41 @@ export const BOX_OFFICE = [
 /**
  * 16 x 32 -- a glass-fronted poster case, one tile wide so a pair can flank
  * the door tightly the way a real cinema entrance frames it with one-sheets
- * on either side. The "poster" inside is an abstracted image block (`X`,
- * reused from the window frame's own shaded tone rather than a new colour --
- * there is no font tile to print an actual title on, so the honest thing is
- * a faded photo silhouette, not fake text) on faded paper (`j`/`J`, this
- * set's other deliberately-warm exception alongside brick, since sun-bleached
- * paper is a real material colour, not a mood). One `s` pixel -- the
- * character palette's own shirt-cream, already present in this tile
- * namespace for the awning -- stands in for a single curled/torn corner:
- * the cheap-cinema detail the user asked for, not a pristine display case.
- * Sits on the same sill language as WINDOW (`l`/`L`) over its own small
- * panelled base, flush to the pavement like BOX_OFFICE (meant for `fy: 0`).
+ * on either side. The "poster" inside is a colour-block art panel (`v`/`V`,
+ * the marquee's own accent, reused rather than adding a colour -- see
+ * renderer.js's own note on why a cinema's signage is allowed a few accents
+ * beyond the marquee's single red) inset in a dark mat (`X`); there is no
+ * font tile to print an actual title on, so the honest thing is a bold
+ * colour panel suggesting a poster's own art, not fake text. **Follow-up,
+ * against the user's reference image**: a first pass made this whole panel
+ * one flat dark `X` rectangle and it read as an empty grey box, not a
+ * poster -- one of the concrete misses called out ("this does not look like
+ * the reference at all"). Sits on faded paper (`j`/`J`, this set's other
+ * deliberately-warm exception alongside brick, since sun-bleached paper is a
+ * real material colour, not a mood), with one `s` pixel (the character
+ * palette's own shirt-cream, already present in this tile namespace for the
+ * awning) standing in for a single curled/torn corner -- the cheap-cinema
+ * detail the user asked for, not a pristine display case. Sits on the same
+ * sill language as WINDOW (`l`/`L`) over its own small panelled base, flush
+ * to the pavement like BOX_OFFICE (meant for `fy: 0`).
  */
 export const POSTER_CASE = [
   '.xxxxxxxxxxxxxx.',
   '.xjjjjjjjjjjjjx.',
   '.xjjjjjjjjjjjjx.',
   '.xXXXXXXXXXXXXx.',
-  '.xXXXXxXXXXXXXx.',
+  '.xXXvvvvvvvvXXx.',
+  '.xXXvvvvvvvvXXx.',
+  '.xXXvvvvvvvvXXx.',
+  '.xXXvvvvvvvvXXx.',
+  '.xXXVVVVVVVVXXx.',
+  '.xXXVVVVVVVVXXx.',
+  '.xXXvvvvvvvvXXx.',
+  '.xXXvvvvvvvvXXx.',
+  '.xXXvvvvvvvvXXx.',
+  '.xXXvvvvvvvvXXx.',
   '.xXXXXXXXXXXXXx.',
-  '.xXXXXxXXXXXXXx.',
   '.xXXXXXXXXXXXXx.',
-  '.xXXXXXXXXXXXXx.',
-  '.xXXXXxXXXXXXXx.',
-  '.xXXXXXXXXXXXXx.',
-  '.xXXXXXXXXXXXXx.',
-  '.xXXXXxXXXXXXXx.',
-  '.xXXXXXXXXXXXXx.',
-  '.xXXXXXXXXXXXXx.',
-  '.xXXXXxXXXXXXXx.',
   '.xXXXXXXXXXXXXx.',
   '.xXXXXXXXXXXXXx.',
   '.xXXXXXXXXXXXXx.',

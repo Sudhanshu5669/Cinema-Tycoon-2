@@ -168,7 +168,6 @@ export function loadCityMap(raw, scene) {
         errs.push(`${label}.awning.tile: unknown tile "${b.awning.tile}"`);
       }
       if (b.awning.h !== undefined && !posInt(b.awning.h)) errs.push(`${label}.awning.h must be a positive integer, got ${b.awning.h}`);
-      checkSignText(`${label}.awning.name`, b.awning.name, fw);
     }
     if (b.sign) {
       const { fx, h } = b.sign;
@@ -177,15 +176,20 @@ export function loadCityMap(raw, scene) {
       }
       if (h !== undefined && !posInt(h)) errs.push(`${label}.sign.h must be a positive integer, got ${h}`);
     }
-    if (b.readerBoard) {
-      const { fx, fw, h, up } = b.readerBoard;
+    // Flat bordered signboards -- the cinema's own name, a reader board, or
+    // any future panel: one generic list (see renderer.js's own `panels`
+    // comment for why this replaced a first pass's separate `awning.name`
+    // and single `readerBoard` field).
+    (b.panels ?? []).forEach((p, j) => {
+      const plabel = `${label}.panels[${j}]`;
+      const { fx, fw, h, up } = p;
       if (!(Number.isInteger(fx) && Number.isInteger(fw) && fw > 0 && fx >= 0 && Number.isInteger(b.w) && fx + fw <= b.w)) {
-        errs.push(`${label}.readerBoard: fx=${fx} fw=${fw} runs past the building's own width ${b.w}`);
+        errs.push(`${plabel}: fx=${fx} fw=${fw} runs past the building's own width ${b.w}`);
       }
-      if (h !== undefined && !posInt(h)) errs.push(`${label}.readerBoard.h must be a positive integer, got ${h}`);
-      if (up !== undefined && !posInt(up)) errs.push(`${label}.readerBoard.up must be a positive integer, got ${up}`);
-      checkSignText(`${label}.readerBoard.text`, b.readerBoard.text, fw);
-    }
+      if (h !== undefined && !posInt(h)) errs.push(`${plabel}.h must be a positive integer, got ${h}`);
+      if (up !== undefined && !posInt(up)) errs.push(`${plabel}.up must be a positive integer, got ${up}`);
+      checkSignText(`${plabel}.text`, p.text, fw);
+    });
   });
 
   (raw.streetlamps ?? []).forEach((p, i) => {

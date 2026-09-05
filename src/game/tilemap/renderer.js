@@ -33,16 +33,30 @@ import { measureWidth, CHAR_H } from './font.js';
 import { ShadowLayer } from './shadows.js';
 import { LightingLayer, wireLight } from '../lighting.js';
 
-// Marquee/reader-board signage colours: the warm bulb-glass family the
-// streetlamp already established (`art/flat/palette.mjs`'s `e`/`E`),
-// duplicated here as a literal hex rather than imported -- `src/` never
-// imports `art/` (Node-only authoring data), see font.js's own note on the
-// same boundary. The reader board's background is a dark neutral, not a
-// second saturated colour: the marquee's own red stays the one accent.
+// Marquee/panel signage colours. Per the user's own reference image: a
+// cinema's signage is where this world is allowed a *few* accents beyond the
+// marquee's single red, the same way the marquee itself was already an
+// exception to "one accent" -- these are still spent in exactly one place
+// (this building's own signage), never bled into the rest of the street.
+// A `panels` entry (below) can override bg/border/color from its own data
+// (city.json gives the name board a cream track, the reader board a cool
+// "screen glow" blue); these are just the shared fallback and the fixed
+// small-plaque tone (TICKET/CANDY use this one always, not per-building data).
 const MARQUEE_TEXT_COLOR = '#d9c9a3';
-const READER_BG_COLOR = '#201c26';
-const READER_BORDER_COLOR = '#d9c9a3';
-const READER_BORDER = 2;
+const PANEL_BORDER_COLOR = '#d9c9a3';
+const READER_BG_COLOR = '#1c2438';
+const PANEL_BORDER = 2;
+const PLAQUE_BG_COLOR = '#201c26';
+/** Small plaque label above a booth/stand -- TICKET, CANDY. Not a per-cinema
+ *  identity like the marquee name; universal fixture signage, so it's fixed
+ *  here rather than authored per building. */
+const FACADE_LABELS = { boxOffice: 'TICKET', candyStand: 'CANDY' };
+const LABEL_SCALE = 1;
+/** The recessed alcove a theatre door sits in -- drawn behind the door tile,
+ *  slightly larger on every side but the bottom (which meets the threshold),
+ *  so the doorway reads as a real inset rather than glued flat to the wall. */
+const ALCOVE_COLOR = '#221e29';
+const ALCOVE_MARGIN = 3;
 
 export class TileMapRenderer {
   static preload(scene) { preloadTiles(scene); }
@@ -261,10 +275,21 @@ export class TileMapRenderer {
       for (const d of b.facade ?? []) {
         const size = frameSize(this.scene, d.tile);
         const localY = faceH - (d.fy ?? 0) * TILE - size.h;
-        g.tile(d.tile, d.fx * TILE, localY);
-        if (d.tile === 'window' || d.tile === 'windowWide') {
+        const localX = d.fx * TILE;
+
+        // A theatre door sits recessed, not glued flat to the wall -- a
+        // darker alcove drawn first, wider on every side but the bottom
+        // (which meets the threshold, already its own plinth-matched tone),
+        // then the door on top of it. Per the user's reference image: the
+        // flat, un-recessed door was one of the concrete misses.
+        if (d.tile === 'cinemaDoor') {
+          g.rect(ALCOVE_COLOR, localX - ALCOVE_MARGIN, localY - ALCOVE_MARGIN,
+            size.w + ALCOVE_MARGIN * 2, size.h + ALCOVE_MARGIN);
+        }
+        g.tile(d.tile, localX, localY);
+        if (d.tile === 'window' || d.tile === 'windowWide' || d.tile === 'cinemaDoor') {
           this._lights.push({
-            x: b.x * TILE + d.fx * TILE + size.w / 2,
+            x: b.x * TILE + localX + size.w / 2,
             y: faceTop + localY + size.h / 2,
             // Ground anchor, for casting the player's shadow away from this
             // light -- straight down the wall to the pavement, not the
@@ -273,9 +298,31 @@ export class TileMapRenderer {
             // as standing further back than it really is on the ground, and
             // skews the shadow's direction to match -- see gy on the
             // streetlamp below for the same mistake, actually made once.
-            gx: b.x * TILE + d.fx * TILE + size.w / 2, gy: frontY,
+            gx: b.x * TILE + localX + size.w / 2, gy: frontY,
             kind: 'window',
           });
+        }
+
+        // Universal fixture signage (TICKET, CANDY) -- not the cinema's own
+        // identity like the marquee name, so it's a fixed label per tile kind
+        // rather than authored per building. A small dark plaque behind the
+        // text, the same idea the reference's own booth/stand plates use.
+        // **Bug caught against a screenshot**: a first pass floated this just
+        // *above* the tile's own top edge, which for these two tiles is
+        // exactly where the awning sits -- a separate object placed later at
+        // a higher depth, so it silently painted over the plaque every time.
+        // Drawn inside the tile's own top edge instead (over BOX_OFFICE's
+        // hood-shadow rows / CANDY_STAND's stripe rows, both dark or busy
+        // enough already to take a plaque on top), it can't be hidden by
+        // anything placed above this facade canvas.
+        const label = FACADE_LABELS[d.tile];
+        if (label) {
+          const tw = measureWidth(label, LABEL_SCALE);
+          const th = CHAR_H * LABEL_SCALE;
+          const plaqueH = th + 4;
+          const plaqueY = localY + 2;
+          g.rect(PLAQUE_BG_COLOR, localX, plaqueY, size.w, plaqueH);
+          g.text(label, localX + (size.w - tw) / 2, plaqueY + 2, LABEL_SCALE, MARQUEE_TEXT_COLOR);
         }
       }
     });
@@ -289,23 +336,14 @@ export class TileMapRenderer {
     // identity, not just "a shopfront") sets it to 'marquee' instead --
     // same footprint and light, a bulb-trimmed canopy tile in its place.
     // `h` (tiles, default 1) grows the canopy itself downward from the same
-    // top edge, and `name` -- the cinema's own name, player-renameable in a
-    // future system, which is exactly why this draws it from data at
-    // runtime rather than baking a fixed name into the tile art the way
-    // SIGN_TOWER deliberately stays blank -- bakes centred on top of it in
-    // the warm bulb tone, at the fixed scale mapLoader.js already validated
-    // it against so it can never overflow the band it's drawn on.
+    // top edge. Plain, textless canopy -- per the user's reference image, the
+    // cinema's own name is its own separate signboard (`b.panels`, below),
+    // not fused onto the stripes; a first pass baked the name straight onto
+    // this tile and it read as cluttered next to the reference.
     if (b.awning) {
       const awH = (b.awning.h ?? 1) * TILE;
       const awW = b.awning.fw * TILE;
-      const awKey = bake(this.scene, awW, awH, (g) => {
-        g.fill(b.awning.tile ?? 'awning', 0, 0, awW, awH);
-        if (b.awning.name) {
-          const tw = measureWidth(b.awning.name, MARQUEE_TEXT_SCALE);
-          const th = CHAR_H * MARQUEE_TEXT_SCALE;
-          g.text(b.awning.name, (awW - tw) / 2, (awH - th) / 2, MARQUEE_TEXT_SCALE, MARQUEE_TEXT_COLOR);
-        }
-      });
+      const awKey = bake(this.scene, awW, awH, (g) => g.fill(b.awning.tile ?? 'awning', 0, 0, awW, awH));
       const awY = frontY - (b.awning.up ?? 3) * TILE;
       this._place(awKey, (b.x + b.awning.fx) * TILE, awY, DEPTH_OVERHEAD);
       this._lights.push({
@@ -316,32 +354,35 @@ export class TileMapRenderer {
       });
     }
 
-    // A horizontal reader board -- "NOW SHOWING" and (eventually, once
-    // SYSTEMS #18's film-booking system exists to drive it) whatever's
-    // actually playing. A flat bordered panel, not an authored tile: signage
-    // whose whole point is data-driven text has no business being repeating
-    // atlas art (see atlas.js's `rect`/`text`, added for exactly this).
-    // Positioned like the awning (`fx` tiles from the left) but anchored by
-    // the top edge (`up` tiles above the pavement, default flush with the
-    // roofline) since it mounts higher up the face, not at door height.
-    if (b.readerBoard) {
-      const rb = b.readerBoard;
-      const rbW = rb.fw * TILE, rbH = (rb.h ?? 2) * STEP;
-      const rbKey = bake(this.scene, rbW, rbH, (g) => {
-        g.rect(READER_BORDER_COLOR, 0, 0, rbW, rbH);
-        g.rect(READER_BG_COLOR, READER_BORDER, READER_BORDER, rbW - READER_BORDER * 2, rbH - READER_BORDER * 2);
-        if (rb.text) {
-          const tw = measureWidth(rb.text, MARQUEE_TEXT_SCALE);
+    // Flat bordered signboards -- the cinema's own name, a reader board
+    // ("NOW SHOWING", eventually driven by SYSTEMS #18's film-booking
+    // system), or any future panel: one generic shape (`panels`, a list),
+    // not a hardcoded field per sign the way the first pass had a single
+    // `awning.name` and one `readerBoard`. None of these are authored
+    // atlas tiles -- signage whose whole point is data-driven text has no
+    // business being repeating tile art (see atlas.js's `rect`/`text`,
+    // added for exactly this). Each panel picks its own colours (the name
+    // board's warm cream track, the reader board's cool "screen glow" blue)
+    // -- per the user's own reference image, a cinema's signage is allowed a
+    // few accents beyond the marquee's single red, spent only here.
+    for (const p of b.panels ?? []) {
+      const pw = p.fw * TILE, ph = (p.h ?? 1) * STEP;
+      const bg = p.bg ?? READER_BG_COLOR, border = p.border ?? PANEL_BORDER_COLOR, color = p.color ?? MARQUEE_TEXT_COLOR;
+      const panelKey = bake(this.scene, pw, ph, (g) => {
+        g.rect(border, 0, 0, pw, ph);
+        g.rect(bg, PANEL_BORDER, PANEL_BORDER, pw - PANEL_BORDER * 2, ph - PANEL_BORDER * 2);
+        if (p.text) {
+          const tw = measureWidth(p.text, MARQUEE_TEXT_SCALE);
           const th = CHAR_H * MARQUEE_TEXT_SCALE;
-          g.text(rb.text, (rbW - tw) / 2, (rbH - th) / 2, MARQUEE_TEXT_SCALE, MARQUEE_TEXT_COLOR);
+          g.text(p.text, (pw - tw) / 2, (ph - th) / 2, MARQUEE_TEXT_SCALE, color);
         }
       });
-      const rbTop = frontY - (rb.up ?? storeys) * TILE;
-      this._place(rbKey, (b.x + rb.fx) * TILE, rbTop, DEPTH_OVERHEAD);
+      const pTop = frontY - (p.up ?? storeys) * TILE;
+      this._place(panelKey, (b.x + p.fx) * TILE, pTop, DEPTH_OVERHEAD);
       this._lights.push({
-        x: (b.x + rb.fx) * TILE + rbW / 2,
-        y: rbTop + rbH / 2,
-        gx: (b.x + rb.fx) * TILE + rbW / 2, gy: frontY,
+        x: (b.x + p.fx) * TILE + pw / 2,
+        y: pTop + ph / 2,
+        gx: (b.x + p.fx) * TILE + pw / 2, gy: frontY,
         kind: 'marquee',
       });
     }

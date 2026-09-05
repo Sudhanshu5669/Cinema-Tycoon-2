@@ -136,6 +136,12 @@ export const TILE_PALETTE = {
 
   // Terrazzo: the dark inset a sidewalk star sits in.
   O: '#3a3742',
+
+  // The cinema door's own glass -- warm amber, not the ordinary window's
+  // cold blue-grey (`I`/`i`): per user reference, the entrance glows with
+  // interior light spilling out, not a dark reflective pane.
+  M: '#c9a468',
+  R: '#8a6f42',
 };
 
 /**
@@ -171,7 +177,7 @@ export const TILE_HEIGHT = {
   B: -1, Y: -1,
   // Window / door frame: proud of the wall; the reveal steps in and the
   // glass sits deepest, behind it.
-  x: 1, X: -1, I: -2, i: -2,
+  x: 1, X: -1, I: -2, i: -2, M: -2, R: -2,
   // Doors: the recess line grooves in, the handle is a real knob.
   D: -1, k: 2,
   // Plinth: the stone course steps out from the wall face above it.
