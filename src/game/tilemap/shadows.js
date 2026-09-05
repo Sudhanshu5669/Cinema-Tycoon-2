@@ -1,12 +1,23 @@
 // The cast-shadow layer for the tile renderer.
 //
-// Each caster is a ground footprint rect plus a silhouette height. For a given
-// hour, sun.js turns the height into a 2D offset; the shadow is that footprint
-// swept along the offset -- the convex hull of the rect and its translated
-// copy. Every shadow is painted solid black into one offscreen canvas and shown
-// as a single Image whose alpha is the day's shadow opacity: baking a flat mask
-// and fading it once is what stops overlapping shadows from stacking into
-// double-dark seams where buildings meet.
+// Two kinds of caster, because "swept footprint" only looks right for one
+// kind of object:
+//
+// - Box casters (buildings, platforms): a ground footprint rect plus a
+//   silhouette height. For a given hour, sun.js turns the height into a 2D
+//   offset; the shadow is that footprint swept along the offset -- the convex
+//   hull of the rect and its translated copy. This is a good model exactly
+//   because these things really do fill their plan footprint at every height.
+// - Sprite casters (streetlamps, and anything else too thin or irregular to
+//   have a meaningful footprint rect -- a swept BOX for a one-pixel-wide pole
+//   reads as a filled slab dragged sideways, wildly heavier than the object
+//   casting it): the shadow instead follows the sprite's own alpha silhouette,
+//   sheared and scaled by the same per-hour offset -- see _spriteShadow.
+//
+// Every shadow -- of either kind -- is painted solid black into one offscreen
+// canvas and shown as a single Image whose alpha is the day's shadow opacity:
+// baking a flat mask and fading it once is what stops overlapping shadows from
+// stacking into double-dark seams where buildings meet.
 //
 // A shadow's hull is computed in ground coordinates -- the same footprint every
 // caster shares -- so it paints straight onto the ground plane. But a roof cap
@@ -31,21 +42,35 @@ export class ShadowLayer {
   /**
    * @param {Phaser.Scene} scene
    * @param {{ rect: {x:number,y:number,w:number,h:number}, heightPx:number }[]} casters
+   *   Box casters -- buildings, platforms. Swept-hull shadows.
+   * @param {{ x:number, y:number, textureKey:string, frameName:string, heightPx:number }[]} spriteCasters
+   *   Sprite casters -- streetlamps and the like. `x, y` is the same ground
+   *   anchor the sprite's own image uses (origin 0.5, 1 -- base, horizontally
+   *   centred). Shadow follows that frame's alpha silhouette, not a synthetic
+   *   footprint. Not clipped onto `surfaces` below -- a low ground prop's
+   *   shadow reaching a neighbouring roof or platform top isn't a case this
+   *   project has hit yet, so that catching logic stays box-caster-only.
    * @param {{ footprint: {x:number,y:number,w:number,h:number},
    *           screen: {x:number,y:number,w:number,h:number},
    *           depth: number, casterIndex: number }[]} surfaces
-   *   Every roof cap and raised platform top a neighbouring caster's shadow
-   *   might land on. `footprint` is in the same ground space as a caster's
-   *   `rect`; `screen` is where that surface is actually drawn -- a plain
-   *   shift for a platform top, shifted-and-squashed for a foreshortened roof.
+   *   Every roof cap and raised platform top a neighbouring *box* caster's
+   *   shadow might land on. `footprint` is in the same ground space as a
+   *   caster's `rect`; `screen` is where that surface is actually drawn -- a
+   *   plain shift for a platform top, shifted-and-squashed for a
+   *   foreshortened roof.
    * @param {number} worldW @param {number} worldH
    */
-  constructor(scene, casters, surfaces, worldW, worldH) {
+  constructor(scene, casters, spriteCasters, surfaces, worldW, worldH) {
     this.scene = scene;
     this.casters = casters;
+    this.spriteCasters = spriteCasters;
     this.surfaces = surfaces;
     this.w = worldW;
     this.h = worldH;
+    /** frameKey -> {canvas, w, h} solid-black-silhouette cache, built lazily
+     *  and shared across every instance of the same sprite (every streetlamp
+     *  reuses one 'tiles:lampPost' silhouette, not one each). */
+    this._silhouettes = new Map();
     this.key = `shadowbake-${scene.sys.settings.key}`;
     if (scene.textures.exists(this.key)) scene.textures.remove(this.key);
     this.canvas = scene.textures.createCanvas(this.key, worldW, worldH);
@@ -74,8 +99,8 @@ export class ShadowLayer {
     if (bucket === this._bucket) return;
     this._bucket = bucket;
 
-    // Every caster's hull, computed once and reused for the ground bake and
-    // every elevated surface's clip below.
+    // Every box caster's hull, computed once and reused for the ground bake
+    // and every elevated surface's clip below.
     let alpha = 0;
     const hulls = this.casters.map((c) => {
       const s = shadowFor(hours, c.heightPx);
@@ -88,6 +113,12 @@ export class ShadowLayer {
     ctx.clearRect(0, 0, this.w, this.h);
     ctx.fillStyle = '#000000';
     for (const hull of hulls) if (hull) paintPolygon(ctx, hull);
+    for (const sc of this.spriteCasters) {
+      const s = shadowFor(hours, sc.heightPx);
+      if (!s) continue;
+      alpha = s.alpha;
+      this._paintSpriteShadow(ctx, sc, s);
+    }
     this.canvas.refresh();
     this.image.setAlpha(alpha).setVisible(alpha > 0);
 
@@ -117,6 +148,66 @@ export class ShadowLayer {
     }
   }
 
+  /**
+   * A solid-black cutout of one atlas frame, cached per (textureKey,
+   * frameName) so every instance of the same sprite (every streetlamp) reuses
+   * one silhouette rather than re-deriving it per placement. A plain DOM
+   * canvas, not a Phaser texture -- it only ever needs to be a drawImage
+   * *source* for _paintSpriteShadow, never a game object of its own.
+   */
+  _silhouetteFor(textureKey, frameName) {
+    const key = `${textureKey}:${frameName}`;
+    let s = this._silhouettes.get(key);
+    if (s) return s;
+
+    const f = this.scene.textures.getFrame(textureKey, frameName);
+    const w = f.cutWidth, h = f.cutHeight;
+    const off = document.createElement('canvas');
+    off.width = w; off.height = h;
+    const octx = off.getContext('2d');
+    octx.drawImage(this.scene.textures.get(textureKey).getSourceImage(),
+      f.cutX, f.cutY, w, h, 0, 0, w, h);
+    // Recolour every opaque pixel solid black without touching alpha:
+    // 'source-in' keeps new pixels only where the existing (destination)
+    // alpha is already opaque, so this fill takes exactly the sprite's shape.
+    octx.globalCompositeOperation = 'source-in';
+    octx.fillStyle = '#000000';
+    octx.fillRect(0, 0, w, h);
+
+    s = { canvas: off, w, h };
+    this._silhouettes.set(key, s);
+    return s;
+  }
+
+  /**
+   * Projects a sprite caster's own alpha silhouette onto the ground plane,
+   * in place of a swept footprint box -- the right model for anything too
+   * thin or irregular to have a meaningful footprint rect (a lamp post's
+   * shadow should taper like the pole, not fan out like a dragged slab).
+   *
+   * The sprite is treated as a flat vertical cutout standing at its own
+   * ground anchor (x, y -- origin 0.5, 1, matching how the image itself is
+   * placed). A pixel at local height `h` above that anchor (h=0 at the base,
+   * h=heightPx at the top) casts to ground position
+   * `(x, y) + (dx, dy) * (h / heightPx)` -- the same linear relationship
+   * shadowFor already defines between a caster's full height and its total
+   * offset, just applied per pixel row instead of only at the two extremes
+   * of a footprint. That is exactly one affine shear + scale, so the whole
+   * projection is a single canvas transform, not a per-pixel loop.
+   */
+  _paintSpriteShadow(ctx, caster, { dx, dy }) {
+    const { canvas, w, h } = this._silhouetteFor(caster.textureKey, caster.frameName);
+    const H = caster.heightPx || h;
+    ctx.save();
+    // Local space: x from the sprite's own centreline, y top-down (0 at the
+    // sprite's top, h at its base) -- see the derivation above for why this
+    // particular matrix sends the base to (x, y) untouched and the top to
+    // (x, y) + (dx, dy).
+    ctx.setTransform(1, 0, -dx / H, -dy / H, caster.x + dx, caster.y + dy);
+    ctx.drawImage(canvas, -w / 2, 0);
+    ctx.restore();
+  }
+
   destroy() {
     this.image.destroy();
     if (this.scene.textures.exists(this.key)) this.scene.textures.remove(this.key);
@@ -124,6 +215,7 @@ export class ShadowLayer {
       layer.image.destroy();
       if (this.scene.textures.exists(layer.key)) this.scene.textures.remove(layer.key);
     }
+    this._silhouettes.clear();
   }
 }
 

@@ -49,8 +49,13 @@ export class TileMapRenderer {
     this.objects = [];
     /** Structure screen rects + depths, for the smoke test and debug overlays. */
     this.structures = [];
-    /** Ground footprint + silhouette height per shadow caster. */
+    /** Ground footprint + silhouette height per shadow caster -- filled
+     *  footprints (buildings/platforms), swept-box shadows. */
     this._casters = [];
+    /** Thin/irregular props (streetlamps) -- shadow follows the sprite's own
+     *  alpha silhouette instead of a synthetic footprint box. See
+     *  _buildStreetlamp and shadows.js's spriteCasters. */
+    this._spriteCasters = [];
     /** Elevated tops (roof caps, platform tops) a shadow can land on -- see
      *  shadows.js for why these need their own footprint -> screen mapping. */
     this._surfaces = [];
@@ -95,7 +100,7 @@ export class TileMapRenderer {
     for (const s of this.map.streetlamps ?? []) this._buildStreetlamp(s);
     this._buildLoose();
     this.shadows = new ShadowLayer(
-      this.scene, this._casters, this._surfaces, this.pixelWidth, this.pixelHeight,
+      this.scene, this._casters, this._spriteCasters, this._surfaces, this.pixelWidth, this.pixelHeight,
     );
     this.shadows.setHours(this.hours);
     this.lighting = new LightingLayer(this.scene, this._lights);
@@ -266,8 +271,14 @@ export class TileMapRenderer {
     wireLight(img);
     this.objects.push(img);
 
-    this._casters.push({
-      rect: { x: p.x * TILE, y: p.y * TILE, w: TILE, h: TILE },
+    // A swept-box shadow (like a building's) is a filled footprint dragged
+    // sideways -- correct for something that really fills its plan, wildly
+    // too heavy for a pole one pixel wide. This casts along the sprite's own
+    // alpha silhouette instead, anchored at the same ground point the image
+    // itself uses.
+    this._spriteCasters.push({
+      x: p.x * TILE + TILE / 2, y: baseY,
+      textureKey: TILES_KEY, frameName: 'lampPost',
       heightPx: size.h,
     });
 

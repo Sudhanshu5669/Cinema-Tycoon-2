@@ -219,6 +219,20 @@ const roofHitAt = async (h) => {
 check('a neighbour\'s long dawn shadow reaches onto a shorter roof', await roofHitAt(6.05));
 check('no roof shadow at noon, when shadows are short', !(await roofHitAt(12)));
 
+// A streetlamp is a sprite caster (SYSTEMS #9's follow-up): its shadow follows
+// the pole's own thin silhouette, not a swept footprint box -- a box the size
+// of the pole's 1-tile footprint dragged sideways would read as a wide slab,
+// several tiles across at a low sun, not the thin line a real pole throws.
+// The lamp at tile (6, 44) -> world (104, 720) is on open south pavement, far
+// from any building's own reach, so this row is only ever this one shadow.
+await page.evaluate(() => window.__dev.setTime(17.7));
+await page.waitForTimeout(150);
+const lampShadowXs = await page.evaluate(() => window.__dev.shadowRow(750, 120, 200));
+const lampShadowSpan = lampShadowXs.length ? Math.max(...lampShadowXs) - Math.min(...lampShadowXs) : 0;
+check('a streetlamp casts a shadow', lampShadowXs.length > 0);
+check('a streetlamp\'s shadow is a thin line, not a dragged slab',
+  lampShadowSpan > 0 && lampShadowSpan < 10, `span ${lampShadowSpan}px, ${lampShadowXs.length} lit px`);
+
 // --- lighting: ambient colour + light cutouts track the hour (SYSTEMS #8) ---
 // Pure model first, no browser: mirrors how shadowFor itself is tested above.
 const luma = (rgb) => ((rgb >> 16 & 0xff) + (rgb >> 8 & 0xff) + (rgb & 0xff)) / 3;

@@ -164,6 +164,15 @@ export class DevScene extends Phaser.Scene {
       // SYSTEMS #9. Validating a tile name needs the live atlas, so this half
       // of the loader's validation is only exercisable through a real scene.
       loadCityMap: (raw) => loadCityMap(raw, this),
+      // The world-x's shadowed (opaque in the baked mask) in [x0, x1) along
+      // one row -- how a sprite caster's shadow (SYSTEMS #8/#9's streetlamp)
+      // is checked for actually being thin, without reading a screenshot.
+      shadowRow: (y, x0, x1) => {
+        const data = this.map.shadows.canvas.getContext().getImageData(x0, y, x1 - x0, 1).data;
+        const xs = [];
+        for (let i = 0; i < x1 - x0; i++) if (data[i * 4 + 3] > 0) xs.push(x0 + i);
+        return xs;
+      },
     };
   }
 
