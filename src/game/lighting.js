@@ -26,9 +26,31 @@ import { ambientFor, glowFor } from './tilemap/sun.js';
 
 const { LIGHT_PIPELINE } = Phaser.Renderer.WebGL.Pipelines;
 
-/** Falloff radius per light kind, in world px. Not hour-dependent, so it
- *  lives here rather than in sun.js's time-of-day curves. */
-const RADIUS = { window: 56, marquee: 100, streetlamp: 76 };
+/**
+ * Falloff radius per light kind, in world px. Not hour-dependent, so it lives
+ * here rather than in sun.js's time-of-day curves.
+ *
+ * Deliberately large relative to the bulb itself. Light2D's falloff --
+ * `1 - d²/r²`, see Light.frag -- holds close to full brightness for most of
+ * its radius and only drops away sharply right near the edge, so a *small*
+ * radius (sized to "how far should this visibly reach") reads exactly like
+ * what the user reported: a flat, crisply-bordered disc, because nearly the
+ * whole visible falloff happens in a thin ring at that edge. A radius several
+ * times the visible glow's real extent pushes that steep part of the curve
+ * out past where the light is still bright enough to matter, so what's left
+ * on screen is only the gentle, near-flat *start* of the curve -- a soft
+ * taper instead of a rim. Center brightness is intensity-only (attenuation is
+ * always 1 at d=0), so this costs nothing there; it only changes how the
+ * edge feels. The overlap this creates between neighbouring lights (windows
+ * a few tiles apart) is itself part of the fix -- a lit street should read as
+ * a soft continuous wash along a facade, not a row of isolated dots.
+ *
+ * `streetlamp` is disproportionately larger than the other two for exactly
+ * that reason in reverse: a lamp usually stands with no neighbour close
+ * enough to overlap and blend its edge away, so it alone needs a big enough
+ * radius to go soft on its own.
+ */
+const RADIUS = { window: 110, marquee: 170, streetlamp: 220 };
 
 /**
  * Opts one drawable into the lighting shader. Safe to call unconditionally --
@@ -59,6 +81,22 @@ export class LightingLayer {
     scene.lights.enable();
     this.lights = points.map((p) =>
       scene.lights.addLight(p.x, p.y, RADIUS[p.kind] ?? RADIUS.window, 0xffffff, 0));
+
+    // Camera-wide post FX -- impacts everything the camera renders, so this
+    // is the one place that needs to set it up, not every scene that builds a
+    // TileMapRenderer. Bloom (the effect that actually feathers a light's
+    // edge by blurring and re-adding bright pixels) was tried here and pulled
+    // back out: even at its cheapest settings it measurably cut real-time
+    // frame pacing enough to flake the walk-speed smoke checks, the same
+    // shape of regression #8's maxLights lesson already burned once on --
+    // and GAME_SPEC targets mobile, where that cost is even less affordable.
+    // A single cheap Vignette stays (a steady darkening toward the screen
+    // edges, day or night, purely for framing) since it did not cost the
+    // same. The edge-softening job Bloom would have done is instead paid for
+    // entirely by the wider RADIUS values above, which cost nothing extra.
+    const cam = scene.cameras.main;
+    cam.postFX.clear();
+    cam.postFX.addVignette(0.5, 0.5, 0.82, 0.25);
   }
 
   /** @param {number} hours 0..24, wraps */
@@ -86,6 +124,8 @@ export class LightingLayer {
   }
 
   destroy() {
-    if (this.active) this.scene.lights.disable();
+    if (!this.active) return;
+    this.scene.lights.disable();
+    this.scene.cameras.main.postFX.clear();
   }
 }
