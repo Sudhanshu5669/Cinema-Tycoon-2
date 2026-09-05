@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
-import { shadowFor } from '../src/game/tilemap/sun.js';
+import { shadowFor, ambientFor, glowFor } from '../src/game/tilemap/sun.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const OUT = path.join(ROOT, 'review/smoke');
@@ -217,6 +217,43 @@ const roofHitAt = async (h) => {
 };
 check('a neighbour\'s long dawn shadow reaches onto a shorter roof', await roofHitAt(6.05));
 check('no roof shadow at noon, when shadows are short', !(await roofHitAt(12)));
+
+// --- lighting: ambient colour + light cutouts track the hour (SYSTEMS #8) ---
+// Pure model first, no browser: mirrors how shadowFor itself is tested above.
+const luma = (rgb) => ((rgb >> 16 & 0xff) + (rgb >> 8 & 0xff) + (rgb & 0xff)) / 3;
+check('ambient is brighter at noon than at midnight',
+  luma(ambientFor(12)) > luma(ambientFor(0)),
+  `noon ${luma(ambientFor(12)).toFixed(0)} midnight ${luma(ambientFor(0)).toFixed(0)}`);
+check('windows are unlit at noon and lit at midnight',
+  glowFor(12, 'window').intensity === 0 && glowFor(0, 'window').intensity > 0);
+check('the marquee switches on before ordinary windows do',
+  glowFor(16.5, 'marquee').intensity > 0 && glowFor(16.5, 'window').intensity === 0,
+  `marquee ${glowFor(16.5, 'marquee').intensity.toFixed(2)} window ${glowFor(16.5, 'window').intensity.toFixed(2)}`);
+
+// In the browser: the live Phaser Light2D pipeline (a real per-fragment
+// shader, not a bespoke one -- see src/game/lighting.js) actually engaged,
+// and its ambient/window/marquee state tracks the same hour as the shadows.
+const lightAt = async (h) => {
+  await page.evaluate((hh) => window.__dev.setTime(hh), h);
+  await page.waitForTimeout(120);
+  return page.evaluate(() => window.__dev.tiles());
+};
+const [litNoon, litNight] = [await lightAt(12), await lightAt(23)];
+check('the Light2D pipeline is actually active, not silently degraded', litNoon.lightingActive === true);
+check('scene ambient colour is brighter at noon than at night',
+  luma(litNoon.ambientColor) > luma(litNight.ambientColor),
+  `noon ${litNoon.ambientColor.toString(16)} night ${litNight.ambientColor.toString(16)}`);
+check('window glow is off at noon and on at night',
+  litNoon.windowGlow === 0 && litNight.windowGlow > 0,
+  `noon ${litNoon.windowGlow} night ${litNight.windowGlow}`);
+check('marquee glow is off at noon and on at night',
+  litNoon.marqueeGlow === 0 && litNight.marqueeGlow > 0,
+  `noon ${litNoon.marqueeGlow} night ${litNight.marqueeGlow}`);
+
+await lightAt(21.5);
+await page.evaluate(() => window.__dev.warp(176, 360));
+await page.waitForTimeout(120);
+await page.screenshot({ path: path.join(OUT, 'tiles-lighting-night.png') });
 
 await page.evaluate(() => window.__dev.setTime(15));
 await page.waitForTimeout(150);

@@ -27,6 +27,7 @@ import {
 } from './projection.js';
 import { preloadTiles, tilesReady, bake, frameSize, TILES_KEY } from './atlas.js';
 import { ShadowLayer } from './shadows.js';
+import { LightingLayer, wireLight } from '../lighting.js';
 
 export class TileMapRenderer {
   static preload(scene) { preloadTiles(scene); }
@@ -52,7 +53,12 @@ export class TileMapRenderer {
     this._surfaces = [];
     /** @type {ShadowLayer | null} set by build(). */
     this.shadows = null;
-    /** Current hour driving the cast shadows. */
+    /** World-space light sources derived from facade data (window tiles,
+     *  awnings) as buildings are built -- see _buildBuilding. */
+    this._lights = [];
+    /** @type {LightingLayer | null} set by build(). */
+    this.lighting = null;
+    /** Current hour driving the cast shadows and the lighting layer. */
     this.hours = 12;
   }
 
@@ -88,18 +94,22 @@ export class TileMapRenderer {
       this.scene, this._casters, this._surfaces, this.pixelWidth, this.pixelHeight,
     );
     this.shadows.setHours(this.hours);
+    this.lighting = new LightingLayer(this.scene, this._lights);
+    this.lighting.setHours(this.hours);
     return this;
   }
 
-  /** Set the hour driving the cast shadows (0..24). */
+  /** Set the hour driving the cast shadows and the lighting layer (0..24). */
   setHours(hours) {
     this.hours = hours;
     this.shadows?.setHours(hours);
+    this.lighting?.setHours(hours);
   }
 
   _place(key, x, y, depth) {
     const img = this.scene.add.image(x, y, key).setOrigin(0, 0);
     img.setDepth(depth);
+    wireLight(img);
     this.objects.push(img);
     return img;
   }
@@ -181,22 +191,39 @@ export class TileMapRenderer {
       g.fill(b.top ?? 'roof', 0, 0, b.w * TILE, roofH));
     this._place(roofKey, b.x * TILE, roofY, frontY);
 
-    // Composed face.
+    // Composed face. Every window facade entry doubles as a light source --
+    // derived here, not authored twice, since this is already the one place
+    // that turns a window's face-space (fx, fy) into a real position.
     const rows = faceRowPlan(storeys, b.face ?? 'wall', b.base ?? 'brick');
     const faceKey = bake(this.scene, b.w * TILE, faceH, (g) => {
       rows.forEach((frame, r) => g.fill(frame, 0, r * TILE, b.w * TILE, TILE));
       for (const d of b.facade ?? []) {
         const size = frameSize(this.scene, d.tile);
-        g.tile(d.tile, d.fx * TILE, faceH - (d.fy ?? 0) * TILE - size.h);
+        const localY = faceH - (d.fy ?? 0) * TILE - size.h;
+        g.tile(d.tile, d.fx * TILE, localY);
+        if (d.tile === 'window') {
+          this._lights.push({
+            x: b.x * TILE + d.fx * TILE + size.w / 2,
+            y: faceTop + localY + size.h / 2,
+            kind: 'window',
+          });
+        }
       }
     });
     this._place(faceKey, b.x * TILE, faceTop, frontY);
 
-    // Awning -- overhead, so the player walks under it.
+    // Awning -- overhead, so the player walks under it. Doubles as the
+    // marquee light: the one saturated colour accent on the street.
     if (b.awning) {
       const awKey = bake(this.scene, b.awning.fw * TILE, TILE, (g) =>
         g.fill('awning', 0, 0, b.awning.fw * TILE, TILE));
-      this._place(awKey, (b.x + b.awning.fx) * TILE, frontY - (b.awning.up ?? 3) * TILE, DEPTH_OVERHEAD);
+      const awY = frontY - (b.awning.up ?? 3) * TILE;
+      this._place(awKey, (b.x + b.awning.fx) * TILE, awY, DEPTH_OVERHEAD);
+      this._lights.push({
+        x: (b.x + b.awning.fx) * TILE + (b.awning.fw * TILE) / 2,
+        y: awY + TILE / 2,
+        kind: 'marquee',
+      });
     }
 
     // The building's silhouette height -- face plus the foreshortened roof --
@@ -228,6 +255,7 @@ export class TileMapRenderer {
           if (!name) continue;
           const img = this.scene.add.image(tx * TILE, ty * TILE, TILES_KEY, name).setOrigin(0, 0);
           img.setDepth(layer.role === 'overhead' ? DEPTH_OVERHEAD : footY(ty));
+          wireLight(img);
           this.objects.push(img);
         }
       }
@@ -254,6 +282,8 @@ export class TileMapRenderer {
   destroy() {
     this.shadows?.destroy();
     this.shadows = null;
+    this.lighting?.destroy();
+    this.lighting = null;
     for (const o of this.objects) o.destroy();
     this.objects.length = 0;
   }

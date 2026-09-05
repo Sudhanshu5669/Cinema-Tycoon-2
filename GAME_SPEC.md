@@ -86,7 +86,11 @@ machinery the Stardew pass needed (`art/materials.mjs`, `tools/shade.mjs`) is
 superseded. Those files and the 16x32 sprites are still in the tree, unreferenced
 by the flat pipeline, pending a decision to delete them.
 
-A separate lighting pass (`tools/light.mjs`, later a Phaser shader) accumulates
+The live scene runs on a real per-fragment shader (SYSTEMS #8, `src/game/
+lighting.js` -- Phaser's own `Light2D` pipeline, not a bespoke one), a
+deliberate choice over a cheaper baked overlay so future growth (more lights,
+flicker, a lantern that follows the player) is a data change, not new GLSL.
+`tools/light.mjs` remains the separate offline CPU pass that accumulates
 coloured lights with quadratic falloff over an ambient tint for day/evening and
 interiors.
 

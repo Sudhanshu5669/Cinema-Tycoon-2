@@ -120,8 +120,16 @@ export class DevScene extends Phaser.Scene {
         hours: this.hours,
         shadowAlpha: this.map.shadows?.image.alpha ?? 0,
         // Whether any roof cap or platform top is currently catching a
-        // neighbour's cast shadow -- see shadows.js's per-surface layers.
+        // neighbour's cast shadow -- see shadows.js for the per-surface layers.
         roofShadowHit: this.map.shadows?.surfaceLayers.some((l) => l.image.visible) ?? false,
+        // SYSTEMS #8. `lightingActive` confirms Phaser's Light2D pipeline is
+        // actually engaged (false would mean a silent Canvas-renderer
+        // degrade, not a broken hour model) rather than reading window/
+        // marquee intensity of 0 for the wrong reason.
+        lightingActive: this.map.lighting?.active ?? false,
+        ambientColor: this.map.lighting?.ambientColor ?? 0xffffff,
+        windowGlow: this._lightIntensity('window'),
+        marqueeGlow: this._lightIntensity('marquee'),
       }),
       probe: (x, y) => ({
         height: this.map.heightAt(x, y),
@@ -135,6 +143,16 @@ export class DevScene extends Phaser.Scene {
       },
       autoTime: (on) => { this.autoTime = on !== false; },
     };
+  }
+
+  /** First live light of the given kind's current intensity, for the smoke
+   *  test -- there being more than one (every building's windows) doesn't
+   *  matter, they all share one hour-driven curve per kind. */
+  _lightIntensity(kind) {
+    const lighting = this.map.lighting;
+    if (!lighting) return 0;
+    const i = lighting.points.findIndex((p) => p.kind === kind);
+    return i === -1 ? 0 : lighting.lights[i].intensity;
   }
 
   /** Dev-only outline of the camera deadzone: the box the player moves inside

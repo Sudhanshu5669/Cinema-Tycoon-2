@@ -21,6 +21,11 @@ const game = new Phaser.Game({
   backgroundColor: '#0d0f13',
   pixelArt: true,   // nearest-neighbour, no antialiasing
   roundPixels: true, // draw sprites on whole pixels
+  // SYSTEMS #8's lighting layer is one Phaser Light per window/marquee; the
+  // default cap of 10 is well under a single building's own window count.
+  // 64 comfortably covers the dev map today with room for more streets --
+  // raise again if a future map's on-screen light count actually needs it.
+  render: { maxLights: 16 },
   scale: {
     mode: Phaser.Scale.NONE,
     autoCenter: Phaser.Scale.CENTER_BOTH,

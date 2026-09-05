@@ -12,6 +12,7 @@ import {
   WALK_SPEED, WALK_FPS, IDLE_FPS, SHEET_COLS, FACING_ROWS, SPRITE_H,
 } from '../core/config.js';
 import { resolveMove } from './collision.js';
+import { wireLight } from './lighting.js';
 
 /** @typedef {'down'|'left'|'right'|'up'} Facing */
 
@@ -64,6 +65,9 @@ export class Player {
     // collision and (later) depth sorting both want.
     this.sprite.setOrigin(0.5, 1);
     this.sprite.play('idle-down');
+    // So the character sits in the same ambient/lit-window light as the
+    // street around them (SYSTEMS #8), rather than reading as pasted on top.
+    wireLight(this.sprite);
   }
 
   /**
