@@ -123,6 +123,19 @@ export const TILE_PALETTE = {
   H: '#38343d', // pole, shaded side
   e: '#d9c9a3', // bulb glass
   E: '#2f2b33', // cap and bracket, dark metal
+
+  // Poster paper -- sun-bleached, the one place this set is allowed to run
+  // warm instead of cool, the same exception BRICK already takes for the
+  // same reason (a real material's own colour, not a mood).
+  j: '#8a8270',
+  J: '#6e6759', // fold shadow / the case's own cast shadow on the sheet
+
+  // Street clutter (bin, vending box): muted city-grime metal, no new accent.
+  Z: '#454a44',
+  Q: '#5c6359', // lit rim/lid
+
+  // Terrazzo: the dark inset a sidewalk star sits in.
+  O: '#3a3742',
 };
 
 /**
@@ -168,4 +181,6 @@ export const TILE_HEIGHT = {
   // Cinema marquee/sign: a real light bulb protrudes; its panel's own border
   // (`V`, the same recessed-reveal idea a window frame uses) steps in.
   e: 2, V: -1,
+  // Poster case: the sheet's own fold/shadow sits a hair back from the paper.
+  J: -1,
 };

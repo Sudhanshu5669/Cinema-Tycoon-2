@@ -28,7 +28,8 @@
       { "x": 49, "y": 24, "tile": "crosswalk" }, { "x": 50, "y": 24, "tile": "crosswalk" }, { "x": 51, "y": 24, "tile": "crosswalk" },
       { "x": 49, "y": 26, "tile": "crosswalk" }, { "x": 50, "y": 26, "tile": "crosswalk" }, { "x": 51, "y": 26, "tile": "crosswalk" },
       { "x": 49, "y": 28, "tile": "crosswalk" }, { "x": 50, "y": 28, "tile": "crosswalk" }, { "x": 51, "y": 28, "tile": "crosswalk" },
-      { "x": 49, "y": 30, "tile": "crosswalk" }, { "x": 50, "y": 30, "tile": "crosswalk" }, { "x": 51, "y": 30, "tile": "crosswalk" }
+      { "x": 49, "y": 30, "tile": "crosswalk" }, { "x": 50, "y": 30, "tile": "crosswalk" }, { "x": 51, "y": 30, "tile": "crosswalk" },
+      { "x": 48, "y": 20, "tile": "sidewalkStar" }, { "x": 50, "y": 20, "tile": "sidewalkStar" }, { "x": 52, "y": 20, "tile": "sidewalkStar" }
     ]
   },
   "flat": {
@@ -39,7 +40,9 @@
   "object": {
     "cells": [
       { "x": 26, "y": 47, "tile": "grass" },
-      { "x": 95, "y": 36, "tile": "grass" }
+      { "x": 95, "y": 36, "tile": "grass" },
+      { "x": 41, "y": 20, "tile": "newsBox" },
+      { "x": 59, "y": 20, "tile": "trashCan" }
     ]
   },
   "overhead": {
@@ -76,6 +79,7 @@
       "face": "brick", "base": "brick", "top": "roof",
       "facade": [
         { "tile": "door", "fx": 12, "fy": 0 },
+        { "tile": "boxOffice", "fx": 8, "fy": 0 }, { "tile": "posterCase", "fx": 10, "fy": 0 }, { "tile": "posterCase", "fx": 14, "fy": 0 },
         { "tile": "window", "fx": 0, "fy": 1 }, { "tile": "window", "fx": 3, "fy": 1 }, { "tile": "window", "fx": 6, "fy": 1 },
         { "tile": "windowWide", "fx": 15, "fy": 1 }, { "tile": "window", "fx": 18, "fy": 1 }, { "tile": "window", "fx": 21, "fy": 1 },
         { "tile": "window", "fx": 0, "fy": 4 }, { "tile": "window", "fx": 4, "fy": 4 }, { "tile": "window", "fx": 8, "fy": 4 },

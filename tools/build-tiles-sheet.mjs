@@ -46,6 +46,7 @@ const RELIEF_STRENGTH = {
   window: 0.8, windowWide: 0.8,
   door: 0.6,
   marquee: 0.5, signTower: 0.6, signCap: 0.6,
+  boxOffice: 0.7, posterCase: 0.5,
 };
 
 // --- validate + raster -----------------------------------------------------

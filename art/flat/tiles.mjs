@@ -192,6 +192,94 @@ export const GRASS = [
   'ggggggggggggGggg',
 ];
 
+/**
+ * A cheap street prop: a bin, seen top-down like GRASS, not a facade feature —
+ * `'object'` layer sugar (SYSTEMS #6), one cell, no relief (see
+ * `RELIEF_STRENGTH` in `build-tiles-sheet.mjs`: this stays exactly as flat as
+ * GRASS, which is the same "top-down, stochastic, no structural edge" case).
+ * Mostly transparent margin so the pavement underneath still reads through —
+ * this is a thing standing *on* the street, not a tile replacing it.
+ */
+export const TRASH_CAN = [
+  '................',
+  '................',
+  '................',
+  '....QQQQQQQQ....',
+  '...QZZZZZZZZQ...',
+  '..ZZZZZZZZZZZZ..',
+  '..ZZZZZZZZZZZZ..',
+  '..ZZZZZZZZZZZZ..',
+  '..ZZZZZZZZZZZZ..',
+  '..ZZZZZZZZZZZZ..',
+  '..ZZZZZZZZZZZZ..',
+  '..ZZZZZZZZZZZZ..',
+  '...ZZZZZZZZZZ...',
+  '....ZZZZZZZZ....',
+  '................',
+  '................',
+];
+
+/**
+ * A coin-op vending box -- the same "top-down street prop" case as
+ * TRASH_CAN, deliberately in the kerb's own muted tones (`c`/`C`) rather than
+ * a new colour: a street already has plenty of grey metal, and this is city
+ * clutter, not a second thing competing for attention with the marquee's own
+ * red. The dark strip through the middle (`i`, reused from window glass) is
+ * its plastic display window, empty of any actual headline since there is no
+ * letter tile to put one on.
+ */
+export const NEWS_BOX = [
+  '................',
+  '................',
+  '................',
+  '..cccccccccccc..',
+  '..cCCCCCCCCCCc..',
+  '..cCCCCCCCCCCc..',
+  '..cCCiiiiiiCCc..',
+  '..cCCiiiiiiCCc..',
+  '..cCCiiiiiiCCc..',
+  '..cCCiiiiiiCCc..',
+  '..cCCCCCCCCCCc..',
+  '..cCCCCCCCCCCc..',
+  '..cCCCCCCCCCCc..',
+  '..cccccccccccc..',
+  '................',
+  '................',
+];
+
+/**
+ * A Hollywood Walk of Fame nod -- a brass-bordered terrazzo tile with a
+ * five-point star pressed into it, one tile a `ground.cells` override can
+ * drop in front of the cinema's own door the same way `paveCrack`/
+ * `paveStain` already sit sparsely in the pavement. Single new dark ground
+ * tone (`O`) plus the door handle's existing brass (`k`) -- two materials,
+ * one tone each, the same discipline as every other tile here. The star
+ * itself is a known chunky five-point silhouette (a filled point straight up
+ * plus two swept-back legs), not a procedural cross/diamond -- a first pass
+ * built from "arms + a diamond core" read as a compass rose, not a star, the
+ * moment it was rendered at scale and checked against a real screenshot;
+ * shape over cleverness. Left out of `RELIEF_STRENGTH` on purpose: it is
+ * ground, and ground stays flat here (see PAVE/ROAD/GRASS).
+ */
+export const SIDEWALK_STAR = [
+  'kkkkkkkkkkkkkkkk',
+  'kOOOOOOOOOOOOOOk',
+  'kOOOOOOOOOOOOOOk',
+  'kOOOOOOOOOOOOOOk',
+  'kOOOOOOOOOOOOOOk',
+  'kOOOOOOkOOOOOOOk',
+  'kOOOOOOkOOOOOOOk',
+  'kOOOOOkkkOOOOOOk',
+  'kOOkkkkkkkkkOOOk',
+  'kOOOkkkkkkkOOOOk',
+  'kOOOOkkkkkOOOOOk',
+  'kOOOkkOOOkkOOOOk',
+  'kOOkkOOOOOkkOOOk',
+  'kOOOOOOOOOOOOOOk',
+  'kOOOOOOOOOOOOOOk',
+  'kkkkkkkkkkkkkkkk',
+];
+
 // --- building ---------------------------------------------------------------
 
 /** Plaster texture: a scatter of fleck pixels, dense and irregular enough to
@@ -617,6 +705,108 @@ export const DOOR = [
   '.TTTTTTTTTTTTTTTTTTTTTT.',
 ];
 
+/**
+ * 24 x 32 -- a ticket booth window, sized like WINDOW (same width, same
+ * "placed once at a pixel offset" FEATURE rules) but its own thing entirely:
+ * per user request, "make different types of tiles for the entry" of a
+ * cheap LA cinema, and a walk-up box office is the single most legible
+ * "buy your ticket here" cue available without a letter tile. A small
+ * hood-shadow (`n`, the cornice's own overhang tone) reads as a tiny awning
+ * over the glass; the glass itself stays uniform dark (`i`) rather than
+ * WINDOW's cold-sky-reflection split, since a booth this recessed has
+ * nothing bright to catch. A red placard band through the middle (`v`/`V`,
+ * the world's one saturated accent, already spent on this same building's
+ * marquee) stands in for a prices board taped inside the glass -- reusing
+ * the accent rather than adding a second one. Flush to the pavement (meant
+ * for `fy: 0`, like DOOR) with its own small panelled base and a single
+ * brass pixel (`k`) for a ticket-tray slot, the cheap-booth equivalent of
+ * DOOR's handle.
+ */
+export const BOX_OFFICE = [
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.xnnnnnnnnnnnnnnnnnnnnx.',
+  '.xnnnnnnnnnnnnnnnnnnnnx.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xXXXXXXXXXXXXXXXXXXXXx.',
+  '.xvvvvvvvvvvvvvvvvvvvvx.',
+  '.xvvvvvvvvvvvvvvvvvvvvx.',
+  '.xVVVVVVVVVVVVVVVVVVVVx.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.XXXXXXXXXXXXXXXXXXXXXX.',
+  'llllllllllllllllllllllll',
+  '.LLLLLLLLLLLLLLLLLLLLLL.',
+  '.xdddddddddkdddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+  '.xdddddddddddddddddddDx.',
+];
+
+/**
+ * 16 x 32 -- a glass-fronted poster case, one tile wide so a pair can flank
+ * the door tightly the way a real cinema entrance frames it with one-sheets
+ * on either side. The "poster" inside is an abstracted image block (`X`,
+ * reused from the window frame's own shaded tone rather than a new colour --
+ * there is no font tile to print an actual title on, so the honest thing is
+ * a faded photo silhouette, not fake text) on faded paper (`j`/`J`, this
+ * set's other deliberately-warm exception alongside brick, since sun-bleached
+ * paper is a real material colour, not a mood). One `s` pixel -- the
+ * character palette's own shirt-cream, already present in this tile
+ * namespace for the awning -- stands in for a single curled/torn corner:
+ * the cheap-cinema detail the user asked for, not a pristine display case.
+ * Sits on the same sill language as WINDOW (`l`/`L`) over its own small
+ * panelled base, flush to the pavement like BOX_OFFICE (meant for `fy: 0`).
+ */
+export const POSTER_CASE = [
+  '.xxxxxxxxxxxxxx.',
+  '.xjjjjjjjjjjjjx.',
+  '.xjjjjjjjjjjjjx.',
+  '.xXXXXXXXXXXXXx.',
+  '.xXXXXxXXXXXXXx.',
+  '.xXXXXXXXXXXXXx.',
+  '.xXXXXxXXXXXXXx.',
+  '.xXXXXXXXXXXXXx.',
+  '.xXXXXXXXXXXXXx.',
+  '.xXXXXxXXXXXXXx.',
+  '.xXXXXXXXXXXXXx.',
+  '.xXXXXXXXXXXXXx.',
+  '.xXXXXxXXXXXXXx.',
+  '.xXXXXXXXXXXXXx.',
+  '.xXXXXXXXXXXXXx.',
+  '.xXXXXxXXXXXXXx.',
+  '.xXXXXXXXXXXXXx.',
+  '.xXXXXXXXXXXXXx.',
+  '.xXXXXXXXXXXXXx.',
+  '.xjjjjjjjjjjjjx.',
+  '.xjjjjjsjjjjjjx.',
+  '.xJJJJJJJJJJJJx.',
+  '.xJJJJJJJJJJJJx.',
+  '.xxxxxxxxxxxxxx.',
+  '.XXXXXXXXXXXXXX.',
+  'llllllllllllllll',
+  '.LLLLLLLLLLLLLL.',
+  '.xdddddddddddDx.',
+  '.xdddddddddddDx.',
+  '.xdddddddddddDx.',
+  '.xdddddddddddDx.',
+  '.DDDDDDDDDDDDDD.',
+];
+
 /** Shopfront awning. Same red as the character's accent — it is the colour
  *  this world spends, and a cinema is where it gets spent. */
 export const AWNING = [
@@ -790,7 +980,7 @@ export const LAMP_POST = [
 /** Draw order is the map's business, not the tile's — these are just names. */
 export const TILES = {
   road: ROAD, roadLine: ROAD_LINE, crosswalk: CROSSWALK, pave: PAVE, paveCrack: PAVE_CRACK, paveStain: PAVE_STAIN,
-  kerb: KERB, grass: GRASS,
+  kerb: KERB, grass: GRASS, trashCan: TRASH_CAN, newsBox: NEWS_BOX, sidewalkStar: SIDEWALK_STAR,
   wall: WALL, wallEdge: WALL_EDGE, brick: BRICK, brickEdge: BRICK_EDGE,
   roof: ROOF, cornice: CORNICE, corniceEdge: CORNICE_EDGE,
   plinth: PLINTH, plinthEdge: PLINTH_EDGE, beltCourse: BELT_COURSE,
@@ -800,4 +990,5 @@ export const TILES = {
 /** Multi-tile. Each is a whole number of tiles and slices cleanly. */
 export const FEATURES = {
   window: WINDOW, windowWide: WINDOW_WIDE, door: DOOR, lampPost: LAMP_POST,
+  boxOffice: BOX_OFFICE, posterCase: POSTER_CASE,
 };

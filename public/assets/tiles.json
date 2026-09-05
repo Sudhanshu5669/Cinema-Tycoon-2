@@ -160,7 +160,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "wall": {
+    "trashCan": {
       "frame": {
         "x": 128,
         "y": 0,
@@ -180,7 +180,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "wallEdge": {
+    "newsBox": {
       "frame": {
         "x": 144,
         "y": 0,
@@ -200,7 +200,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "brick": {
+    "sidewalkStar": {
       "frame": {
         "x": 160,
         "y": 0,
@@ -220,7 +220,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "brickEdge": {
+    "wall": {
       "frame": {
         "x": 176,
         "y": 0,
@@ -240,7 +240,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "roof": {
+    "wallEdge": {
       "frame": {
         "x": 192,
         "y": 0,
@@ -260,7 +260,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "cornice": {
+    "brick": {
       "frame": {
         "x": 208,
         "y": 0,
@@ -280,7 +280,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "corniceEdge": {
+    "brickEdge": {
       "frame": {
         "x": 224,
         "y": 0,
@@ -300,7 +300,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "plinth": {
+    "roof": {
       "frame": {
         "x": 240,
         "y": 0,
@@ -320,7 +320,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "plinthEdge": {
+    "cornice": {
       "frame": {
         "x": 256,
         "y": 0,
@@ -340,7 +340,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "beltCourse": {
+    "corniceEdge": {
       "frame": {
         "x": 272,
         "y": 0,
@@ -360,7 +360,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "awning": {
+    "plinth": {
       "frame": {
         "x": 288,
         "y": 0,
@@ -380,7 +380,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "marquee": {
+    "plinthEdge": {
       "frame": {
         "x": 304,
         "y": 0,
@@ -400,7 +400,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "signTower": {
+    "beltCourse": {
       "frame": {
         "x": 320,
         "y": 0,
@@ -420,7 +420,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "signCap": {
+    "awning": {
       "frame": {
         "x": 336,
         "y": 0,
@@ -440,9 +440,69 @@
       "rotated": false,
       "trimmed": false
     },
-    "window": {
+    "marquee": {
       "frame": {
         "x": 352,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "signTower": {
+      "frame": {
+        "x": 368,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "signCap": {
+      "frame": {
+        "x": 384,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "window": {
+      "frame": {
+        "x": 400,
         "y": 0,
         "w": 24,
         "h": 32
@@ -462,7 +522,7 @@
     },
     "windowWide": {
       "frame": {
-        "x": 376,
+        "x": 424,
         "y": 0,
         "w": 32,
         "h": 32
@@ -482,7 +542,7 @@
     },
     "door": {
       "frame": {
-        "x": 408,
+        "x": 456,
         "y": 0,
         "w": 24,
         "h": 48
@@ -502,7 +562,7 @@
     },
     "lampPost": {
       "frame": {
-        "x": 432,
+        "x": 480,
         "y": 0,
         "w": 16,
         "h": 48
@@ -519,12 +579,52 @@
       },
       "rotated": false,
       "trimmed": false
+    },
+    "boxOffice": {
+      "frame": {
+        "x": 496,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 32
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "posterCase": {
+      "frame": {
+        "x": 520,
+        "y": 0,
+        "w": 16,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 32
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false
     }
   },
   "meta": {
     "image": "tiles.png",
     "size": {
-      "w": 448,
+      "w": 536,
       "h": 48
     },
     "scale": 1

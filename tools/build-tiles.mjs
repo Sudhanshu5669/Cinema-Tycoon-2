@@ -105,9 +105,18 @@ const streetB = scene(false);
 const street = streetA;
 
 // --- sheet ------------------------------------------------------------------
-const SW = 1040;
+// Width is content-driven, not a fixed guess: the features row lays its
+// swatches out left-to-right at S scale and the street mockup sits right-
+// aligned beside them on the same row, so adding a wider or a new FEATURE
+// (as BOX_OFFICE/POSTER_CASE did) can silently push that row's total width
+// past a hardcoded canvas and overlap the street scene instead of erroring --
+// exactly the kind of silent-not-loud failure this whole review sheet exists
+// to avoid in the actual tile set.
+const S = 5;
+const featuresRowW = Object.values(FEATURES).reduce((x, g) => x + g[0].length * S + 40, 24);
+const SW = Math.max(1040, featuresRowW + streetA.w + 24);
 const tileNames = Object.keys(TILES);
-const S = 5, CELL = TW * S, GAP = 14, PER_ROW = 7;
+const CELL = TW * S, GAP = 14, PER_ROW = 7;
 const tileRows = Math.ceil(tileNames.length / PER_ROW);
 
 const featTop = 62 + tileRows * (CELL + 22) + 24;
