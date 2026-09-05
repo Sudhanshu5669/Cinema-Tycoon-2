@@ -7,12 +7,18 @@
 // world edges still get a plain clamp on top: solidAt reports false outside
 // the map, so collision alone would let the player walk off it.
 //
-// The world is deliberately 3 x 3 screens: a camera that follows, holds a
-// deadzone and stops at the world edge has nothing to prove in a room that
-// fits on screen.
+// The world is the loaded city map's own pixel size (SYSTEMS #9) -- a camera
+// that follows, holds a deadzone and stops at the world edge has nothing to
+// prove in a room that fits on screen, and the map is comfortably several
+// screens either way. This used to be a fixed INTERNAL_W/H * 3 constant, a
+// leftover from before #9 gave the world a real, data-driven size of its
+// own; it happened to stay close enough to the map's own size that the
+// mismatch went unnoticed until the map was resized smaller than it (see
+// `__dev.tiles().normalMapped`'s neighbour, the "map covers the world"
+// smoke check, for the regression this would otherwise reopen).
 
 import Phaser from 'phaser';
-import { INTERNAL_W, INTERNAL_H, SPRITE_W, SPRITE_H } from '../core/config.js';
+import { SPRITE_W, SPRITE_H } from '../core/config.js';
 import { Input, KeyboardSource, VirtualStickSource, isTouchDevice } from '../core/input/index.js';
 import { Player, registerAnimations, TEXTURE } from '../game/player.js';
 import { FollowCamera } from '../game/camera.js';
@@ -21,8 +27,6 @@ import { loadCityMap } from '../game/tilemap/mapLoader.js';
 import { clockLabel } from '../game/tilemap/sun.js';
 import { bakeOccludedLight } from '../game/occludedLight.js';
 
-const WORLD_W = INTERNAL_W * 3;
-const WORLD_H = INTERNAL_H * 3;
 /** SYSTEMS #9: the city is a hand-editable JSON file, loaded like any other
  *  asset -- never a code change to add a building or move a streetlamp. */
 const CITY_KEY = 'city';
@@ -63,6 +67,8 @@ export class DevScene extends Phaser.Scene {
     // never silently three files deep inside the renderer.
     const cityMap = loadCityMap(this.cache.json.get(CITY_KEY), this);
     this.map = new TileMapRenderer(this, cityMap).build();
+    this.worldW = this.map.pixelWidth;
+    this.worldH = this.map.pixelHeight;
     this.hours = START_HOUR;
     this.autoTime = false;
     this.map.setHours(this.hours);
@@ -74,9 +80,11 @@ export class DevScene extends Phaser.Scene {
     // overlay that drives it (SYSTEMS #21) is mobile-only.
     this.stick = this.input_.add(new VirtualStickSource());
 
-    // On the pavement in front of the cinema, facing the street.
-    this.player = new Player(this, 176, 360, (wx, wy) => this.map.solidAt(wx, wy));
-    this.cam = new FollowCamera(this, this.player, WORLD_W, WORLD_H);
+    // On the pavement in front of the cinema (building #3, the one with the
+    // marquee -- SYSTEMS #6's "give the cinema some identity" pass moved it
+    // to the centre of the street), facing the street.
+    this.player = new Player(this, 812, 340, (wx, wy) => this.map.solidAt(wx, wy));
+    this.cam = new FollowCamera(this, this.player, this.worldW, this.worldH);
     this.drawDeadzone();
 
     // Depth sits above the renderer's overhead band so buildings never cover it.
@@ -105,7 +113,7 @@ export class DevScene extends Phaser.Scene {
       ready: true,
       player: () => this.player,
       zoom: () => this.game.scale.zoom,
-      world: () => ({ w: WORLD_W, h: WORLD_H }),
+      world: () => ({ w: this.worldW, h: this.worldH }),
       state: () => ({
         x: this.player.x,
         y: this.player.y,
@@ -335,8 +343,8 @@ export class DevScene extends Phaser.Scene {
     // Building collision is the player's own job now (SYSTEMS #7); this is
     // just the world edge, which solidAt has no opinion about.
     const half = SPRITE_W / 2;
-    this.player.x = Phaser.Math.Clamp(this.player.x, half, WORLD_W - half);
-    this.player.y = Phaser.Math.Clamp(this.player.y, 48, WORLD_H);
+    this.player.x = Phaser.Math.Clamp(this.player.x, half, this.worldW - half);
+    this.player.y = Phaser.Math.Clamp(this.player.y, 48, this.worldH);
 
     // After the player has moved, so the camera never trails a frame behind.
     this.cam.update(dt);

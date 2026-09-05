@@ -165,4 +165,7 @@ export const TILE_HEIGHT = {
   t: 1, T: 1, u: 1, U: 1,
   // Kerb: a raised top edge, then a real drop to road level.
   c: 1, C: -3,
+  // Cinema marquee/sign: a real light bulb protrudes; its panel's own border
+  // (`V`, the same recessed-reveal idea a window frame uses) steps in.
+  e: 2, V: -1,
 };

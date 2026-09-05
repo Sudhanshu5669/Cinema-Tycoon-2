@@ -143,6 +143,16 @@ export function loadCityMap(raw, scene) {
       if (!(Number.isInteger(fx) && Number.isInteger(fw) && fw > 0 && fx >= 0 && Number.isInteger(b.w) && fx + fw <= b.w)) {
         errs.push(`${label}.awning: fx=${fx} fw=${fw} runs past the building's own width ${b.w}`);
       }
+      if (b.awning.tile !== undefined && !validTile(b.awning.tile)) {
+        errs.push(`${label}.awning.tile: unknown tile "${b.awning.tile}"`);
+      }
+    }
+    if (b.sign) {
+      const { fx, h } = b.sign;
+      if (!(Number.isInteger(fx) && fx >= 0 && Number.isInteger(b.w) && fx < b.w)) {
+        errs.push(`${label}.sign: fx=${fx} outside the building's own width ${b.w}`);
+      }
+      if (h !== undefined && !posInt(h)) errs.push(`${label}.sign.h must be a positive integer, got ${h}`);
     }
   });
 

@@ -271,16 +271,46 @@ export class TileMapRenderer {
     this._wallFaces.push({ x0: b.x * TILE, x1: (b.x + b.w) * TILE, faceTop, frontY });
 
     // Awning -- overhead, so the player walks under it. Doubles as the
-    // marquee light: the one saturated colour accent on the street.
+    // marquee light: the one saturated colour accent on the street. `tile`
+    // defaults to the generic striped canopy any shopfront can use; a
+    // building that wants to read as a cinema specifically (its own
+    // identity, not just "a shopfront") sets it to 'marquee' instead --
+    // same footprint and light, a bulb-trimmed canopy tile in its place.
     if (b.awning) {
       const awKey = bake(this.scene, b.awning.fw * TILE, TILE, (g) =>
-        g.fill('awning', 0, 0, b.awning.fw * TILE, TILE));
+        g.fill(b.awning.tile ?? 'awning', 0, 0, b.awning.fw * TILE, TILE));
       const awY = frontY - (b.awning.up ?? 3) * TILE;
       this._place(awKey, (b.x + b.awning.fx) * TILE, awY, DEPTH_OVERHEAD);
       this._lights.push({
         x: (b.x + b.awning.fx) * TILE + (b.awning.fw * TILE) / 2,
         y: awY + TILE / 2,
         gx: (b.x + b.awning.fx) * TILE + (b.awning.fw * TILE) / 2, gy: frontY,
+        kind: 'marquee',
+      });
+    }
+
+    // A vertical marquee sign above the roofline -- the cinema's own
+    // identity marker (see SIGN_TOWER's own doc comment for why a blank
+    // fixture, not text, is what carries that here). `sign.h` tiles of
+    // repeating tower under one capping tile, positioned in face-space like
+    // an awning (`fx` tiles from the left) but stacked upward from the roof
+    // instead of hanging from the wall. Its own light is a second `marquee`
+    // point, independent of the canopy's -- a tall sign glows along its own
+    // height, not just at the canopy line below it.
+    if (b.sign) {
+      const bodyH = (b.sign.h ?? 4) * STEP;
+      const capH = TILE;
+      const signX = (b.x + b.sign.fx) * TILE;
+      const capY = roofY - capH;
+      const bodyY = capY - bodyH;
+      const bodyKey = bake(this.scene, TILE, bodyH, (g) => g.fill('signTower', 0, 0, TILE, bodyH));
+      this._place(bodyKey, signX, bodyY, DEPTH_OVERHEAD);
+      const capKey = bake(this.scene, TILE, capH, (g) => g.fill('signCap', 0, 0, TILE, capH));
+      this._place(capKey, signX, capY, DEPTH_OVERHEAD);
+      this._lights.push({
+        x: signX + TILE / 2,
+        y: bodyY + bodyH / 2,
+        gx: signX + TILE / 2, gy: frontY,
         kind: 'marquee',
       });
     }

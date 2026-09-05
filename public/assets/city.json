@@ -1,57 +1,54 @@
 {
   "w": 120,
-  "h": 68,
+  "h": 50,
   "ground": {
     "default": "road",
     "bands": [
-      { "y0": 18, "y1": 28, "tile": "pave" },
-      { "y0": 29, "y1": 29, "tile": "kerb" },
-      { "y0": 30, "y1": 37, "tile": "road" },
-      { "y0": 38, "y1": 67, "tile": "pave" }
+      { "y0": 18, "y1": 22, "tile": "pave" },
+      { "y0": 23, "y1": 23, "tile": "kerb" },
+      { "y0": 24, "y1": 31, "tile": "road" },
+      { "y0": 32, "y1": 49, "tile": "pave" }
     ],
     "vbands": [
       { "x0": 62, "x1": 65, "tile": "road" }
     ],
     "cells": [
-      { "x": 9, "y": 21, "tile": "paveCrack" },
-      { "x": 28, "y": 25, "tile": "paveCrack" },
+      { "x": 9, "y": 19, "tile": "paveCrack" },
       { "x": 47, "y": 20, "tile": "paveCrack" },
-      { "x": 18, "y": 44, "tile": "paveCrack" },
-      { "x": 55, "y": 41, "tile": "paveCrack" },
-      { "x": 82, "y": 50, "tile": "paveCrack" },
-      { "x": 70, "y": 60, "tile": "paveCrack" },
-      { "x": 90, "y": 22, "tile": "paveCrack" },
-      { "x": 101, "y": 26, "tile": "paveCrack" },
-      { "x": 95, "y": 55, "tile": "paveCrack" },
-      { "x": 105, "y": 48, "tile": "paveCrack" },
-      { "x": 15, "y": 40, "tile": "paveStain" },
-      { "x": 33, "y": 55, "tile": "paveStain" },
-      { "x": 58, "y": 62, "tile": "paveStain" },
-      { "x": 95, "y": 45, "tile": "paveStain" },
-      { "x": 9, "y": 30, "tile": "crosswalk" }, { "x": 10, "y": 30, "tile": "crosswalk" }, { "x": 11, "y": 30, "tile": "crosswalk" },
-      { "x": 9, "y": 32, "tile": "crosswalk" }, { "x": 10, "y": 32, "tile": "crosswalk" }, { "x": 11, "y": 32, "tile": "crosswalk" },
-      { "x": 9, "y": 34, "tile": "crosswalk" }, { "x": 10, "y": 34, "tile": "crosswalk" }, { "x": 11, "y": 34, "tile": "crosswalk" },
-      { "x": 9, "y": 36, "tile": "crosswalk" }, { "x": 10, "y": 36, "tile": "crosswalk" }, { "x": 11, "y": 36, "tile": "crosswalk" }
+      { "x": 90, "y": 20, "tile": "paveCrack" },
+      { "x": 101, "y": 19, "tile": "paveCrack" },
+      { "x": 18, "y": 34, "tile": "paveCrack" },
+      { "x": 55, "y": 36, "tile": "paveCrack" },
+      { "x": 70, "y": 47, "tile": "paveCrack" },
+      { "x": 82, "y": 45, "tile": "paveCrack" },
+      { "x": 105, "y": 44, "tile": "paveCrack" },
+      { "x": 15, "y": 41, "tile": "paveStain" },
+      { "x": 58, "y": 44, "tile": "paveStain" },
+      { "x": 95, "y": 42, "tile": "paveStain" },
+      { "x": 49, "y": 24, "tile": "crosswalk" }, { "x": 50, "y": 24, "tile": "crosswalk" }, { "x": 51, "y": 24, "tile": "crosswalk" },
+      { "x": 49, "y": 26, "tile": "crosswalk" }, { "x": 50, "y": 26, "tile": "crosswalk" }, { "x": 51, "y": 26, "tile": "crosswalk" },
+      { "x": 49, "y": 28, "tile": "crosswalk" }, { "x": 50, "y": 28, "tile": "crosswalk" }, { "x": 51, "y": 28, "tile": "crosswalk" },
+      { "x": 49, "y": 30, "tile": "crosswalk" }, { "x": 50, "y": 30, "tile": "crosswalk" }, { "x": 51, "y": 30, "tile": "crosswalk" }
     ]
   },
   "flat": {
     "stripes": [
-      { "y": 33, "tile": "roadLine", "step": 2, "offset": 0 }
+      { "y": 27, "tile": "roadLine", "step": 2, "offset": 0 }
     ]
   },
   "object": {
     "cells": [
-      { "x": 26, "y": 46, "tile": "grass" },
-      { "x": 95, "y": 46, "tile": "grass" }
+      { "x": 26, "y": 47, "tile": "grass" },
+      { "x": 95, "y": 36, "tile": "grass" }
     ]
   },
   "overhead": {
     "cells": [
-      { "x": 60, "y": 41, "tile": "awning" }
+      { "x": 75, "y": 36, "tile": "awning" }
     ]
   },
   "platforms": [
-    { "x": 30, "y": 43, "w": 12, "h": 7, "e": 2, "top": "grass", "face": "plinth" }
+    { "x": 30, "y": 39, "w": 12, "h": 7, "e": 2, "top": "grass", "face": "plinth" }
   ],
   "buildings": [
     {
@@ -63,8 +60,7 @@
         { "tile": "window", "fx": 12, "fy": 1 }, { "tile": "window", "fx": 15, "fy": 1 }, { "tile": "window", "fx": 18, "fy": 1 },
         { "tile": "window", "fx": 1, "fy": 4 }, { "tile": "window", "fx": 6, "fy": 4 },
         { "tile": "windowWide", "fx": 11, "fy": 4 }, { "tile": "window", "fx": 16, "fy": 4 }
-      ],
-      "awning": { "fx": 6, "fw": 10, "up": 3 }
+      ]
     },
     {
       "x": 22, "y": 13, "w": 16, "h": 5, "storeys": 9, "roofDepth": 3,
@@ -84,7 +80,9 @@
         { "tile": "windowWide", "fx": 15, "fy": 1 }, { "tile": "window", "fx": 18, "fy": 1 }, { "tile": "window", "fx": 21, "fy": 1 },
         { "tile": "window", "fx": 0, "fy": 4 }, { "tile": "window", "fx": 4, "fy": 4 }, { "tile": "window", "fx": 8, "fy": 4 },
         { "tile": "window", "fx": 12, "fy": 4 }, { "tile": "window", "fx": 16, "fy": 4 }, { "tile": "window", "fx": 20, "fy": 4 }
-      ]
+      ],
+      "awning": { "fx": 5, "fw": 16, "up": 3, "tile": "marquee" },
+      "sign": { "fx": 20, "h": 3 }
     },
     {
       "x": 66, "y": 13, "w": 20, "h": 5, "storeys": 5, "roofDepth": 3,
@@ -109,9 +107,9 @@
     }
   ],
   "streetlamps": [
-    { "x": 8, "y": 24 }, { "x": 12, "y": 24 }, { "x": 22, "y": 24 }, { "x": 36, "y": 24 }, { "x": 50, "y": 24 },
-    { "x": 64, "y": 24 }, { "x": 78, "y": 24 }, { "x": 92, "y": 24 }, { "x": 106, "y": 24 },
-    { "x": 6, "y": 44 }, { "x": 20, "y": 44 }, { "x": 50, "y": 44 }, { "x": 64, "y": 44 },
-    { "x": 78, "y": 44 }, { "x": 92, "y": 44 }, { "x": 106, "y": 44 }
+    { "x": 8, "y": 22 }, { "x": 22, "y": 22 }, { "x": 36, "y": 22 }, { "x": 46, "y": 22 }, { "x": 50, "y": 22 },
+    { "x": 64, "y": 22 }, { "x": 78, "y": 22 }, { "x": 92, "y": 22 }, { "x": 106, "y": 22 },
+    { "x": 6, "y": 32 }, { "x": 20, "y": 32 }, { "x": 46, "y": 32 }, { "x": 50, "y": 32 }, { "x": 64, "y": 32 },
+    { "x": 78, "y": 32 }, { "x": 92, "y": 32 }, { "x": 106, "y": 32 }
   ]
 }

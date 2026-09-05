@@ -380,9 +380,69 @@
       "rotated": false,
       "trimmed": false
     },
-    "window": {
+    "marquee": {
       "frame": {
         "x": 304,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "signTower": {
+      "frame": {
+        "x": 320,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "signCap": {
+      "frame": {
+        "x": 336,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "window": {
+      "frame": {
+        "x": 352,
         "y": 0,
         "w": 24,
         "h": 32
@@ -402,7 +462,7 @@
     },
     "windowWide": {
       "frame": {
-        "x": 328,
+        "x": 376,
         "y": 0,
         "w": 32,
         "h": 32
@@ -422,7 +482,7 @@
     },
     "door": {
       "frame": {
-        "x": 360,
+        "x": 408,
         "y": 0,
         "w": 24,
         "h": 48
@@ -442,7 +502,7 @@
     },
     "lampPost": {
       "frame": {
-        "x": 384,
+        "x": 432,
         "y": 0,
         "w": 16,
         "h": 48
@@ -464,7 +524,7 @@
   "meta": {
     "image": "tiles.png",
     "size": {
-      "w": 400,
+      "w": 448,
       "h": 48
     },
     "scale": 1

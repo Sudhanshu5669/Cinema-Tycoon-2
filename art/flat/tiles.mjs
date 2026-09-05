@@ -639,6 +639,94 @@ export const AWNING = [
 ];
 
 /**
+ * A cinema's own canopy, not the generic AWNING every shopfront can use --
+ * **per user request, "give it some identity"**: the same candy-stripe body,
+ * but a row of alternating light bulbs (`e`/`E`, the streetlamp's own bulb
+ * tones, reused rather than invented) along the bottom edge, the one part of
+ * the canopy actually silhouetted against the sidewalk instead of the wall
+ * behind it. A row of literal bulbs is the single most legible "this is a
+ * theatre" cue pixel art this small has available, more so than the stripe
+ * pattern alone (which any awning already carries).
+ */
+export const MARQUEE = [
+  '................',
+  '................',
+  'vvvvssssvvvvssss',
+  'vvvvssssvvvvssss',
+  'vvvvssssvvvvssss',
+  'vvvvssssvvvvssss',
+  'vvvvssssvvvvssss',
+  'vvvvssssvvvvssss',
+  'vvvvssssvvvvssss',
+  'vvvvssssvvvvssss',
+  'vvvvssssvvvvssss',
+  'eEeEeEeEeEeEeEeE',
+  'VVVVSSSSVVVVSSSS',
+  'VVVVSSSSVVVVSSSS',
+  '................',
+  '................',
+];
+
+/**
+ * A vertical marquee sign, tileable: repeats via `fill()` to whatever height
+ * a building's `sign.h` calls for, then capped with SIGN_CAP below. **Per
+ * user request, "give it [the cinema] some identity... make art for it if
+ * needed"** -- there's no letter/font tile in this set to spell a name on
+ * it, so the identity is the fixture itself: a vertical blade tower rising
+ * above the roofline is the classic silhouette a cinema marquee reads as
+ * even blank, the way a striped pole reads as a barber's without needing a
+ * word on it. Bulb-light columns down both edges (`e`/`E`, the streetlamp's
+ * own tones) frame a plain saturated-red panel (`v`, bordered by a recessed
+ * `V` edge, the same reveal language a window frame uses) -- the world's one
+ * saturated accent, spent on the one building that should visibly own it.
+ * The bulb rhythm is every 4 rows, which divides this tile's own 16 evenly,
+ * so repeating it vertically never shows a seam in the spacing.
+ */
+export const SIGN_TOWER = [
+  'eVvvvvvvvvvvvvVe',
+  'EVvvvvvvvvvvvvVE',
+  'EVvvvvvvvvvvvvVE',
+  'EVvvvvvvvvvvvvVE',
+  'eVvvvvvvvvvvvvVe',
+  'EVvvvvvvvvvvvvVE',
+  'EVvvvvvvvvvvvvVE',
+  'EVvvvvvvvvvvvvVE',
+  'eVvvvvvvvvvvvvVe',
+  'EVvvvvvvvvvvvvVE',
+  'EVvvvvvvvvvvvvVE',
+  'EVvvvvvvvvvvvvVE',
+  'eVvvvvvvvvvvvvVe',
+  'EVvvvvvvvvvvvvVE',
+  'EVvvvvvvvvvvvvVE',
+  'EVvvvvvvvvvvvvVE',
+];
+
+/** The one-off finial on top of a SIGN_TOWER stack -- a small stepped peak
+ *  (transparent either side, so it actually tapers instead of just changing
+ *  colour) in the roof cornice's own brightest tones (`l`/`s`), so the very
+ *  top of the tower catches light the same way the building's own roof lip
+ *  does. Its own bottom four rows continue SIGN_TOWER's exact bulb/panel
+ *  pattern (same 4-row phase) so the seam where they meet is invisible. */
+export const SIGN_CAP = [
+  '......llll......',
+  '.....llllll.....',
+  '....ssssssss....',
+  '...ssssssssss...',
+  'eVvvvvvvvvvvvvVe',
+  'EVvvvvvvvvvvvvVE',
+  'EVvvvvvvvvvvvvVE',
+  'EVvvvvvvvvvvvvVE',
+  'eVvvvvvvvvvvvvVe',
+  'EVvvvvvvvvvvvvVE',
+  'EVvvvvvvvvvvvvVE',
+  'EVvvvvvvvvvvvvVE',
+  'eVvvvvvvvvvvvvVe',
+  'EVvvvvvvvvvvvvVE',
+  'EVvvvvvvvvvvvvVE',
+  'EVvvvvvvvvvvvvVE',
+];
+
+/**
  * 16 x 48 — three tiles, a streetlamp standing at street height. Its glass is
  * baked warm-pale rather than the windows' cold blue: at runtime this is a
  * light *source* (SYSTEMS #8 registers a Light at its bulb), so the tile only
@@ -706,7 +794,7 @@ export const TILES = {
   wall: WALL, wallEdge: WALL_EDGE, brick: BRICK, brickEdge: BRICK_EDGE,
   roof: ROOF, cornice: CORNICE, corniceEdge: CORNICE_EDGE,
   plinth: PLINTH, plinthEdge: PLINTH_EDGE, beltCourse: BELT_COURSE,
-  awning: AWNING,
+  awning: AWNING, marquee: MARQUEE, signTower: SIGN_TOWER, signCap: SIGN_CAP,
 };
 
 /** Multi-tile. Each is a whole number of tiles and slices cleanly. */
