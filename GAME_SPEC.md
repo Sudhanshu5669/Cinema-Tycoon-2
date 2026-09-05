@@ -68,6 +68,16 @@ Locked art constants:
 - Presentation: **integer scale x3 -> 1920 x 1080**, nearest-neighbour
 - On-screen world: 40 x 22 tiles
 
+The tile renderer (SYSTEMS #6) is **elevation-aware**: a map is a `height` grid
+plus named layers (`ground`/`flat`/`object`/`overhead`), and raised terrain and
+buildings are drawn with an **oblique face** — a wall that projects straight
+down the screen — rather than a flat facade glued under a top-down roof. The
+face height per elevation level (`STEP`) is a renderer knob, not a locked
+constant. This was a deliberate call ("versatile enough to have levels if
+needed"); flat maps still author flat, the capability is just there. Tile art
+is a later "art second" pass — the renderer runs on the SYSTEMS #0 placeholder
+tiles for now.
+
 Sprites are authored as an **indexed-colour ASCII grid** (`art/flat/player.mjs`)
 against a named palette (`art/flat/palette.mjs`); `tools/flat.mjs` maps
 characters to exact colours and validates every grid. There is no shading pass —

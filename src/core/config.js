@@ -12,6 +12,16 @@ export const TILE = 16;
 export const SPRITE_W = 16;
 export const SPRITE_H = 48;
 
+/**
+ * Collision footprint, centred at the feet — not the full sprite. A tall
+ * character's shoulders should be free to visually overlap a wall while the
+ * feet still stop at it. Both dimensions stay under one tile: a box that size
+ * can straddle at most a 2x2 group of cells, so sampling just its four
+ * corners is guaranteed to land inside every solid cell it overlaps.
+ */
+export const COLLIDER_W = 10;
+export const COLLIDER_H = 8;
+
 /** Spritesheet layout: [idle 0, idle 1, walk 0..3] x [down, left, right, up]. */
 export const SHEET_COLS = 6;
 export const FACING_ROWS = ['down', 'left', 'right', 'up'];

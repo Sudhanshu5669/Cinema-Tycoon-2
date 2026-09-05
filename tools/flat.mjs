@@ -8,11 +8,25 @@
 import { Bitmap, hexToRGBA } from './png.mjs';
 import { PALETTE } from '../art/flat/palette.mjs';
 
-const RGBA = Object.fromEntries(
-  Object.entries(PALETTE).map(([ch, hex]) => [ch, hexToRGBA(hex)]),
-);
+const cache = new WeakMap();
 
-export function validateGrid(name, grid, w, h) {
+/**
+ * Characters are only meaningful against a palette, and the character palette
+ * and the tile palette are separate namespaces — `h` is hair on a person and
+ * has no business meaning hair on a pavement. So both entry points take the
+ * palette they are drawing against, defaulting to the character one.
+ */
+function rgba(palette) {
+  let map = cache.get(palette);
+  if (!map) {
+    map = Object.fromEntries(Object.entries(palette).map(([ch, hex]) => [ch, hexToRGBA(hex)]));
+    cache.set(palette, map);
+  }
+  return map;
+}
+
+export function validateGrid(name, grid, w, h, palette = PALETTE) {
+  const RGBA = rgba(palette);
   const errs = [];
   if (grid.length !== h) errs.push(`${name}: ${grid.length} rows, expected ${h}`);
   grid.forEach((row, y) => {
@@ -25,7 +39,8 @@ export function validateGrid(name, grid, w, h) {
 }
 
 /** @returns {Bitmap} */
-export function raster(grid) {
+export function raster(grid, palette = PALETTE) {
+  const RGBA = rgba(palette);
   const h = grid.length, w = grid[0].length;
   const b = new Bitmap(w, h);
   for (let y = 0; y < h; y++) {

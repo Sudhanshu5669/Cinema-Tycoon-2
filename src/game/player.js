@@ -11,6 +11,7 @@
 import {
   WALK_SPEED, WALK_FPS, IDLE_FPS, SHEET_COLS, FACING_ROWS, SPRITE_H,
 } from '../core/config.js';
+import { resolveMove } from './collision.js';
 
 /** @typedef {'down'|'left'|'right'|'up'} Facing */
 
@@ -44,12 +45,16 @@ export class Player {
    * @param {Phaser.Scene} scene
    * @param {number} x world x of the player's feet
    * @param {number} y world y of the player's feet
+   * @param {(wx: number, wy: number) => boolean} [solidAt] world-pixel solidity
+   *   query (SYSTEMS #6's tile renderer). Omitted, movement is unobstructed —
+   *   what tools/smoke.mjs's pure walk checks want.
    */
-  constructor(scene, x, y) {
+  constructor(scene, x, y, solidAt = null) {
     /** Float position. The sprite is drawn at a rounded copy of it, so movement
      *  accumulates smoothly but never lands the art on a half pixel. */
     this.x = x;
     this.y = y;
+    this.solidAt = solidAt;
     /** @type {Facing} */
     this.facing = 'down';
     this.moving = false;
@@ -70,8 +75,10 @@ export class Player {
     const moving = ax !== 0 || ay !== 0;
 
     if (moving) {
-      this.x += ax * WALK_SPEED * dt;
-      this.y += ay * WALK_SPEED * dt;
+      const nx = this.x + ax * WALK_SPEED * dt;
+      const ny = this.y + ay * WALK_SPEED * dt;
+      if (this.solidAt) ({ x: this.x, y: this.y } = resolveMove(this.solidAt, this.x, this.y, nx, ny));
+      else { this.x = nx; this.y = ny; }
       this.facing = pickFacing(this.facing, ax, ay);
     }
 
@@ -81,6 +88,10 @@ export class Player {
     }
 
     this.sprite.setPosition(Math.round(this.x), Math.round(this.y));
+    // Depth sorting against the tile renderer's structures (#6): everything in
+    // the world is ordered by the world Y of its ground contact, and the feet
+    // are the player's.
+    this.sprite.setDepth(Math.round(this.y));
   }
 
   /** Feet position — the player's actual location in the world. */

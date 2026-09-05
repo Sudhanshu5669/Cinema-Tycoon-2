@@ -1,22 +1,34 @@
 // Dev sandbox. A persistent scene for testing whatever system is being built,
 // so no throwaway harness has to be rebuilt each time.
 //
-// The floor here is a placeholder drawn with Graphics, NOT the tile renderer —
-// that is SYSTEMS #6 and has its own 3/4 perspective rules. There is no
-// collision either (#7), so the player is only clamped to the world edges.
+// The floor is the real tile renderer (SYSTEMS #6) running the dev map, and
+// the player resolves movement against its `solidAt` (SYSTEMS #7) — buildings
+// block, everything else (open ground, a raised platform's top) does not. The
+// world edges still get a plain clamp on top: solidAt reports false outside
+// the map, so collision alone would let the player walk off it.
 //
-// The room is deliberately 3 x 3 screens: a camera that follows, holds a
+// The world is deliberately 3 x 3 screens: a camera that follows, holds a
 // deadzone and stops at the world edge has nothing to prove in a room that
 // fits on screen.
 
 import Phaser from 'phaser';
-import { INTERNAL_W, INTERNAL_H, TILE, SPRITE_W } from '../core/config.js';
+import { INTERNAL_W, INTERNAL_H, SPRITE_W } from '../core/config.js';
 import { Input, KeyboardSource, VirtualStickSource, isTouchDevice } from '../core/input/index.js';
 import { Player, registerAnimations, TEXTURE } from '../game/player.js';
 import { FollowCamera } from '../game/camera.js';
+import { TileMapRenderer } from '../game/tilemap/renderer.js';
+import { DEV_MAP } from '../game/tilemap/devmap.js';
+import { clockLabel } from '../game/tilemap/sun.js';
 
 const WORLD_W = INTERNAL_W * 3;
 const WORLD_H = INTERNAL_H * 3;
+
+/** Where the dev day starts: late afternoon, a long shadow to the east that
+ *  agrees with the west-lit flat tiles. `__dev.setTime` / `__dev.autoTime`
+ *  move it; a real day/night clock is SYSTEMS #16. */
+const START_HOUR = 16;
+/** Seconds of real time for a full 24h sweep when auto-advancing. */
+const DAY_SECONDS = 120;
 
 export class DevScene extends Phaser.Scene {
   constructor() { super('dev'); }
@@ -26,10 +38,15 @@ export class DevScene extends Phaser.Scene {
       frameWidth: SPRITE_W,
       frameHeight: 48,
     });
+    TileMapRenderer.preload(this);
   }
 
   create() {
-    this.drawPlaceholderFloor();
+    this.cameras.main.setBackgroundColor('#1b1b22');
+    this.map = new TileMapRenderer(this, DEV_MAP).build();
+    this.hours = START_HOUR;
+    this.autoTime = false;
+    this.map.setHours(this.hours);
     registerAnimations(this);
 
     this.input_ = new Input();
@@ -38,16 +55,21 @@ export class DevScene extends Phaser.Scene {
     // overlay that drives it (SYSTEMS #21) is mobile-only.
     this.stick = this.input_.add(new VirtualStickSource());
 
-    this.player = new Player(this, WORLD_W / 2, WORLD_H / 2);
+    // On the pavement in front of the cinema, facing the street.
+    this.player = new Player(this, 176, 360, (wx, wy) => this.map.solidAt(wx, wy));
     this.cam = new FollowCamera(this, this.player, WORLD_W, WORLD_H);
     this.drawDeadzone();
 
+    // Depth sits above the renderer's overhead band so buildings never cover it.
     this.hud = this.add.text(6, 4, '', {
       fontFamily: 'monospace', fontSize: '10px', color: '#e0e0e0',
-    }).setScrollFactor(0).setDepth(100);
+    }).setScrollFactor(0).setDepth(1e6);
 
     this.exposeDevHooks();
-    this.events.once('shutdown', () => this.input_.destroy());
+    this.events.once('shutdown', () => {
+      this.input_.destroy();
+      this.map.destroy();
+    });
   }
 
   /**
@@ -87,35 +109,32 @@ export class DevScene extends Phaser.Scene {
         this.player.y = y;
         this.cam.snap();
       },
+      // SYSTEMS #6. Screen rects and depths of the renderer's structures, so
+      // the smoke test can warp the player behind and in front of a building
+      // and assert the sort order without sampling pixels.
+      tiles: () => ({
+        pixelW: this.map.pixelWidth,
+        pixelH: this.map.pixelHeight,
+        playerDepth: this.player.sprite.depth,
+        structures: this.map.structures,
+        hours: this.hours,
+        shadowAlpha: this.map.shadows?.image.alpha ?? 0,
+        // Whether any roof cap or platform top is currently catching a
+        // neighbour's cast shadow -- see shadows.js's per-surface layers.
+        roofShadowHit: this.map.shadows?.surfaceLayers.some((l) => l.image.visible) ?? false,
+      }),
+      probe: (x, y) => ({
+        height: this.map.heightAt(x, y),
+        solid: this.map.solidAt(x, y),
+      }),
+      // Cast shadows are driven by this hour; a real day/night clock is #16.
+      setTime: (h) => {
+        this.autoTime = false;
+        this.hours = ((h % 24) + 24) % 24;
+        this.map.setHours(this.hours);
+      },
+      autoTime: (on) => { this.autoTime = on !== false; },
     };
-  }
-
-  drawPlaceholderFloor() {
-    this.cameras.main.setBackgroundColor('#3b3a40');
-    const g = this.add.graphics();
-    g.fillStyle(0x46454c, 1);
-    for (let ty = 0; ty * TILE < WORLD_H; ty++) {
-      for (let tx = 0; tx * TILE < WORLD_W; tx++) {
-        if ((tx + ty) % 2 === 0) g.fillRect(tx * TILE, ty * TILE, TILE, TILE);
-      }
-    }
-    // A marker every four tiles, so a walk of known length can be eyeballed.
-    g.fillStyle(0x5a5964, 1);
-    for (let ty = 0; ty * TILE < WORLD_H; ty += 4) {
-      for (let tx = 0; tx * TILE < WORLD_W; tx += 4) g.fillRect(tx * TILE, ty * TILE, 2, 2);
-    }
-    // Screen-sized blocks, so scrolling is obvious and it is clear at a glance
-    // which of the nine screens you are standing on.
-    g.lineStyle(1, 0x6c6b78, 1);
-    for (let y = 0; y < WORLD_H; y += INTERNAL_H) {
-      for (let x = 0; x < WORLD_W; x += INTERNAL_W) g.strokeRect(x + 0.5, y + 0.5, INTERNAL_W - 1, INTERNAL_H - 1);
-    }
-    // World edge, so the camera clamp is something you can see happen.
-    g.fillStyle(0x2a2930, 1);
-    g.fillRect(0, 0, WORLD_W, TILE);
-    g.fillRect(0, WORLD_H - TILE, WORLD_W, TILE);
-    g.fillRect(0, 0, TILE, WORLD_H);
-    g.fillRect(WORLD_W - TILE, 0, TILE, WORLD_H);
   }
 
   /** Dev-only outline of the camera deadzone: the box the player moves inside
@@ -127,7 +146,7 @@ export class DevScene extends Phaser.Scene {
       .lineStyle(1, 0xffffff, 0.14)
       .strokeRect(dz.x + 0.5, dz.y + 0.5, dz.w - 1, dz.h - 1)
       .setScrollFactor(0)
-      .setDepth(99);
+      .setDepth(1e6 - 1);
   }
 
   /**
@@ -139,14 +158,18 @@ export class DevScene extends Phaser.Scene {
     this.input_.update();
     this.player.update(dt, this.input_);
 
-    // No collision system yet — keep the player inside the world so the sandbox
-    // cannot lose them off the map.
+    // Building collision is the player's own job now (SYSTEMS #7); this is
+    // just the world edge, which solidAt has no opinion about.
     const half = SPRITE_W / 2;
     this.player.x = Phaser.Math.Clamp(this.player.x, half, WORLD_W - half);
     this.player.y = Phaser.Math.Clamp(this.player.y, 48, WORLD_H);
 
     // After the player has moved, so the camera never trails a frame behind.
     this.cam.update(dt);
+
+    if (this.autoTime) this.hours = (this.hours + dt * (24 / DAY_SECONDS)) % 24;
+    // Cheap when the hour has not moved into a new bake bucket.
+    this.map.setHours(this.hours);
 
     const a = this.input_.axis;
     const view = this.cameras.main;
@@ -155,6 +178,7 @@ export class DevScene extends Phaser.Scene {
       `face   ${this.player.facing}${this.player.moving ? ' (walking)' : ''}`,
       `feet   ${this.player.x.toFixed(1)} ${this.player.y.toFixed(1)}`,
       `scroll ${view.scrollX} ${view.scrollY}`,
+      `time   ${clockLabel(this.hours)}${this.autoTime ? ' (auto)' : ''}`,
       `touch  ${isTouchDevice() ? 'yes' : 'no'}`,
     ].join('\n'));
   }

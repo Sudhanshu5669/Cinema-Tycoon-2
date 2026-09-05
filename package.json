@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "build:art": "node tools/build-flat.mjs && node tools/build-walk.mjs",
+    "build:art": "node tools/build-flat.mjs && node tools/build-walk.mjs && node tools/build-tiles-sheet.mjs",
     "smoke": "node tools/smoke.mjs"
   },
   "repository": {

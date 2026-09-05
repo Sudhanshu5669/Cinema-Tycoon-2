@@ -7,17 +7,18 @@
 // clip, and camera scroll — then saves screenshots.
 //
 //   npm run dev            (in another terminal)
-//   node tools/smoke.mjs   [--url http://localhost:5173]
+//   node tools/smoke.mjs   [--url http://localhost:3000]
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
+import { shadowFor } from '../src/game/tilemap/sun.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const OUT = path.join(ROOT, 'review/smoke');
 const url = process.argv.includes('--url')
   ? process.argv[process.argv.indexOf('--url') + 1]
-  : 'http://localhost:5173';
+  : 'http://localhost:3000';
 
 const results = [];
 const check = (name, ok, detail = '') => {
@@ -108,10 +109,127 @@ check('walk frame advances', fA.frame !== fB.frame, `${fA.frame} -> ${fB.frame}`
 await page.screenshot({ path: path.join(OUT, 'walking-down.png') });
 await page.keyboard.up('ArrowDown');
 
+// --- tile renderer: elevation, oblique faces, depth sorting (SYSTEMS #6) -----
+const tiles = await page.evaluate(() => window.__dev.tiles());
+const world = await page.evaluate(() => window.__dev.world());
+check('tile map covers the world', tiles.pixelW >= world.w && tiles.pixelH >= world.h,
+  `map ${tiles.pixelW}x${tiles.pixelH} vs world ${world.w}x${world.h}`);
+const cinema = tiles.structures.find((s) => s.kind === 'building');
+const platform = tiles.structures.find((s) => s.kind === 'platform');
+check('renderer built a building and a platform', !!cinema && !!platform);
+
+// A building footprint reports its storey height and reads as solid; the open
+// road reports elevation 0 and is not solid. This is the contract collision
+// (#7) is going to build on.
+const inside = await page.evaluate(([x, y]) => window.__dev.probe(x, y),
+  [cinema.worldRect.x + 8, cinema.worldRect.y + 8]);
+check('heightAt returns the storey count inside a building', inside.height === cinema.storeys,
+  `${inside.height} vs ${cinema.storeys}`);
+check('solidAt is true inside a building', inside.solid === true);
+const road = await page.evaluate(() => window.__dev.probe(window.__dev.world().w / 2, window.__dev.world().h / 2));
+check('open ground is elevation 0 and not solid', road.height === 0 && road.solid === false);
+
+// Depth sort: north of the front wall the player is behind the face; south of
+// it, in front. The renderer never moves, only the player's depth does.
+await page.evaluate(([x, y]) => window.__dev.warp(x, y),
+  [cinema.worldRect.x + cinema.worldRect.w / 2, cinema.worldRect.y + 4]);
+await page.waitForTimeout(80);
+const behind = await page.evaluate(() => window.__dev.tiles());
+check('player sorts behind a building when north of its front wall',
+  behind.playerDepth < cinema.faceDepth, `depth ${behind.playerDepth} vs face ${cinema.faceDepth}`);
+
+await page.evaluate(([x, y]) => window.__dev.warp(x, y),
+  [cinema.worldRect.x + cinema.worldRect.w / 2, cinema.faceDepth + 40]);
+await page.waitForTimeout(80);
+const front = await page.evaluate(() => window.__dev.tiles());
+check('player sorts in front of a building when south of its front wall',
+  front.playerDepth > cinema.faceDepth, `depth ${front.playerDepth} vs face ${cinema.faceDepth}`);
+await page.screenshot({ path: path.join(OUT, 'tiles-depth-sort.png') });
+
+// A raised platform lifts its top surface and shows an oblique face below it.
+check('platform face sits below its raised top', platform.faceDepth > platform.topDepth,
+  `face ${platform.faceDepth} top ${platform.topDepth}`);
+
+// --- collision: solidAt blocks the player, sliding past a corner (SYSTEMS #7) -
+// Walk straight into the cinema's front wall from open pavement: the player
+// should stop short of it, never inside it, and stay put under continued
+// pressure (no tunnelling through a stalled resolve).
+const wallX = cinema.worldRect.x + cinema.worldRect.w / 2;
+await page.evaluate(([x, y]) => window.__dev.warp(x, y), [wallX, cinema.faceDepth + 80]);
+await hold(page, 'ArrowUp', 2500);
+const stopped = await state(page);
+check('walking into a building stops the player short of it',
+  stopped.y > cinema.faceDepth && stopped.y < cinema.faceDepth + 20,
+  `y ${stopped.y.toFixed(1)} vs face ${cinema.faceDepth}`);
+const stoppedProbe = await page.evaluate(([x, y]) => window.__dev.probe(x, y), [wallX, stopped.y]);
+check('the player never actually enters the solid footprint', stoppedProbe.solid === false);
+
+// Held against the wall, a diagonal should slide along it (x keeps advancing)
+// rather than the whole move rejecting because y alone is blocked.
+await page.evaluate(([x, y]) => window.__dev.warp(x, y), [wallX, cinema.faceDepth + 80]);
+await page.keyboard.down('ArrowUp');
+await page.keyboard.down('ArrowRight');
+await page.waitForTimeout(4000);
+await page.keyboard.up('ArrowUp');
+await page.keyboard.up('ArrowRight');
+await page.waitForTimeout(120);
+const slid = await state(page);
+check('a diagonal into a wall slides along it instead of snagging',
+  slid.x > wallX + 20 && slid.y < cinema.faceDepth + 20,
+  `x ${wallX.toFixed(1)} -> ${slid.x.toFixed(1)}, y ${slid.y.toFixed(1)}`);
+await page.screenshot({ path: path.join(OUT, 'collision-slide.png') });
+
+// --- cast shadows: driven by height and hour (sun.js) -----------------------
+// Pure model, no browser: a taller thing throws a longer shadow, noon is
+// shorter than dusk, the horizontal swings west -> east across the day, and
+// there is nothing at night.
+const noon = shadowFor(12, 100), dusk = shadowFor(18, 100);
+const noonTall = shadowFor(12, 200);
+check('shadow is longer near dusk than at noon', Math.hypot(dusk.dx, dusk.dy) > Math.hypot(noon.dx, noon.dy) * 2,
+  `noon ${Math.hypot(noon.dx, noon.dy).toFixed(0)} dusk ${Math.hypot(dusk.dx, dusk.dy).toFixed(0)}`);
+check('a taller caster throws a proportionally longer shadow',
+  Math.abs(Math.hypot(noonTall.dx, noonTall.dy) / Math.hypot(noon.dx, noon.dy) - 2) < 0.01);
+check('shadow points west in the morning, east in the evening',
+  shadowFor(8, 100).dx < 0 && shadowFor(16, 100).dx > 0);
+check('no cast shadow at night', shadowFor(2, 100) === null && shadowFor(23, 100) === null);
+
+// In the browser: setting the hour re-bakes the shadow layer, and its opacity
+// tracks the sun -- firm at midday, faint at dusk, gone at night.
+const alphaAt = async (h) => {
+  await page.evaluate((hh) => window.__dev.setTime(hh), h);
+  await page.waitForTimeout(120);
+  return (await page.evaluate(() => window.__dev.tiles())).shadowAlpha;
+};
+const [aMidday, aDusk, aNight] = [await alphaAt(12), await alphaAt(18.4), await alphaAt(2)];
+check('shadow layer is firmer at midday than at dusk', aMidday > aDusk && aDusk > 0,
+  `midday ${aMidday.toFixed(3)} dusk ${aDusk.toFixed(3)}`);
+check('shadow layer is off at night', aNight === 0);
+
+// A tall building's long dawn/dusk shadow can bleed sideways into a shorter
+// neighbour's roof footprint -- the roof/platform-top surfaces shadows.js
+// renders on their own, shifted through the same footprint -> screen mapping
+// the roof art itself uses. No such reach exists at noon, when shadows are
+// short and fall straight down onto the pavement.
+const roofHitAt = async (h) => {
+  await page.evaluate((hh) => window.__dev.setTime(hh), h);
+  await page.waitForTimeout(120);
+  return (await page.evaluate(() => window.__dev.tiles())).roofShadowHit;
+};
+check('a neighbour\'s long dawn shadow reaches onto a shorter roof', await roofHitAt(6.05));
+check('no roof shadow at noon, when shadows are short', !(await roofHitAt(12)));
+
+await page.evaluate(() => window.__dev.setTime(15));
+await page.waitForTimeout(150);
+await page.evaluate(() => window.__dev.warp(430, 330));
+await page.waitForTimeout(120);
+await page.screenshot({ path: path.join(OUT, 'tiles-shadows-afternoon.png') });
+
+await page.evaluate(() => window.__dev.warp(176, 360));
+await page.waitForTimeout(120);
+
 // --- camera: follows, holds a deadzone, clamps, stays on whole pixels --------
 // SYSTEMS #5. The world is 3 x 3 screens, so there is room to scroll and edges
-// to stop at.
-const world = await page.evaluate(() => window.__dev.world());
+// to stop at. `world` is read above, in the tile-renderer section.
 
 // Centred at rest. The camera aims at the middle of the body, not the feet, so
 // the player draws a half-sprite below the centre line.
@@ -135,11 +253,15 @@ check('deadzone: the player did move inside it',
 
 // Push past the deadzone and the camera must take over, and must land on whole
 // pixels on every frame it does it — a fractional scroll is what makes static
-// tile edges shimmer.
+// tile edges shimmer. The catch-up is an exponential smoothing, not a linear
+// one, so it is slow for the first few hundred ms — 45 samples (1.8s) gives
+// it enough real time to clear the threshold with margin instead of sitting
+// right on it (was 25 samples / 1s, which the heavier tile+shadow render cost
+// per frame made this session's real-clock pacing tip below +40px).
 const beforeScroll = await camera(page);
 await page.keyboard.down('ArrowRight');
 const samples = [];
-for (let i = 0; i < 25; i++) {
+for (let i = 0; i < 45; i++) {
   samples.push(await camera(page));
   await page.waitForTimeout(40);
 }
