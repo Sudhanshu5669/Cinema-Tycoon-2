@@ -33,6 +33,17 @@ const START_HOUR = 16;
 /** Seconds of real time for a full 24h sweep when auto-advancing. */
 const DAY_SECONDS = 120;
 
+/**
+ * Dev-only time-of-day hotkeys, so testing a system across the whole day
+ * (shadows, #8's lighting) doesn't mean parking a console open. Digit row
+ * keys, brackets and T -- nothing WASD/arrows already use for movement, so
+ * this can read raw key codes directly without going anywhere near the
+ * gameplay Input abstraction.
+ */
+const HOUR_PRESETS = {
+  Digit1: 6, Digit2: 9, Digit3: 12, Digit4: 15, Digit5: 18, Digit6: 22,
+};
+
 export class DevScene extends Phaser.Scene {
   constructor() { super('dev'); }
 
@@ -73,6 +84,7 @@ export class DevScene extends Phaser.Scene {
     }).setScrollFactor(0).setDepth(1e6);
 
     this.exposeDevHooks();
+    this.bindDevHotkeys();
     this.events.once('shutdown', () => {
       this.input_.destroy();
       this.map.destroy();
@@ -155,11 +167,7 @@ export class DevScene extends Phaser.Scene {
         solid: this.map.solidAt(x, y),
       }),
       // Cast shadows are driven by this hour; a real day/night clock is #16.
-      setTime: (h) => {
-        this.autoTime = false;
-        this.hours = ((h % 24) + 24) % 24;
-        this.map.setHours(this.hours);
-      },
+      setTime: (h) => this._setHour(h),
       autoTime: (on) => { this.autoTime = on !== false; },
       // SYSTEMS #9. Validating a tile name needs the live atlas, so this half
       // of the loader's validation is only exercisable through a real scene.
@@ -184,6 +192,37 @@ export class DevScene extends Phaser.Scene {
     if (!lighting) return 0;
     const i = lighting.points.findIndex((p) => p.kind === kind);
     return i === -1 ? 0 : lighting.lights[i].intensity;
+  }
+
+  /** Jump straight to an hour -- shared by `__dev.setTime` and the hotkeys
+   *  below, so there is exactly one place that wraps/clears autoTime. */
+  _setHour(h) {
+    this.autoTime = false;
+    this.hours = ((h % 24) + 24) % 24;
+    this.map.setHours(this.hours);
+  }
+
+  /**
+   * Dev-only: 1-6 jump to a time-of-day preset (dawn/morning/noon/afternoon/
+   * dusk/night), [ and ] step an hour at a time, T toggles auto-advancing.
+   * Raw `keydown`, not the gameplay Input abstraction -- this is a developer
+   * tool, not something a player action should ever read, the same reasoning
+   * that already keeps the deadzone overlay and __dev behind
+   * `import.meta.env.DEV`. Removed on shutdown like every other listener this
+   * scene installs.
+   */
+  bindDevHotkeys() {
+    if (!import.meta.env.DEV) return;
+    const onKeyDown = (e) => {
+      if (e.code in HOUR_PRESETS) this._setHour(HOUR_PRESETS[e.code]);
+      else if (e.code === 'BracketLeft') this._setHour(this.hours - 1);
+      else if (e.code === 'BracketRight') this._setHour(this.hours + 1);
+      else if (e.code === 'KeyT') this.autoTime = !this.autoTime;
+      else return;
+      e.preventDefault();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    this.events.once('shutdown', () => window.removeEventListener('keydown', onKeyDown));
   }
 
   /** Dev-only outline of the camera deadzone: the box the player moves inside
@@ -229,6 +268,7 @@ export class DevScene extends Phaser.Scene {
       `scroll ${view.scrollX} ${view.scrollY}`,
       `time   ${clockLabel(this.hours)}${this.autoTime ? ' (auto)' : ''}`,
       `touch  ${isTouchDevice() ? 'yes' : 'no'}`,
+      ...(import.meta.env.DEV ? ['1-6 time  [ ] step  T auto'] : []),
     ].join('\n'));
   }
 }
