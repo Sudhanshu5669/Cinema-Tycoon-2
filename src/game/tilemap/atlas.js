@@ -52,7 +52,7 @@ export function frameSize(scene, name) {
  *   p.tile(name, dx, dy)              one frame at a pixel offset
  *   p.fill(name, x0, y0, w, h)        tile a frame across a rect (clipped)
  *   p.rect(color, x0, y0, w, h)       a flat filled rect, no atlas frame
- *   p.text(str, x0, y0, scale, color) baked, data-driven signage (font.js)
+ *   p.text(str, x0, y0, scale, color, font) baked, data-driven signage (font.js)
  * Returns a unique texture key; add it with scene.add.image(x, y, key).
  *
  * `rect`/`text` are for signage that has no business being authored as a
@@ -118,8 +118,8 @@ export function bake(scene, w, h, paint) {
       ctx.fillStyle = color;
       ctx.fillRect(Math.round(x0), Math.round(y0), Math.round(rw), Math.round(rh));
     },
-    text(str, x0, y0, scale, color) {
-      drawText(ctx, str, x0, y0, scale, color);
+    text(str, x0, y0, scale, color, font) {
+      drawText(ctx, str, x0, y0, scale, color, font);
     },
   });
   canvas.refresh();

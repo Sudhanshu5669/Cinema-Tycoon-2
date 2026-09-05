@@ -6,8 +6,9 @@
 // deliberate step back from the previous pipeline's material/shader model —
 // there is nothing left for a shader to decide.
 //
-// Two tones per garment at most. The register is muted and slightly cool; the
-// red is the only thing allowed to be saturated.
+// Two tones per garment at most. The figure stays low-saturation so it reads
+// against a city that does not -- see TILE_PALETTE below for the world's own,
+// deliberately warmer and higher-contrast register.
 
 export const PALETTE = {
   h: '#2b2430', // hair
@@ -42,106 +43,143 @@ export const PALETTE = {
  * hair on a person and has no business meaning anything on a pavement, and the
  * two sets would otherwise fight over sixteen usable letters.
  *
- * Same discipline as the figures — no outlines, at most two tones for a
- * material, muted and slightly cool. The one place tones go three deep is where
- * a surface turns a corner in the 3/4 view (roof -> lip -> shadow -> wall),
- * because that turn is the only thing telling the player a building has a face
- * at all. Light still comes from the left, but a wall's shading belongs to the
- * BUILDING, not to the tile: a per-tile shaded edge would repeat every 16px and
- * read as stripes, so the shaded side is its own tile (`WALL_EDGE`).
+ * **Warm register, wide value range.** The city runs warm -- tan plaster, red
+ * brick, warm stone paving -- against a near-black road and a cool window
+ * glass that is the one deliberate cold family left. The point is contrast:
+ * an earlier muted, uniformly cool version of this table put the whole street
+ * within a few values of itself, so nothing could ever be the brightest thing
+ * on screen and a lit cinema facade read as grey-mauve wash rather than as
+ * light. Value spread is what makes a night street work, and it is spent
+ * deliberately: the road is the floor, the marquee's bulb core (`*`) is the
+ * ceiling, and everything else is placed between them on purpose.
+ *
+ * The one place tones go three deep is where a surface turns a corner in the
+ * 3/4 view (roof -> lip -> shadow -> wall), because that turn is the only
+ * thing telling the player a building has a face at all. Light still comes
+ * from the left, but a wall's shading belongs to the BUILDING, not to the
+ * tile: a per-tile shaded edge would repeat every 16px and read as stripes,
+ * so the shaded side is its own tile (`WALL_EDGE`).
  */
 export const TILE_PALETTE = {
-  // Road.
-  a: '#34343e', // asphalt
-  A: '#3c3c47', // asphalt, lighter fleck — worn patches, not noise
-  z: '#2c2c35', // asphalt, darker fleck
-  m: '#8a8678', // lane marking, worn. Never white; white reads as neon here
+  // Road. The darkest surface in the set, so one lit facade can dominate the
+  // frame -- but tuned as *daylight asphalt*, not as what asphalt looks like
+  // at midnight. A first pass set these to the value the night shot wanted
+  // and the road went black at noon: the night is the ambient light's job
+  // (sun.js multiplies every one of these by ~0.11 after dark, which takes
+  // this straight down to near-black on its own), and baking the darkness
+  // into the material instead just breaks every other hour of the day.
+  a: '#3a3742', // asphalt
+  A: '#454150', // asphalt, lighter fleck — worn patches, not noise
+  z: '#302d38', // asphalt, darker fleck
+  m: '#a89678', // lane marking, worn. Never white; white reads as neon
+                 // here -- but the road around it is now near-black, and at
+                 // the ambient a night runs at, the old value left a
+                 // crosswalk you could not actually see was there.
 
   // Kerb: the small vertical face where the pavement drops to the road, and
   // the first thing that sells the 3/4 view at ground level.
-  c: '#6f6c7a', // kerb top, catching the light
-  C: '#4b4956', // kerb face, turned away from it
+  c: '#7d7263', // kerb top, catching the light
+  C: '#4a4238', // kerb face, turned away from it
 
-  // Pavement.
-  p: '#5e5b69', // slab
-  P: '#666371', // slab, lighter
-  q: '#514f5c', // slab seam
+  // Pavement — warm stone, and a full step lighter than the road, so the
+  // footpath reads as a separate surface and not just less-dark asphalt.
+  p: '#6e675c', // slab
+  P: '#7b7368', // slab, lighter
+  q: '#5c564d', // slab seam
 
   // Planting.
-  g: '#4c6552', // grass
-  G: '#3f5545', // grass, shaded
+  g: '#4f6247', // grass
+  G: '#3d4d38', // grass, shaded
 
-  // Plaster wall — the default building face.
-  w: '#7b7482',
-  W: '#6a6470', // the shaded side of a building (see WALL_EDGE)
-  n: '#585362', // the band of shadow a roof overhang throws on the wall
+  // Plaster wall — the default building face. Warm tan.
+  w: '#8a7d6d',
+  W: '#6f6456', // the shaded side of a building (see WALL_EDGE)
+  n: '#564c41', // the band of shadow a roof overhang throws on the wall
 
-  // Brick, for facade variety. Muted: this is a rainy city, not a barn.
-  b: '#6d4f4c',
-  B: '#5b4240', // mortar course
-  r: '#7a5b56', // the odd lighter brick
-  y: '#573f3d', // brick on the shaded return (see BRICK_EDGE)
-  Y: '#48332f', // its mortar
+  // Brick. Warm red-brown and a wider light/dark spread than the plaster,
+  // so a brick building reads as the warmer, older one on the street.
+  b: '#7d5344',
+  B: '#5e3c31', // mortar course
+  r: '#8f6250', // the odd lighter brick
+  y: '#5c3b30', // brick on the shaded return (see BRICK_EDGE)
+  Y: '#452a22', // its mortar
 
   // Roof and its lip. The roof faces up, so it is the lightest thing here.
-  f: '#8d8593',
-  F: '#7f7886', // roof, weathered patch
-  l: '#9c94a2', // the lip of the parapet, brightest edge in the scene
-  L: '#4f4a58', // the hard shadow immediately under it
-  o: '#857e8c', // lip, on the shaded return
-  N: '#443f4d', // the shadow band, on the shaded return
+  f: '#8f8474',
+  F: '#7f7566', // roof, weathered patch
+  l: '#a89b87', // the lip of the parapet, brightest edge in the scene
+  L: '#4a4136', // the hard shadow immediately under it
+  o: '#8d8271', // lip, on the shaded return
+  N: '#3e362d', // the shadow band, on the shaded return
 
-  // Windows.
-  i: '#2e2e3a', // glass, dark
-  I: '#3f4859', // glass, catching cold sky
-  x: '#4c4653', // frame
-  X: '#3b3743', // frame, shaded
+  // Windows. The one cool family left in the set, on purpose: glass reflects
+  // the sky, and against warm brick that contrast is what makes a window
+  // read as glass rather than a painted panel.
+  i: '#2a2b36', // glass, dark
+  I: '#3d4757', // glass, catching cold sky
+  x: '#584c40', // frame
+  X: '#40372e', // frame, shaded
 
   // Doors.
-  d: '#5b4436',
-  D: '#46362b',
-  k: '#a98c52', // handle — one pixel of brass
+  d: '#6b4a33',
+  D: '#4f3624',
+  k: '#c9a04e', // handle — one pixel of brass
 
   // Awning. Deliberately the same red as the character's accent: it is the
   // colour this world spends, and a cinema is where it should get spent.
-  v: '#93403c',
-  V: '#6f2f2d',
-  s: '#cbc3ae',
-  S: '#a89f8d',
+  v: '#b03a34',
+  V: '#7d2723',
+  s: '#efe0c2',
+  S: '#c9b998',
 
   // Plinth: the course of stone where a wall meets the pavement. Without it
   // buildings look like they were pasted onto the ground.
-  t: '#4a4552',
-  T: '#3d3946',
-  u: '#3e3a47', // plinth, on the shaded return
-  U: '#332f3b',
+  t: '#574c40',
+  T: '#453b31',
+  u: '#463d33', // plinth, on the shaded return
+  U: '#372f27',
 
   // Streetlamp. Warm cream glass, not the windows' cold blue -- it's the
   // shader's job to actually light it at night, this is just what the glass
   // looks like unlit, in daylight.
-  h: '#4a4650', // pole, lit side
-  H: '#38343d', // pole, shaded side
-  e: '#d9c9a3', // bulb glass
-  E: '#2f2b33', // cap and bracket, dark metal
+  h: '#544a3f', // pole, lit side
+  H: '#3c342c', // pole, shaded side
+  e: '#ffdfa0', // bulb glass
+  E: '#332c25', // cap and bracket, dark metal
 
-  // Poster paper -- sun-bleached, the one place this set is allowed to run
-  // warm instead of cool, the same exception BRICK already takes for the
-  // same reason (a real material's own colour, not a mood).
-  j: '#8a8270',
-  J: '#6e6759', // fold shadow / the case's own cast shadow on the sheet
+  // Poster paper -- sun-bleached.
+  j: '#a3937a',
+  J: '#7d7060', // fold shadow / the case's own cast shadow on the sheet
 
   // Street clutter (bin, vending box): muted city-grime metal, no new accent.
-  Z: '#454a44',
-  Q: '#5c6359', // lit rim/lid
+  Z: '#474b42',
+  Q: '#5f665a', // lit rim/lid
 
   // Terrazzo: the dark inset a sidewalk star sits in.
-  O: '#3a3742',
+  O: '#3d3730',
 
   // The cinema door's own glass -- warm amber, not the ordinary window's
   // cold blue-grey (`I`/`i`): per user reference, the entrance glows with
   // interior light spilling out, not a dark reflective pane.
-  M: '#c9a468',
-  R: '#8a6f42',
+  M: '#f0c274',
+  R: '#b8863f',
+
+  // --- cinema signage ------------------------------------------------------
+  // The reference's marquee is built from four things this set had no colour
+  // for: gold letters, a white-hot bulb, a deep red board field, and a cool
+  // dark reader-board screen. Every one of them is spent inside the cinema's
+  // own signage and nowhere else on the street -- the same containment the
+  // marquee red already had, just with the palette it actually needs.
+  '+': '#f2c451', // marquee gold — letters, pinstripes, the bulb's warm ring
+  '*': '#fff2d2', // bulb core, the single brightest pixel value in the set
+  '=': '#5a161c', // sign board field, deep red
+  '%': '#3a0d12', // sign board back / the frame's own dark rebate
+  'K': '#1d2740', // reader-board screen, cool and dark against all that gold
+
+  // Lobby light spilling out of the entrance, and the runner it falls on.
+  '@': '#ffca7d', // interior glow behind the doors
+  '&': '#7a2420', // carpet
+  '$': '#5c1a18', // carpet, in shadow
 };
 
 /**
@@ -160,12 +198,12 @@ export const TILE_PALETTE = {
  * and PAVE/ROAD/GRASS are stochastic texture, not a structural edge, and
  * giving every fleck its own bump reads as noisy grain under a moving light
  * rather than a real surface, so they stay flat for now (this table can
- * always grow later). Every value here is small and the transitions across
- * it are sharp (one or two pixels), not a smooth ramp -- the failure mode on
- * record for this project (see GAME_SPEC's rejected direction #1, a smooth
- * normal-based falloff on the character reading as "glassy, moulded
- * plastic") came from gentle, continuous gradients, not from bump mapping
- * itself; a crisp, low-amplitude step reads as an edge, not a blob.
+ * always grow later). Every value here is small and the transitions across it
+ * are sharp (one or two pixels), not a smooth ramp. That is the whole trick:
+ * a crisp, low-amplitude step reads as a real edge, while a gentle continuous
+ * gradient over flat pixel art reads as moulded plastic. Height differences
+ * here are structural facts (mortar is recessed, a lip is raised, a bulb is a
+ * sphere) -- never shading.
  */
 export const TILE_HEIGHT = {
   // Cornice / belt course: the lip juts out, the wall sets back sharply
@@ -189,4 +227,13 @@ export const TILE_HEIGHT = {
   e: 2, V: -1,
   // Poster case: the sheet's own fold/shadow sits a hair back from the paper.
   J: -1,
+  // Cinema signage: a bulb is a real glass bubble standing off the board, its
+  // gold surround a thin proud pinstripe, and both board fields are rebated
+  // behind that frame -- the same proud-frame/recessed-field language the
+  // window reveal already uses, which is why these read as boards bolted to a
+  // wall rather than decals painted on it.
+  '*': 3, '+': 1, '=': -1, '%': -2, K: -1,
+  // The lobby glow sits deepest of all -- it is light coming from further
+  // back inside the building than the door plane itself.
+  '@': -3,
 };

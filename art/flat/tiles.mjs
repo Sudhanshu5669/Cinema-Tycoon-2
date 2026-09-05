@@ -280,6 +280,33 @@ export const SIDEWALK_STAR = [
   'kkkkkkkkkkkkkkkk',
 ];
 
+/**
+ * The strip of carpet a cinema lays from its doors to the kerb. Ground-layer
+ * sugar, placed like `paveCrack`/`sidewalkStar`. Deep red (`&`) with a
+ * darker edge and a scatter of wear (`$`) so a runner several tiles long
+ * doesn't read as one flat decal painted on the pavement. Flat, like all
+ * ground here (see PAVE/ROAD/GRASS on why ground stays out of the normal
+ * map): carpet has no relief worth a light picking out.
+ */
+export const LOBBY_CARPET = [
+  '$$$$$$$$$$$$$$$$',
+  '$&&$&&&&&&&&&&&$',
+  '$&&&&&&&&&&$&&&$',
+  '$&&&&&&&&&&&&&&$',
+  '$&&&&&&&&&&&&&&$',
+  '$&&&&&&&&&&&&&&$',
+  '$&&$&&&&&&&&&&&$',
+  '$&&&&&&&&&&$&&&$',
+  '$&&&&&&&&&&&&&&$',
+  '$&&&&&&&&&&&&&&$',
+  '$&&&&&&&&&&&&&&$',
+  '$&&$&&&&&&&&&&&$',
+  '$&&&&&&&&&&$&&&$',
+  '$&&&&&&&&&&&&&&$',
+  '$&&&&&&&&&&&&&&$',
+  '$$$$$$$$$$$$$$$$',
+];
+
 // --- building ---------------------------------------------------------------
 
 /** Plaster texture: a scatter of fleck pixels, dense and irregular enough to
@@ -420,6 +447,104 @@ export const PLINTH_EDGE = [
  *  no shading of its own, only grain. (Generated once with a fixed random
  *  seed rather than hand-placed, then locked in as authored art -- see
  *  tools/build-tiles-sheet.mjs, this is not regenerated at build time.) */
+/**
+ * Plaster, in the shaded tones -- a *background* building's face.
+ *
+ * Not to be confused with WALL_EDGE, which carries a hard 4px band down its
+ * right-hand side because it exists to be the last column of a facade. Tiling
+ * WALL_EDGE across a whole face instead -- which is exactly what "just use the
+ * darker variant" tempts you into -- repeats that band every 16px and paints
+ * vertical stripes up the entire building, the precise failure this file's own
+ * header warns about. This tile is uniform, so it can be tiled anywhere.
+ *
+ * The point of having it: a street where every building is the same value has
+ * no depth and nothing can be its focal point. Giving the neighbours a darker
+ * material pushes them back and lets the cinema come forward, in data
+ * (`face`/`base`/`cornice`/`plinth` in city.json), with no new geometry.
+ */
+export const WALL_DARK = [
+  'WWWWWWWnWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWnWWWWWWNWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'NWWWWWWWnWWWWWWW',
+  'WWWWWWWWWWWnWWWW',
+  'WWWnWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWNWWWWWWWWWW',
+  'WWWWWWWWWWnWWWWW',
+  'WWnWWWWWWWWWWWWW',
+  'WWWWWWWnWWWWWWWW',
+  'WWWWWWWWWWWWNWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWnWWWWWWWWWWW',
+];
+
+/** Brick in the shaded tones, for a background building -- uniform, unlike
+ *  BRICK_EDGE. See WALL_DARK on why that distinction matters. */
+export const BRICK_DARK = [
+  'YYYYYYYYYYYYYYYY',
+  'Yyyyyyybyyyyyyyy',
+  'Yyyyyyyyyyyyyyyy',
+  'Yyyyyyyyyyyyyyyy',
+  'Yyyyyyyyyyyyyyyy',
+  'YYYYYYYYYYYYYYYY',
+  'yyyyYyyyyyyyYyyy',
+  'yyyyYyyybyyyYyyy',
+  'yyyyYyyyyyyyYyyy',
+  'yyyyYyyyyyyyYyyy',
+  'YYYYYYYYYYYYYYYY',
+  'Yyyyyyyyyyyyyyyy',
+  'Yyyyyyyyyyybyyyy',
+  'Yyyyyyyyyyyyyyyy',
+  'Yyyyyyyyyyyyyyyy',
+  'YYYYYYYYYYYYYYYY',
+];
+
+/** The roof lip, darkened to match WALL_DARK/BRICK_DARK. A receding building
+ *  whose facade darkens but whose cornice stays bright reads as a dark wall
+ *  wearing somebody else's roof. */
+export const CORNICE_DARK = [
+  'FFFFFFFFFFFFFFFF',
+  'FFFFFFFFFFFFFFFF',
+  'oooooooooooooooo',
+  'oooooooooooooooo',
+  'NNNNNNNNNNNNNNNN',
+  'NNNNNNNNNNNNNNNN',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+];
+
+/** Where a background building's wall meets the pavement. Companion to
+ *  WALL_DARK -- same reasoning as CORNICE_DARK, at the other end. */
+export const PLINTH_DARK = [
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'WWWWWWWWWWWWWWWW',
+  'uuuuuuuuuuuuuuuu',
+  'uuuuuuuuuuuuuuuu',
+  'UUUUUUUUUUUUUUUU',
+  'UUUUUUUUUUUUUUUU',
+];
+
 export const ROOF = [
   'fFfFffFfFfFFffFf',
   'fffffFffFFffffff',
@@ -589,6 +714,91 @@ export const WINDOW = [
 ];
 
 /**
+ * 24 x 32 -- WINDOW's exact frame with the glass lit from inside and somebody
+ * at it: a warm field (`M`/`R`), a valance across the top sash, curtains down
+ * one edge, and a dark head-and-shoulders silhouette in the lower sash.
+ *
+ * This is the single detail that does the most work in the reference image.
+ * Its upper storeys are not decorated windows -- they are *occupied* ones,
+ * with a staircase, a person and plants visible through the glass, and that
+ * is what makes the building read as a place with people in it rather than a
+ * facade with rectangles on it. The ordinary cold-glass WINDOW is still the
+ * right tile for an unlit flat; this is for the ones that are home.
+ */
+export const WINDOW_LIT = [
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.xRRRRRRRRRRXRRRRRRRRRx.',
+  '.xRRRRRRRRRRXRRRRRRRRRx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xXXXXXXXXXXXXXXXXXXXXx.',
+  '.xRRMMMMMMMMXMMMMMMMMMx.',
+  '.xRRMMMMMMMMXMMMMMMMMMx.',
+  '.xRRMMMMMMMMXMMMMMMMMMx.',
+  '.xRRMMMMMMMMXMMMMMMMMMx.',
+  '.xRRMMMMMMMMXMMMMMMMMMx.',
+  '.xRRMMMMMMMMXMMMMMMMMMx.',
+  '.xRRMMMMMMMMXMMMXXXXMMx.',
+  '.xRRMMMMMMMMXMMXXXXXXMx.',
+  '.xRRMMMMMMMMXMMXXXXXXMx.',
+  '.xRRMMMMMMMMXMMMXXXXMMx.',
+  '.xRRMMMMMMMMXMXXXXXXXXx.',
+  '.xRRMMMMMMMMXMXXXXXXXXx.',
+  '.xRRMMMMMMMMXMXXXXXXXXx.',
+  '.xRRMMMMMMMMXMXXXXXXXXx.',
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.XXXXXXXXXXXXXXXXXXXXXX.',
+  'llllllllllllllllllllllll',
+  '.LLLLLLLLLLLLLLLLLLLLLL.',
+];
+
+/** The same lit window without a figure -- a plant on the sill and one drawn
+ *  curtain instead. Exists purely so a row of lit windows isn't eight copies
+ *  of the same silhouette, which reads as wallpaper rather than as neighbours. */
+export const WINDOW_WARM = [
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.xRRRRRRRRRRXRRRRRRRRRx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xXXXXXXXXXXXXXXXXXXXXx.',
+  '.xMMMMMMMMMMXMMMMMMRRRx.',
+  '.xMMMMMMMMMMXMMMMMMRRRx.',
+  '.xMMMMMMMMMMXMMMMMMRRRx.',
+  '.xMMMMMMMMMMXMMMMMMRRRx.',
+  '.xMMMMMMMMMMXMMMMMMRRRx.',
+  '.xMMMMMRRMMMXMMMMMMRRRx.',
+  '.xMMMMRRRRMMXMMMMMMRRRx.',
+  '.xMMMRRRRRRMXMMMMMMRRRx.',
+  '.xMMMMRRRRMMXMMMMMMRRRx.',
+  '.xMMMMMRRMMMXMMMMMMRRRx.',
+  '.xMMMMMRRMMMXMMMMMMRRRx.',
+  '.xMMMMRRRRMMXMMMMMMRRRx.',
+  '.xMMMMMMMMMMXMMMMMMRRRx.',
+  '.xMMMMMMMMMMXMMMMMMRRRx.',
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.XXXXXXXXXXXXXXXXXXXXXX.',
+  'llllllllllllllllllllllll',
+  '.LLLLLLLLLLLLLLLLLLLLLL.',
+];
+
+/**
  * 32 x 32 — two tiles wide, two tall: a shopfront window, for a ground floor
  * that wants to look like it does business rather than just has a facade.
  * Briefly the same size as plain WINDOW when a pass widened that one to 32px
@@ -706,235 +916,283 @@ export const DOOR = [
 ];
 
 /**
- * DOOR, recoloured -- per user reference ("make the cinema look kinda like
- * this", a red double-doored theatre entrance), not a reshape. Every `d`/`D`
- * (the generic residential door's wood-brown) becomes `v`/`V`, the marquee's
- * own accent, reused rather than adding a colour a door has no business
- * introducing on its own; DOOR's existing central mullion (`X`, originally
- * just a sash bar down the middle of the glass) now doubles for free as the
- * seam between two theatre-door leaves once it's this colour, so the
- * geometry needed no changes at all to read as a double door. The glass
- * itself is warm amber (`M`/`R`), not the ordinary window's cold `I`/`i` --
- * **second follow-up, against the reference again**: a flat, un-recessed
- * door with cold glass was one of the concrete misses the user called out
- * ("this does not look like the reference at all"), so the glass now reads
- * as lit from inside rather than a dark reflective pane, and `renderer.js`'s
- * `_buildBuilding` draws a darker recessed alcove behind this tile
- * specifically (see `ALCOVE_COLOR`) so the doorway sits inset in the wall
- * instead of glued flush to it. Same 24x48 footprint as DOOR -- a straight
- * swap in a building's own `facade` entry, nothing about placement or the
- * loader's validation changes.
+ * 96 x 48 -- the entrance itself: a bank of four red theatre doors, six tiles
+ * wide, in one frame. **This is the single biggest thing the reference gets
+ * right and a lone 24px door cannot**: a cinema's way in is a *wall* of doors,
+ * because a full house has to leave through it in five minutes. One door
+ * reads as a corner shop no matter how well it is drawn -- it was drawn well,
+ * and it still read as a corner shop.
+ *
+ * Four 22px leaves separated by 2px mullions (`X`, the window frame's own
+ * shaded reveal, reused) inside a 1px frame. Each leaf carries a tall glass
+ * panel over a brass push bar over a recessed kick panel -- the real anatomy
+ * of a theatre door, and the push bar in particular is what stops the bank
+ * reading as four shopfront windows. The glass is warm (`M` over `R`, bright
+ * at the top and deepening toward the floor) because it is lit from inside:
+ * the lobby behind it is on, and that spill is what makes an entrance look
+ * open rather than shuttered. `renderer.js` draws a lit alcove behind this
+ * tile (see `ALCOVE_*` there) so the doorway sits inset in the wall with real
+ * light in the recess, rather than glued flat to it.
  */
-export const CINEMA_DOOR = [
-  '.xxxxxxxxxxxxxxxxxxxxxx.',
-  '.xxxxxxxxxxxxxxxxxxxxxx.',
-  '.xvvvvvvvvvvvvvvvvvvvVx.',
-  '.xvvvvvvvvvvvvvvvvvvvVx.',
-  '.xvvvvvvvvvvvvvvvvvvvVx.',
-  '.xvMMMMMMMMMXRRRRRRRRVx.',
-  '.xvMMMMMMMMMXRRRRRRRRVx.',
-  '.xvMMMMMMMMMXRRRRRRRRVx.',
-  '.xvMMMMMMMMMXRRRRRRRRVx.',
-  '.xvMMMMMMMMMXRRRRRRRRVx.',
-  '.xvMMMMMMMMMXRRRRRRRRVx.',
-  '.xvMMMMMMMMMXRRRRRRRRVx.',
-  '.xvMMMMMMMMMXRRRRRRRRVx.',
-  '.xvMMMMMMMMMXRRRRRRRRVx.',
-  '.xvRRRRRRRRRXRRRRRRRRVx.',
-  '.xvRRRRRRRRRXRRRRRRRRVx.',
-  '.xvRRRRRRRRRXRRRRRRRRVx.',
-  '.xvRRRRRRRRRXRRRRRRRRVx.',
-  '.xvRRRRRRRRRXRRRRRRRRVx.',
-  '.xvRRRRRRRRRXRRRRRRRRVx.',
-  '.xvRRRRRRRRRXRRRRRRRRVx.',
-  '.xvRRRRRRRRRXRRRRRRRRVx.',
-  '.xvRRRRRRRRRXRRRRRRRRVx.',
-  '.xvRRRRRRRRRXRRRRRRRRVx.',
-  '.xvvvvvvvvvvvvvvvvvvvVx.',
-  '.xvvvvvvvvvvvvvvvvvvvVx.',
-  '.xvvvvvvvvvvvvvvvvvvkVx.',
-  '.xvvvvvvvvvvvvvvvvvvkVx.',
-  '.xvvvvvvvvvvvvvvvvvvvVx.',
-  '.xvvvvvvvvvvvvvvvvvvvVx.',
-  '.xvVVVVVVVVVVVVVVVVVVVx.',
-  '.xvVvvvvvvvvvvvvvvvvVVx.',
-  '.xvVvvvvvvvvvvvvvvvvVVx.',
-  '.xvVvvvvvvvvvvvvvvvvVVx.',
-  '.xvVvvvvvvvvvvvvvvvvVVx.',
-  '.xvVvvvvvvvvvvvvvvvvVVx.',
-  '.xvVvvvvvvvvvvvvvvvvVVx.',
-  '.xvVvvvvvvvvvvvvvvvvVVx.',
-  '.xvVvvvvvvvvvvvvvvvvVVx.',
-  '.xvVvvvvvvvvvvvvvvvvVVx.',
-  '.xvVvvvvvvvvvvvvvvvvVVx.',
-  '.xvVvvvvvvvvvvvvvvvvVVx.',
-  '.xvVvvvvvvvvvvvvvvvvVVx.',
-  '.xvVVVVVVVVVVVVVVVVVVVx.',
-  '.xvvvvvvvvvvvvvvvvvvvVx.',
-  '.xvvvvvvvvvvvvvvvvvvvVx.',
-  '.TTTTTTTTTTTTTTTTTTTTTT.',
-  '.TTTTTTTTTTTTTTTTTTTTTT.',
+export const CINEMA_DOORS = [
+  'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+  'xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx',
+  'xvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvx',
+  'xvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvx',
+  'xvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvx',
+  'xvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvx',
+  'xvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvx',
+  'xvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvx',
+  'xvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvx',
+  'xvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvx',
+  'xvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvx',
+  'xvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvx',
+  'xvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvx',
+  'xvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvx',
+  'xvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvx',
+  'xvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvx',
+  'xvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvXXvvMMMMMMMMMMMMMMMMMMvvx',
+  'xvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvx',
+  'xvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvx',
+  'xvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvx',
+  'xvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvx',
+  'xvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvx',
+  'xvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvx',
+  'xvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvx',
+  'xvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvx',
+  'xvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvx',
+  'xvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvXXvvRRRRRRRRRRRRRRRRRRvvx',
+  'xvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvx',
+  'xvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvx',
+  'xvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvx',
+  'xvvvkkkkkkkkkkkkkkkkvvvXXvvvkkkkkkkkkkkkkkkkvvvXXvvvkkkkkkkkkkkkkkkkvvvXXvvvkkkkkkkkkkkkkkkkvvvx',
+  'xvvvkkkkkkkkkkkkkkkkvvvXXvvvkkkkkkkkkkkkkkkkvvvXXvvvkkkkkkkkkkkkkkkkvvvXXvvvkkkkkkkkkkkkkkkkvvvx',
+  'xvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvx',
+  'xvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvx',
+  'xvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvx',
+  'xvVVVVVVVVVVVVVVVVVVVVvXXvVVVVVVVVVVVVVVVVVVVVvXXvVVVVVVVVVVVVVVVVVVVVvXXvVVVVVVVVVVVVVVVVVVVVvx',
+  'xvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvx',
+  'xvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvx',
+  'xvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvx',
+  'xvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvx',
+  'xvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvx',
+  'xvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvx',
+  'xvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvx',
+  'xvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvx',
+  'xvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvXXvVvvvvvvvvvvvvvvvvvvVvx',
+  'xvVVVVVVVVVVVVVVVVVVVVvXXvVVVVVVVVVVVVVVVVVVVVvXXvVVVVVVVVVVVVVVVVVVVVvXXvVVVVVVVVVVVVVVVVVVVVvx',
+  'xvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvXXvvvvvvvvvvvvvvvvvvvvvvx',
+  'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',
 ];
-
 /**
- * 24 x 32 -- a ticket booth window, sized like WINDOW (same width, same
- * "placed once at a pixel offset" FEATURE rules) but its own thing entirely:
- * per user request, "make different types of tiles for the entry" of a
- * cheap LA cinema, and a walk-up box office is the single most legible
- * "buy your ticket here" cue available without a letter tile. A small
- * hood-shadow (`n`, the cornice's own overhang tone) reads as a tiny awning
- * over the glass; the glass itself stays uniform dark (`i`) rather than
- * WINDOW's cold-sky-reflection split, since a booth this recessed has
- * nothing bright to catch. A red placard band through the middle (`v`/`V`,
- * the world's one saturated accent, already spent on this same building's
- * marquee) stands in for a prices board taped inside the glass -- reusing
- * the accent rather than adding a second one. Flush to the pavement (meant
- * for `fy: 0`, like DOOR) with its own small panelled base and a single
- * brass pixel (`k`) for a ticket-tray slot, the cheap-booth equivalent of
- * DOOR's handle.
+ * 32 x 48 -- the walk-up ticket booth, two tiles wide and a full three tall,
+ * so it stands the same height as the doors beside it instead of being a
+ * half-height panel stuck on the wall. A walk-up box office is the single
+ * most legible "buy your ticket here" cue available, and the reference makes
+ * it a real projecting kiosk, not a window.
+ *
+ * Depth without a second facing: this view only ever draws south-facing
+ * walls, so a kiosk cannot literally turn a corner. What sells it instead is
+ * the *canopy* -- a bright lip (`l`) over a hard shadow (`L`) at the very
+ * top, then the hood's own shadow (`n`) falling across the top rows of the
+ * glass underneath it. Something has to be sticking out to throw that
+ * shadow, and the eye supplies the rest. The same trick runs again at the
+ * sill (rows 38-39) so the counter reads as projecting too.
+ *
+ * The glass is lit from inside (`@`, the lobby glow) rather than dark: an
+ * unlit booth reads as closed, and the reference's is emphatically open. A
+ * red placard band through the middle stands in for a prices board, and one
+ * brass pixel (`k`) in the base is the ticket tray. The dark board across
+ * the top (`%`) is where `renderer.js` prints the TICKET plaque.
  */
 export const BOX_OFFICE = [
-  '.xxxxxxxxxxxxxxxxxxxxxx.',
-  '.xnnnnnnnnnnnnnnnnnnnnx.',
-  '.xnnnnnnnnnnnnnnnnnnnnx.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xXXXXXXXXXXXXXXXXXXXXx.',
-  '.xvvvvvvvvvvvvvvvvvvvvx.',
-  '.xvvvvvvvvvvvvvvvvvvvvx.',
-  '.xVVVVVVVVVVVVVVVVVVVVx.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xiiiiiiiiiiXiiiiiiiiix.',
-  '.xxxxxxxxxxxxxxxxxxxxxx.',
-  '.XXXXXXXXXXXXXXXXXXXXXX.',
-  'llllllllllllllllllllllll',
-  '.LLLLLLLLLLLLLLLLLLLLLL.',
-  '.xdddddddddkdddddddddDx.',
-  '.xdddddddddddddddddddDx.',
-  '.xdddddddddddddddddddDx.',
+  'llllllllllllllllllllllllllllllll',
+  'LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '++++++++++++++++++++++++++++++++',
+  'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+  'xnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnx',
+  'xnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnx',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx',
+  'xvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvx',
+  'xVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVx',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@X@@@@@@@@@@@@@@@x',
+  'xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx',
+  'llllllllllllllllllllllllllllllll',
+  'LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL',
+  'xdddddddddddddkddddddddddddddddx',
+  'xdddddddddddddddddddddddddddddDx',
+  'xdddddddddddddddddddddddddddddDx',
+  'xdddddddddddddddddddddddddddddDx',
+  'xdddddddddddddddddddddddddddddDx',
+  'xdddddddddddddddddddddddddddddDx',
+  'xdddddddddddddddddddddddddddddDx',
+  'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',
 ];
 
 /**
- * 16 x 32 -- a glass-fronted poster case, one tile wide so a pair can flank
- * the door tightly the way a real cinema entrance frames it with one-sheets
- * on either side. The "poster" inside is a colour-block art panel (`v`/`V`,
- * the marquee's own accent, reused rather than adding a colour -- see
- * renderer.js's own note on why a cinema's signage is allowed a few accents
- * beyond the marquee's single red) inset in a dark mat (`X`); there is no
- * font tile to print an actual title on, so the honest thing is a bold
- * colour panel suggesting a poster's own art, not fake text. **Follow-up,
- * against the user's reference image**: a first pass made this whole panel
- * one flat dark `X` rectangle and it read as an empty grey box, not a
- * poster -- one of the concrete misses called out ("this does not look like
- * the reference at all"). Sits on faded paper (`j`/`J`, this set's other
- * deliberately-warm exception alongside brick, since sun-bleached paper is a
- * real material colour, not a mood), with one `s` pixel (the character
- * palette's own shirt-cream, already present in this tile namespace for the
- * awning) standing in for a single curled/torn corner -- the cheap-cinema
- * detail the user asked for, not a pristine display case. Sits on the same
- * sill language as WINDOW (`l`/`L`) over its own small panelled base, flush
- * to the pavement like BOX_OFFICE (meant for `fy: 0`).
+ * 24 x 48 -- a glass-fronted one-sheet case, grown from one tile wide to a
+ * a real poster's proportions. At 16 x 32 the "poster" inside was 12 x 18px
+ * and could only ever be a coloured rectangle; at 20 x 34 there is room for
+ * an actual image, and an actual image is what a cinema frontage is *made*
+ * of -- the reference hangs its whole left-hand side on one readable poster.
+ *
+ * What's on the sheet is a small sci-fi one-sheet: a gold planet disc, a few
+ * stars, a ship crossing in silhouette with its engine glow (`@`), a dark
+ * horizon and a gold title bar. Deliberately a *composition* and not a
+ * texture -- it has a subject, a focal point and a place for a title, which
+ * is what makes a 20px image read as a poster rather than as noise.
+ *
+ * Around it: a bright case lip over its shadow (the same projecting-canopy
+ * trick BOX_OFFICE uses), a dark mat, a gold pinstripe, and one `s` pixel of
+ * sun-bleached paper (`j`/`J`) standing in for a curled corner -- the
+ * cheap-cinema detail, not a pristine display case.
  */
 export const POSTER_CASE = [
-  '.xxxxxxxxxxxxxx.',
-  '.xjjjjjjjjjjjjx.',
-  '.xjjjjjjjjjjjjx.',
-  '.xXXXXXXXXXXXXx.',
-  '.xXXvvvvvvvvXXx.',
-  '.xXXvvvvvvvvXXx.',
-  '.xXXvvvvvvvvXXx.',
-  '.xXXvvvvvvvvXXx.',
-  '.xXXVVVVVVVVXXx.',
-  '.xXXVVVVVVVVXXx.',
-  '.xXXvvvvvvvvXXx.',
-  '.xXXvvvvvvvvXXx.',
-  '.xXXvvvvvvvvXXx.',
-  '.xXXvvvvvvvvXXx.',
-  '.xXXXXXXXXXXXXx.',
-  '.xXXXXXXXXXXXXx.',
-  '.xXXXXXXXXXXXXx.',
-  '.xXXXXXXXXXXXXx.',
-  '.xXXXXXXXXXXXXx.',
-  '.xjjjjjjjjjjjjx.',
-  '.xjjjjjsjjjjjjx.',
-  '.xJJJJJJJJJJJJx.',
-  '.xJJJJJJJJJJJJx.',
-  '.xxxxxxxxxxxxxx.',
-  '.XXXXXXXXXXXXXX.',
-  'llllllllllllllll',
-  '.LLLLLLLLLLLLLL.',
-  '.xdddddddddddDx.',
-  '.xdddddddddddDx.',
-  '.xdddddddddddDx.',
-  '.xdddddddddddDx.',
-  '.DDDDDDDDDDDDDD.',
+  'xxxxxxxxxxxxxxxxxxxxxxxx',
+  'llllllllllllllllllllllll',
+  'LLLLLLLLLLLLLLLLLLLLLLLL',
+  'xXXXXXXXXXXXXXXXXXXXXXXx',
+  'xXXXXXXXXXXXXXXXXXXXXXXx',
+  'xX%%%%%%%%%%%%%%%%%%%%Xx',
+  'xX%%%%%%%%*%%%%%%%%%%%Xx',
+  'xX%%*%%%%%%%%%%%%%%%*%Xx',
+  'xX%%%%%%%%%%%%%%%%%%%%Xx',
+  'xX%%%%%%%%%%%VVVVVV%%%Xx',
+  'xX%%%%%%*%%VVV++++VVV%Xx',
+  'xX%%%%%%%%%V++++++++V%Xx',
+  'xX%%%%%%%%VV++++++++VVXx',
+  'xX%%%%%%%%V++++++++++VXx',
+  'xX%%%%%%%%V++++++++++VXx',
+  'xX%%%%%%%%V++++++++++VXx',
+  'xX%%%%%%%%V++++++++++VXx',
+  'xX%%%*%%%%VV++++++++VVXx',
+  'xX%%%%%%%%%V++++++++V%Xx',
+  'xX%%%%%%%%%VVV++++VVV%Xx',
+  'xX%%%%**%%%%%VVVVVV%%%Xx',
+  'xX%%%*****%%%%%%%%%%%%Xx',
+  'xX%%**@@@***%%%%%%%%%%Xx',
+  'xX%%%*****%%%%%%%%%%%%Xx',
+  'xX%%%%**%%%%%%%%%%%%%%Xx',
+  'xX%%%%%%%%%%%%%%%%%%%%Xx',
+  'xX%%%%%%%%%%%%%%%%%%%%Xx',
+  'xX%%%%%%%%%%%%%%%%%%%%Xx',
+  'xX%%%%%%%%%%%%%%%%%%%%Xx',
+  'xX%%%%%%%%%%%%%%%%%%%%Xx',
+  'xX%%%%%%%%%%%%%%%%%%%%Xx',
+  'xXVVVVVVVVVVVVVVVVVVVVXx',
+  'xX%%%%%%%%%%%%%%%%%%%%Xx',
+  'xX%%++++++++++++++++%%Xx',
+  'xX%%++++++++++++++++%%Xx',
+  'xX%%++++++++++++++++%%Xx',
+  'xX%%++++++++++++++++%%Xx',
+  'xX%%%%%%%%%%%%%%%%%%%%Xx',
+  'xX%%%%%%%%%%%%%%%%%%%%Xx',
+  'xXXXXXXXXXXXXXXXXXXXXXXx',
+  'xjjjjjjjjjjsjjjjjjjjjjjx',
+  'xJJJJJJJJJJJJJJJJJJJJJJx',
+  '++++++++++++++++++++++++',
+  'xxxxxxxxxxxxxxxxxxxxxxxx',
+  'llllllllllllllllllllllll',
+  'LLLLLLLLLLLLLLLLLLLLLLLL',
+  'xdddddddddddddddddddddDx',
+  'TTTTTTTTTTTTTTTTTTTTTTTT',
 ];
 
 /**
- * 24 x 32 -- a concession stand: a candy-stripe hood (the awning's own
- * `v`/`s` pattern, reused rather than a new colour, since the reference this
- * whole entrance pass is matching shows exactly that stripe on its own
- * snack counter) over a display window holding two muted product blobs
- * (`j`/`J`, the poster paper's tones doing service a second time as a
- * candy-jar silhouette rather than adding a saturated colour a snack stand
- * has no real claim to over the marquee). Same base/sill family as
- * BOX_OFFICE for visual consistency between the two kiosks flanking the
- * same door.
+ * 32 x 48 -- the concession counter, sized to match the box office across the
+ * entrance. A candy-stripe hood under its own bright lip, a dark board for
+ * the CANDY plaque `renderer.js` prints, then a lit counter (`@` again --
+ * concessions are the brightest thing on a cinema frontage after the marquee
+ * itself, which is the entire commercial point of them) with two striped
+ * popcorn boxes standing on it. The boxes are the tell: a lit empty counter
+ * is a cafe, and a lit counter with popcorn on it is a cinema.
  */
 export const CANDY_STAND = [
-  '.xxxxxxxxxxxxxxxxxxxxxx.',
-  '.xvvvvssssvvvvssssvvvvx.',
-  '.xvvvvssssvvvvssssvvvvx.',
-  '.xvvvvssssvvvvssssvvvvx.',
-  '.XXXXXXXXXXXXXXXXXXXXXX.',
-  '.xiiiiiiiiiiiiiiiiiiiix.',
-  '.xiiijjjjjiiiijjjjjiiix.',
-  '.xiiijjjjjiiiijjjjjiiix.',
-  '.xiiiJJJJJiiiiJJJJJiiix.',
-  '.xiiiiiiiiiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiiiiiix.',
-  '.xiiiiiiiiiiiiiiiiiiiix.',
-  '.xxxxxxxxxxxxxxxxxxxxxx.',
-  '.XXXXXXXXXXXXXXXXXXXXXX.',
-  'llllllllllllllllllllllll',
-  '.LLLLLLLLLLLLLLLLLLLLLL.',
-  '.xdddddddddkdddddddddDx.',
-  '.xdddddddddddddddddddDx.',
-  '.xdddddddddddddddddddDx.',
-  '.xdddddddddddddddddddDx.',
-  '.xdddddddddddddddddddDx.',
-  '.xdddddddddddddddddddDx.',
-  '.xdddddddddddddddddddDx.',
-  '.xdddddddddddddddddddDx.',
-  '.xdddddddddddddddddddDx.',
-  '.xdddddddddddddddddddDx.',
-  '.xdddddddddddddddddddDx.',
-  '.xdddddddddddddddddddDx.',
-  '.xxxxxxxxxxxxxxxxxxxxxx.',
-  '.XXXXXXXXXXXXXXXXXXXXXX.',
+  'llllllllllllllllllllllllllllllll',
+  'LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL',
+  'vvvvssssvvvvssssvvvvssssvvvvssss',
+  'vvvvssssvvvvssssvvvvssssvvvvssss',
+  'vvvvssssvvvvssssvvvvssssvvvvssss',
+  'vvvvssssvvvvssssvvvvssssvvvvssss',
+  'vvvvssssvvvvssssvvvvssssvvvvssss',
+  'VVVVSSSSVVVVSSSSVVVVSSSSVVVVSSSS',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '++++++++++++++++++++++++++++++++',
+  'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx',
+  'xnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnx',
+  'xnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnx',
+  'xnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnx',
+  'x@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@x',
+  'x@@@@@ssssss@@@@@@@@ssssss@@@@@x',
+  'x@@@@svsvsvsv@@@@@@svsvsvsv@@@@x',
+  'x@@@@svsvsvsv@@@@@@svsvsvsv@@@@x',
+  'x@@@@svsvsvsv@@@@@@svsvsvsv@@@@x',
+  'x@@@@svsvsvsv@@@@@@svsvsvsv@@@@x',
+  'x@@@@svsvsvsv@@@@@@svsvsvsv@@@@x',
+  'x@@@@svsvsvsv@@@@@@svsvsvsv@@@@x',
+  'x@@@@@SSSSSS@@@@@@@@SSSSSS@@@@@x',
+  'x@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@x',
+  'x@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@x',
+  'xXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXx',
+  'llllllllllllllllllllllllllllllll',
+  'LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL',
+  'xdddddddddddddddddddddddddddddDx',
+  'xdddddddddddddddddddddddddddddDx',
+  'xdddddddddddddddddddddddddddddDx',
+  'xdddddddddddddddddddddddddddddDx',
+  'xdddddddddddddddddddddddddddddDx',
+  'xdddddddddddddddddddddddddddddDx',
+  'xdddddddddddddddddddddddddddddDx',
+  'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT',
 ];
 
-/** Shopfront awning. Same red as the character's accent — it is the colour
- *  this world spends, and a cinema is where it gets spent. */
+/** Shopfront awning -- a bright leading lip (`l`) over its own hard shadow
+ *  (`L`), then the striped canopy falling away below it, so the thing reads
+ *  as a surface tilted toward the sky rather than a flat painted band. Same
+ *  red as the character's accent: it is the colour this world spends. */
 export const AWNING = [
-  '................',
-  '................',
+  'llllllllllllllll',
+  'LLLLLLLLLLLLLLLL',
+  'vvvvssssvvvvssss',
   'vvvvssssvvvvssss',
   'vvvvssssvvvvssss',
   'vvvvssssvvvvssss',
@@ -946,24 +1204,24 @@ export const AWNING = [
   'vvvvssssvvvvssss',
   'vvvvssssvvvvssss',
   'VVVVSSSSVVVVSSSS',
-  'VVVVSSSSVVVVSSSS',
-  '................',
+  'XXXXXXXXXXXXXXXX',
   '................',
 ];
 
 /**
- * A cinema's own canopy, not the generic AWNING every shopfront can use --
- * **per user request, "give it some identity"**: the same candy-stripe body,
- * but a row of alternating light bulbs (`e`/`E`, the streetlamp's own bulb
- * tones, reused rather than invented) along the bottom edge, the one part of
- * the canopy actually silhouetted against the sidewalk instead of the wall
- * behind it. A row of literal bulbs is the single most legible "this is a
- * theatre" cue pixel art this small has available, more so than the stripe
- * pattern alone (which any awning already carries).
+ * A cinema's own canopy, not the generic AWNING every shopfront can use: the
+ * same striped body under the same bright lip, but ending in a real bulb
+ * fringe -- a white-hot core (`*`) over its warm gold surround (`+`), set in
+ * a dark rebate (`%`) so each bulb reads as a separate lamp with air around
+ * it. A single row of alternating `e`/`E` pixels was tried first and at
+ * night it read as a dotted line, because a bulb needs a bright centre AND a
+ * darker socket to be a bulb; two tones cannot do both jobs at once. The
+ * rhythm is every 4px, which divides the tile evenly, so a canopy tiled to
+ * any width never shows a hitch in its spacing.
  */
 export const MARQUEE = [
-  '................',
-  '................',
+  'llllllllllllllll',
+  'LLLLLLLLLLLLLLLL',
   'vvvvssssvvvvssss',
   'vvvvssssvvvvssss',
   'vvvvssssvvvvssss',
@@ -973,70 +1231,73 @@ export const MARQUEE = [
   'vvvvssssvvvvssss',
   'vvvvssssvvvvssss',
   'vvvvssssvvvvssss',
-  'eEeEeEeEeEeEeEeE',
   'VVVVSSSSVVVVSSSS',
-  'VVVVSSSSVVVVSSSS',
-  '................',
-  '................',
+  '%%%%%%%%%%%%%%%%',
+  '%*%%%*%%%*%%%*%%',
+  '%+%%%+%%%+%%%+%%',
+  '%%%%%%%%%%%%%%%%',
 ];
 
 /**
- * A vertical marquee sign, tileable: repeats via `fill()` to whatever height
- * a building's `sign.h` calls for, then capped with SIGN_CAP below. **Per
- * user request, "give it [the cinema] some identity... make art for it if
- * needed"** -- there's no letter/font tile in this set to spell a name on
- * it, so the identity is the fixture itself: a vertical blade tower rising
- * above the roofline is the classic silhouette a cinema marquee reads as
- * even blank, the way a striped pole reads as a barber's without needing a
- * word on it. Bulb-light columns down both edges (`e`/`E`, the streetlamp's
- * own tones) frame a plain saturated-red panel (`v`, bordered by a recessed
- * `V` edge, the same reveal language a window frame uses) -- the world's one
- * saturated accent, spent on the one building that should visibly own it.
- * The bulb rhythm is every 4 rows, which divides this tile's own 16 evenly,
- * so repeating it vertically never shows a seam in the spacing.
+ * A vertical blade sign, tileable: repeats via `fill()` to whatever height a
+ * building's `sign.h` calls for, then capped with SIGN_CAP below. A blade
+ * rising off a facade is the classic cinema silhouette -- it reads as a
+ * cinema even blank, the way a striped pole reads as a barber's.
+ *
+ * Bulb columns down both edges (`*` core on `+` gold) frame a deep red field
+ * (`=`). The bulb rhythm is every 2 rows, which divides this tile's own 16
+ * evenly, so repeating it vertically never shows a seam in the spacing. It
+ * was every 4 rows first and the blade read as a dull red pilaster at night:
+ * a blade sign is mostly *bulbs*, and at half that density there weren't
+ * enough of them for the thing to light up.
+ *
+ * **This is mounted on the facade, not stacked above the roof.** It used to
+ * be stacked on the roofline, which on a building tall enough to want one
+ * put the entire sign above the top of the frame -- 32 rows of authored art
+ * that the player could not see from anywhere on the street it faces. See
+ * `renderer.js`'s `sign.up`.
  */
 export const SIGN_TOWER = [
-  'eVvvvvvvvvvvvvVe',
-  'EVvvvvvvvvvvvvVE',
-  'EVvvvvvvvvvvvvVE',
-  'EVvvvvvvvvvvvvVE',
-  'eVvvvvvvvvvvvvVe',
-  'EVvvvvvvvvvvvvVE',
-  'EVvvvvvvvvvvvvVE',
-  'EVvvvvvvvvvvvvVE',
-  'eVvvvvvvvvvvvvVe',
-  'EVvvvvvvvvvvvvVE',
-  'EVvvvvvvvvvvvvVE',
-  'EVvvvvvvvvvvvvVE',
-  'eVvvvvvvvvvvvvVe',
-  'EVvvvvvvvvvvvvVE',
-  'EVvvvvvvvvvvvvVE',
-  'EVvvvvvvvvvvvvVE',
+  '*+============+*',
+  '%+============+%',
+  '*+============+*',
+  '%+============+%',
+  '*+============+*',
+  '%+============+%',
+  '*+============+*',
+  '%+============+%',
+  '*+============+*',
+  '%+============+%',
+  '*+============+*',
+  '%+============+%',
+  '*+============+*',
+  '%+============+%',
+  '*+============+*',
+  '%+============+%',
 ];
 
-/** The one-off finial on top of a SIGN_TOWER stack -- a small stepped peak
+/** The one-off finial on top of a SIGN_TOWER stack -- a stepped gold peak
  *  (transparent either side, so it actually tapers instead of just changing
- *  colour) in the roof cornice's own brightest tones (`l`/`s`), so the very
- *  top of the tower catches light the same way the building's own roof lip
- *  does. Its own bottom four rows continue SIGN_TOWER's exact bulb/panel
- *  pattern (same 4-row phase) so the seam where they meet is invisible. */
+ *  colour) with the bulb tones running up into it. Its own lower rows
+ *  continue SIGN_TOWER's exact bulb/field pattern on the same 2-row phase,
+ *  so the seam where they meet is invisible. */
 export const SIGN_CAP = [
-  '......llll......',
-  '.....llllll.....',
-  '....ssssssss....',
-  '...ssssssssss...',
-  'eVvvvvvvvvvvvvVe',
-  'EVvvvvvvvvvvvvVE',
-  'EVvvvvvvvvvvvvVE',
-  'EVvvvvvvvvvvvvVE',
-  'eVvvvvvvvvvvvvVe',
-  'EVvvvvvvvvvvvvVE',
-  'EVvvvvvvvvvvvvVE',
-  'EVvvvvvvvvvvvvVE',
-  'eVvvvvvvvvvvvvVe',
-  'EVvvvvvvvvvvvvVE',
-  'EVvvvvvvvvvvvvVE',
-  'EVvvvvvvvvvvvvVE',
+  '......++++......',
+  '.....++**++.....',
+  '....++****++....',
+  '...++********...',
+  '*+============+*',
+  '%+============+%',
+  '*+============+*',
+  '%+============+%',
+  '*+============+*',
+  '%+============+%',
+  '*+============+*',
+  '%+============+%',
+  '*+============+*',
+  '%+============+%',
+  '*+============+*',
+  '%+============+%',
 ];
 
 /**
@@ -1100,11 +1361,38 @@ export const LAMP_POST = [
   '.......hH.......',
 ];
 
+/**
+ * 8 x 8 -- one marquee bulb, on transparent. Not part of any board's own art:
+ * `renderer.js` steps these around the perimeter of a signboard of whatever
+ * size the data asks for (see its `_paintSignFrame`), which is the only way a
+ * bulb frame can be data-driven -- a board's width is a `city.json` field, so
+ * its bulb count cannot be baked into a fixed tile.
+ *
+ * A white-hot core (`*`) inside a gold ring (`+`) inside a dark rebate (`%`),
+ * with a pixel of transparent margin all round so bulbs stepped at an 8px
+ * pitch have visible air between them. `TILE_HEIGHT` gives `*` the tallest
+ * value in the whole table, so the live light actually catches each bulb as a
+ * bump rather than a flat dot.
+ */
+export const SIGN_BULB = [
+  '........',
+  '..%%%%..',
+  '.%+**+%.',
+  '.%****%.',
+  '.%****%.',
+  '.%+**+%.',
+  '..%%%%..',
+  '........',
+];
+
 /** Draw order is the map's business, not the tile's — these are just names. */
 export const TILES = {
   road: ROAD, roadLine: ROAD_LINE, crosswalk: CROSSWALK, pave: PAVE, paveCrack: PAVE_CRACK, paveStain: PAVE_STAIN,
   kerb: KERB, grass: GRASS, trashCan: TRASH_CAN, newsBox: NEWS_BOX, sidewalkStar: SIDEWALK_STAR,
+  lobbyCarpet: LOBBY_CARPET,
   wall: WALL, wallEdge: WALL_EDGE, brick: BRICK, brickEdge: BRICK_EDGE,
+  wallDark: WALL_DARK, brickDark: BRICK_DARK,
+  corniceDark: CORNICE_DARK, plinthDark: PLINTH_DARK,
   roof: ROOF, cornice: CORNICE, corniceEdge: CORNICE_EDGE,
   plinth: PLINTH, plinthEdge: PLINTH_EDGE, beltCourse: BELT_COURSE,
   awning: AWNING, marquee: MARQUEE, signTower: SIGN_TOWER, signCap: SIGN_CAP,
@@ -1113,6 +1401,8 @@ export const TILES = {
 /** Multi-tile. Each is a whole number of tiles and slices cleanly. */
 export const FEATURES = {
   window: WINDOW, windowWide: WINDOW_WIDE, door: DOOR, lampPost: LAMP_POST,
+  windowLit: WINDOW_LIT, windowWarm: WINDOW_WARM,
   boxOffice: BOX_OFFICE, posterCase: POSTER_CASE,
-  cinemaDoor: CINEMA_DOOR, candyStand: CANDY_STAND,
+  cinemaDoors: CINEMA_DOORS, candyStand: CANDY_STAND,
+  signBulb: SIGN_BULB,
 };

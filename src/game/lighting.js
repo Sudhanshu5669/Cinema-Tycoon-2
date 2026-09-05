@@ -18,10 +18,12 @@
 // answering "which lights are actually touching this point right now" for
 // the shadow layer -- see shadowSources.
 //
-// No normal maps are bound, so every surface reads as flat-facing-the-camera
-// (Phaser's own default __NORMAL texture) -- consistent with this project's
-// no-shading-pass flat art; a light still falls off with distance and tints
-// with colour, it just never carves fake bump detail into flat pixel art.
+// Normal maps *are* bound -- the tile atlas ships one derived from the same
+// authored grids as the diffuse art (tools/normals.mjs), and atlas.js carries
+// it through every bake -- so a light here shades real relief rather than only
+// tinting flat colour. The relief is deliberately shallow and hard-edged: a
+// mortar groove, a cornice lip, a marquee bulb. Anything that isn't a
+// structural edge stays flat.
 //
 // Light *sources* -- which windows glow, where the marquee sits -- are data
 // the tile renderer already has (facade window tiles, the awning) and derives
@@ -58,7 +60,7 @@ const { LIGHT_PIPELINE } = Phaser.Renderer.WebGL.Pipelines;
  * enough to overlap and blend its edge away, so it alone needs a big enough
  * radius to go soft on its own.
  */
-const RADIUS = { window: 110, marquee: 170, streetlamp: 220 };
+const RADIUS = { window: 110, marquee: 190, streetlamp: 220, lobby: 150 };
 
 /**
  * Opts one drawable into the lighting shader. Safe to call unconditionally --

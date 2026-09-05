@@ -187,6 +187,14 @@ export class DevScene extends Phaser.Scene {
       }),
       // Cast shadows are driven by this hour; a real day/night clock is #16.
       setTime: (h) => this._setHour(h),
+      // Show/hide the debug furniture -- the HUD text and the deadzone box.
+      // For tools/build-entrance.mjs: a review screenshot of the facade has
+      // to be of the facade, and both of those sit right on top of it.
+      hud: (on) => {
+        const show = on !== false;
+        this.hud.setVisible(show);
+        this.deadzoneBox?.setVisible(show);
+      },
       autoTime: (on) => { this.autoTime = on !== false; },
       // SYSTEMS #9. Validating a tile name needs the live atlas, so this half
       // of the loader's validation is only exercisable through a real scene.
@@ -324,7 +332,7 @@ export class DevScene extends Phaser.Scene {
   drawDeadzone() {
     if (!import.meta.env.DEV) return;
     const dz = this.cam.deadzone;
-    this.add.graphics()
+    this.deadzoneBox = this.add.graphics()
       .lineStyle(1, 0xffffff, 0.14)
       .strokeRect(dz.x + 0.5, dz.y + 0.5, dz.w - 1, dz.h - 1)
       .setScrollFactor(0)

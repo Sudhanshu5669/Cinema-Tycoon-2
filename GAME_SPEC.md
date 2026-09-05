@@ -1,6 +1,12 @@
 # Game Spec — Cinema Tycoon (working title)
 
+_What the game is and what the code is built against. Kept short on purpose:
+this file states the target, not the route to it. Decisions that are already
+expressed in code belong in the code; a spec that also records every path not
+taken turns into a list of things not to try, which is the opposite of useful._
+
 ## Core loop
+
 You play a character who has just bought a derelict cinema in the middle of a
 city. Moment to moment you walk around as that character in a top-down 3/4
 pixel-art world — through city streets, into building interiors, talking to
@@ -8,136 +14,82 @@ NPCs via visual-novel dialogue. The cinema is the anchor: you walk into it,
 survey its broken and filthy state, and spend money and time repairing,
 upgrading and running it. Business decisions (what films to screen, ticket
 pricing, concessions, staff, renovations) feed a simulation that changes the
-city's footfall and your reputation, which loops back into more money and
-more of the city opening up to you. The intended feel is vast and
-open-ended — a city that keeps revealing more, not a fixed level list.
+city's footfall and your reputation, which loops back into more money and more
+of the city opening up to you. The intended feel is vast and open-ended — a
+city that keeps revealing more, not a fixed level list.
 
 ## Genre
+
 Management/tycoon simulation with a walk-around top-down adventure layer and
-visual-novel storytelling. Not a menu-driven tycoon — the player is embodied
-in the world.
+visual-novel storytelling. Not a menu-driven tycoon — the player is embodied in
+the world.
 
 ## Platform target
-Both desktop and mobile.
+
+Desktop and mobile.
+
 - Desktop: keyboard (WASD/arrows) + mouse.
-- Mobile: on-screen virtual joystick + tap. Touch overlay is mobile-only and
-  must not appear on desktop.
-- All input routed through a single input abstraction from day one so no
-  system ever reads a raw key event directly.
+- Mobile: on-screen virtual joystick + tap. The touch overlay is mobile-only
+  and must not appear on desktop.
+- All input routes through a single input abstraction (`src/core/input/`), so
+  no system reads a raw key event directly.
 
-## Art approach
-Hand-authored **flat pixel art** in the style of the user's supplied Metkis
-reference: tall, slim figures, no outlines, muted palette, minimal shading.
+## Art
 
-History, so no rejected direction gets retried:
-1. Eastward-styled 32x56 with distance-field lighting -> rejected, "glassy and
-   weird". Cause: smooth normal-based falloff reads as moulded plastic.
-2. Stardew-styled 32x48 with flat cel shading -> rejected. Cause: roughly three
-   times Stardew's real pixel count. The chunkiness IS the style.
-3. Stardew-styled 16x32 (actual Stardew scale) -> approved for the front and
-   back facings, then abandoned. The profile never landed: at 16px the face
-   collapses into a 3px stripe, and hair and jacket rendered at identical
-   luminance so the whole side view fused into one brown slab. Repeated attempts
-   to fix it by reshaping the head did not help, because the problem was the
-   style's dependence on a chunky face doing all the work.
-4. **Current: flat "tall figure", 16 x 48.** Chosen because it is
-   authorable — the profile reads from silhouette and proportion rather than
-   from facial detail there is no room for.
+Hand-authored pixel art, tall slim figures, no outlines on the characters.
 
-What the reference dictates (measured, not guessed — the reference figures are
-13 x 50 native pixels):
-- **No outline anywhere.** Shapes sit flat against the background. This is the
-  single biggest departure from every previous pass.
-- Proportions: head 20% of height and **54% of body width**; torso 32%; hips
-  8%; legs and feet 40%. The width ratio is the one that matters — a first pass
-  at 67% read as a bobblehead with the vertical proportions already correct.
-- Two tones per garment at most, and no ramps. Light comes from the left, so
-  the near arm is lit and the far arm is shaded; that tonal split is the only
-  thing separating arm from torso, since there is no outline to do it.
-- The face carries **eyes only** — one dark pixel each. No nose, no mouth, no
-  whites, no catchlights. The profile gets a single-pixel nose bump.
-- There **is** a neck, one pixel row of it.
-- Legs are long and thin with a clear gap between them; feet are small and are
-  the darkest thing on the figure.
-- Muted, slightly cool register. Exactly one saturated accent per character.
+Sprites and tiles are authored as **indexed-colour ASCII grids** against named
+palettes (`art/flat/`), rastered and validated by `tools/`. That is the whole
+pipeline: what is written in the grid is what is drawn. It exists so a typo is
+a build error rather than a silent one-pixel bug, and so art is diffable.
 
-Locked art constants:
-- Internal render resolution: **640 x 360**
-- Tile grid: **16 x 16 px**
-- Character: **16 x 48 px** (3 tiles tall)
-- Presentation: **integer scale x3 -> 1920 x 1080**, nearest-neighbour
-- On-screen world: 40 x 22 tiles
+The world runs **warm and high-contrast** — tan plaster, red brick, warm stone
+paving against a near-black road — with cool glass as the one deliberate cold
+family. Value spread is spent on purpose: the road is the floor, a marquee bulb
+is the ceiling. The character palette stays lower-saturation so a figure reads
+against the city rather than dissolving into it.
 
-The tile renderer (SYSTEMS #6) is **elevation-aware**: a map is a `height` grid
-plus named layers (`ground`/`flat`/`object`/`overhead`), and raised terrain and
-buildings are drawn with an **oblique face** — a wall that projects straight
-down the screen — rather than a flat facade glued under a top-down roof. The
-face height per elevation level (`STEP`) is a renderer knob, not a locked
-constant. This was a deliberate call ("versatile enough to have levels if
-needed"); flat maps still author flat, the capability is just there. Tile art
-started as the SYSTEMS #0 placeholder set and later got a surface detail/
-variety pass (window sills, wall/roof texture, brick colour variety, a
-pavement stain tile) — see SYSTEMS.md #6.
+Art constants the code is authored against (`src/core/config.js`):
 
-Sprites are authored as an **indexed-colour ASCII grid** (`art/flat/player.mjs`)
-against a named palette (`art/flat/palette.mjs`); `tools/flat.mjs` maps
-characters to exact colours and validates every grid. The *player sprite*
-itself has no shading pass — every pixel is an authored exact colour, no
-gradient, no normal-based falloff — which is a real, deliberate constraint on
-that one piece of art specifically: an earlier attempt at normal-based
-lighting on the character (rejected direction #1 above) read as "glassy and
-moulded plastic". That is not a project-wide ban on shaders or normal maps —
-the *tile* art now uses exactly that (see SYSTEMS.md #6's normal-map system:
-`art/flat/palette.mjs`'s `TILE_HEIGHT` + `tools/normals.mjs`), deliberately
-designed around the same failure mode rather than avoided because of it (small
-height deltas, sharp transitions, not the smooth continuous falloff that read
-as plastic). The Stardew-era material/normal/cel machinery
-(`art/materials.mjs`, `tools/shade.mjs`) is superseded for a different reason —
-it doesn't match this flat *style* — not because normal maps themselves are
-off the table. Those files and the 16x32 sprites are still in the tree,
-unreferenced by either pipeline, pending a decision to delete them.
+| | |
+|---|---|
+| Internal render resolution | 640 x 360 |
+| Presentation | integer scale, nearest-neighbour |
+| Tile grid | 16 x 16 |
+| Character | 16 x 48 (3 tiles) |
 
-The live scene runs on a real per-fragment shader (SYSTEMS #8, `src/game/
-lighting.js` -- Phaser's own `Light2D` pipeline, not a bespoke one), a
-deliberate choice over a cheaper baked overlay so future growth (more lights,
-flicker, a lantern that follows the player) is a data change, not new GLSL.
-`tools/light.mjs` remains the separate offline CPU pass that accumulates
-coloured lights with quadratic falloff over an ambient tint for day/evening and
-interiors.
+`STEP` (screen px per elevation level, `tilemap/projection.js`) is a renderer
+tuning knob, not a locked constant — raising it makes every building taller
+without touching a map.
+
+## Rendering
+
+The tile renderer is **elevation-aware**: a map is a `height` grid plus named
+layers (`ground`/`flat`/`object`/`overhead`), and raised terrain and buildings
+are drawn with an **oblique face** projecting straight down the screen, rather
+than a flat facade glued under a top-down roof. Flat maps still author flat.
+
+Lighting is a real per-fragment shader (Phaser's `Light2D`), driven by an
+hour-of-day model, with normal maps derived from the same authored grids the
+diffuse art comes from. Lights are data: adding one is a map edit.
 
 ## Scope
-Full game, built up in verified stages. The user has explicitly asked for a
-"vast game with endless possibilities", so systems must be built
-data-driven and extensible rather than hardcoded — but delivered and
-validated one system at a time.
 
-## Genre-specific answers
-- **Protagonist look:** "Film-nerd casual" — hoodie, cargo pants, beanie,
-  headphones round the neck, camera bag. Cinephile energy, not
-  businessperson energy.
-- **Storytelling:** Visual-novel dialogue box with a **nameplate + dialogue
-  box**. Opening scene: the character arrives in the middle of town and the
-  dialogue establishes that they finally bought the cinema they always
-  wanted to manage.
-- **Cinema state at start:** very broken and dirty, located in the middle of
-  the city.
-- **City:** must be **dynamically constructed from data**. Changing the city
-  map — moving a building, adding a district, swapping a shopfront — must be
-  a data edit, not a code change.
-- **Interiors:** enterable buildings with their own interior scenes.
+Full game, built up in verified stages, one system at a time — see
+`SYSTEMS.md` for the running list and status. Systems must be **data-driven
+and extensible** rather than hardcoded: the city is a JSON file
+(`public/assets/city.json`), and moving a building, adding a district or
+swapping a shopfront is a data edit, not a code change.
+
+## Setting details
+
+- **Protagonist:** "film-nerd casual" — hoodie, cargo pants, beanie, headphones
+  round the neck, camera bag. Cinephile energy, not businessperson energy.
+- **Storytelling:** visual-novel dialogue with a nameplate + dialogue box.
+  Opening scene: the character arrives in town, having finally bought the
+  cinema they always wanted to run.
+- **Cinema at start:** very broken and dirty, in the middle of the city.
+- **Interiors:** buildings are enterable, with their own interior scenes.
 - **NPCs:** present in the world and talkable-to.
-- **System depth:** the user's phrasing is "deeply smart" — favour
-  simulation and emergent behaviour over scripted one-offs.
-
-## Validation protocol (user-imposed)
-The user validates everything. In particular, for this first pass:
-1. Main character sprite is drafted and **shown for approval first**.
-2. **No animation work begins until the static sprite look is approved.**
-3. Walking system comes after sprite approval.
-
-## Explicit non-goals (this pass)
-- No 3D.
-- No multiplayer.
-- No animation frames until the base sprite is signed off.
-- No city content beyond what's needed to test the system currently being
-  built.
+- **System depth:** favour simulation and emergent behaviour over scripted
+  one-offs.

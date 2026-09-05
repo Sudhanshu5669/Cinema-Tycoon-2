@@ -276,8 +276,8 @@ check('marquee glow is off at noon and on at night',
   `noon ${litNoon.marqueeGlow} night ${litNight.marqueeGlow}`);
 
 // --- the player casts a shadow too, from the sun and from nearby lights -----
-// The player's own silhouette has real gaps in it (the legs, per GAME_SPEC's
-// own art direction, are "long and thin with a clear gap between them"), and
+// The player's own silhouette has real gaps in it (the legs are long, thin
+// and clearly separated in the sprite art), and
 // those gaps carry through into the shadow -- a single exact-pixel sample can
 // land right in one and read as unlit even where the shadow is genuinely
 // present. Sampling a small spread of distances along the same direction and

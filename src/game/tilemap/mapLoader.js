@@ -11,6 +11,12 @@
 //     ground|flat|object|overhead: { default?, bands?, vbands?, stripes?, cells? },
 //     platforms: [...], buildings: [...], streetlamps: [...] }
 //
+// A building may also name `cornice`/`plinth` tiles alongside `face`/`base`,
+// which is how a background building is pushed back: swapping all four for
+// their `*Edge` (shaded-return) variants darkens a whole facade in data,
+// with no new art, so the street has a foreground and a background instead
+// of every building competing at the same value.
+//
 // -- expanded into the renderer's full-grid shape. `bands` fills a row range
 // with one tile (a pavement, a road); `vbands` is the same thing turned
 // sideways, a column range across every row (a cross street cutting through
@@ -32,8 +38,7 @@
 // than one mistake at a time and deserves to hear about all of them.
 
 import { TILES_KEY } from './atlas.js';
-import { TILE, MARQUEE_TEXT_SCALE, MARQUEE_TEXT_MARGIN } from './projection.js';
-import { measureWidth } from './font.js';
+import { signLines, signFieldWidth, signLineWidth } from './sign.js';
 
 const LAYER_ROLES = ['ground', 'flat', 'object', 'overhead'];
 
@@ -122,22 +127,34 @@ export function loadCityMap(raw, scene) {
   };
 
   /**
-   * A sign string (a marquee's own name, a reader board's text) fits the
-   * pixel width its own band has to show it in, at the fixed scale/margin
-   * the renderer draws it at -- per user request, "make sure name doesn't
-   * overflow the board", checked here, once, before the renderer ever bakes
-   * a pixel, rather than silently clipping or overrunning the sign.
-   * `bandTiles` is the sign's own `fw` (tiles); `undefined`/absent text is
-   * fine (nothing to draw, nothing to overflow).
+   * Every line of a signboard fits the pixel width its own board has to show
+   * it in -- checked here, once, before the renderer ever bakes a pixel,
+   * rather than silently clipping or overrunning the sign.
+   *
+   * This measures exactly what the renderer will draw: `sign.js` resolves the
+   * same line list, with the same per-line scale and face defaults, against
+   * the same field width (the board's tile width less its bulb frame and end
+   * margins). The two cannot drift, because there is only one copy of that
+   * arithmetic and neither file owns it.
    */
-  const checkSignText = (label, text, bandTiles) => {
-    if (text === undefined) return;
-    if (typeof text !== 'string' || !text.length) { errs.push(`${label}: must be a non-empty string, got ${JSON.stringify(text)}`); return; }
-    const avail = bandTiles * TILE - MARQUEE_TEXT_MARGIN;
-    const need = measureWidth(text, MARQUEE_TEXT_SCALE);
-    if (need > avail) {
-      errs.push(`${label}: "${text}" is ${need}px wide, ${avail}px available in a ${bandTiles}-tile band -- shorten it or widen the band`);
-    }
+  const checkSignText = (label, panel, bandTiles) => {
+    const lines = signLines(panel);
+    const avail = signFieldWidth(bandTiles);
+    lines.forEach((line, i) => {
+      const where = lines.length > 1 ? `${label}.lines[${i}]` : label;
+      if (typeof line.text !== 'string' || !line.text.length) {
+        errs.push(`${where}: must be a non-empty string, got ${JSON.stringify(line.text)}`);
+        return;
+      }
+      if (!(Number.isInteger(line.scale) && line.scale > 0)) {
+        errs.push(`${where}: scale must be a positive integer, got ${line.scale}`);
+        return;
+      }
+      const need = signLineWidth(line);
+      if (need > avail) {
+        errs.push(`${where}: "${line.text}" is ${need}px wide at scale ${line.scale}, ${avail}px available inside a ${bandTiles}-tile board -- shorten it, widen the board, or drop a scale`);
+      }
+    });
   };
 
   (raw.platforms ?? []).forEach((p, i) => {
@@ -148,7 +165,7 @@ export function loadCityMap(raw, scene) {
 
   (raw.buildings ?? []).forEach((b, i) => {
     const label = `buildings[${i}]`;
-    checkFootprint(b, label, ['top', 'face', 'base']);
+    checkFootprint(b, label, ['top', 'face', 'base', 'cornice', 'plinth']);
     if (b.storeys !== undefined && !posInt(b.storeys)) errs.push(`${label}.storeys must be a positive integer, got ${b.storeys}`);
     if (b.roofDepth !== undefined && !posInt(b.roofDepth)) errs.push(`${label}.roofDepth must be a positive integer, got ${b.roofDepth}`);
     (b.facade ?? []).forEach((d, j) => {
@@ -170,11 +187,14 @@ export function loadCityMap(raw, scene) {
       if (b.awning.h !== undefined && !posInt(b.awning.h)) errs.push(`${label}.awning.h must be a positive integer, got ${b.awning.h}`);
     }
     if (b.sign) {
-      const { fx, h } = b.sign;
+      const { fx, h, up } = b.sign;
       if (!(Number.isInteger(fx) && fx >= 0 && Number.isInteger(b.w) && fx < b.w)) {
         errs.push(`${label}.sign: fx=${fx} outside the building's own width ${b.w}`);
       }
       if (h !== undefined && !posInt(h)) errs.push(`${label}.sign.h must be a positive integer, got ${h}`);
+      // `up` mounts the blade on the facade instead of stacking it off the
+      // roofline -- see renderer.js. Absent is still "stack off the roof".
+      if (up !== undefined && !posInt(up)) errs.push(`${label}.sign.up must be a positive integer, got ${up}`);
     }
     // Flat bordered signboards -- the cinema's own name, a reader board, or
     // any future panel: one generic list (see renderer.js's own `panels`
@@ -188,7 +208,7 @@ export function loadCityMap(raw, scene) {
       }
       if (h !== undefined && !posInt(h)) errs.push(`${plabel}.h must be a positive integer, got ${h}`);
       if (up !== undefined && !posInt(up)) errs.push(`${plabel}.up must be a positive integer, got ${up}`);
-      checkSignText(`${plabel}.text`, p.text, fw);
+      checkSignText(plabel, p, fw);
     });
   });
 

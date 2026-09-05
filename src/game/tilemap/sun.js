@@ -80,11 +80,18 @@ function lerpRGB([r1, g1, b1], [r2, g2, b2], t) {
 // Anchor tones. NIGHT and DAY are reused at every occurrence rather than each
 // getting its own shade -- one dark/cool tone, one bright/near-neutral tone,
 // and the transitions between them are what actually reads as day/night.
-const NIGHT = [0.15, 0.17, 0.28];   // dark, cool-blue -- geometry still legible
+const NIGHT = [0.11, 0.12, 0.19];   // dark and cool -- geometry still legible,
+                                     // but genuinely dark. An earlier, lighter
+                                     // night lifted the whole street to within
+                                     // a few values of the lit shopfronts, so
+                                     // nothing could read as *the* light source;
+                                     // a warm glow only looks like a glow when
+                                     // there is real darkness for it to sit in.
 const DAY = [1.02, 1.00, 0.92];     // bright, faintly warm -- "as authored"
-const EVENING = [0.58, 0.40, 0.52]; // warm-magenta dusk, cooler than the sun
-                                     // itself so the marquee's glow has
-                                     // something dim to punch through
+const EVENING = [0.62, 0.44, 0.36]; // warm dusk. Warmer than the night that
+                                     // follows it, so the hour before the
+                                     // lights come on reads as the sun going
+                                     // rather than as the street going blue.
 
 /** Ambient keyframes across a full day. Flat NIGHT/DAY stretches either side
  *  of a ramp through dawn and dusk; the two ends (0h, 24h) must agree since
@@ -134,14 +141,29 @@ function hump(h, from, to) {
  */
 const GLOW_CURVES = {
   // Ordinary windows: on a little before dusk, off a little after dawn.
-  window: { from: DUSK - 0.5, to: DAWN + 0.5, color: 0xffc878, intensity: 1.0 },
-  // The cinema marquee: the one saturated accent on the street (echoing the
-  // "one saturated accent per character" rule), on its own timer -- switched
-  // on earlier than residents turn their lights on, brighter once lit.
-  marquee: { from: DUSK - 2, to: DAWN, color: 0xff4d6d, intensity: 1.7 },
+  window: { from: DUSK - 0.5, to: DAWN + 0.5, color: 0xffb877, intensity: 1.0 },
+  // The cinema marquee, on its own timer -- switched on earlier than
+  // residents turn their lights on, brighter once lit.
+  //
+  // **Warm gold, not pink.** This was `0xff4d6d` at intensity 1.7, reasoning
+  // that the marquee should carry the street's one saturated accent -- but a
+  // light's colour is not a material's colour. Red paint under a warm lamp is
+  // still red; a *rose-coloured lamp* tints everything it reaches, and with
+  // this one's radius that meant the facade, the pavement, the player and the
+  // neighbouring buildings all went mauve, and the doorway blew out to a
+  // magenta blob. The red stays where it belongs -- the doors, the stripes,
+  // the board fields, all authored art -- and the light that falls on it is
+  // the colour theatre bulbs actually are.
+  marquee: { from: DUSK - 2, to: DAWN, color: 0xffb44a, intensity: 1.5 },
+  // The lobby behind the entrance doors: the warmest, palest source on the
+  // street and the only one that is a doorway rather than a lamp. Its own
+  // kind so it can be a gentle wide wash (see lighting.js's RADIUS) instead
+  // of borrowing a point source's falloff, which is what turned the entrance
+  // into a hotspot before.
+  lobby: { from: DUSK - 2, to: DAWN + 0.5, color: 0xffca7d, intensity: 1.2 },
   // Streetlamps: on a photocell, not a resident's hand -- a sharper, earlier
-  // on/off than windows and the palest colour of the three light kinds.
-  streetlamp: { from: DUSK - 1, to: DAWN + 0.25, color: 0xfff0c0, intensity: 1.3 },
+  // on/off than windows and the palest colour of the lamp kinds.
+  streetlamp: { from: DUSK - 1, to: DAWN + 0.25, color: 0xffd89a, intensity: 1.2 },
 };
 
 /**

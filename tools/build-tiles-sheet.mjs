@@ -40,14 +40,20 @@ const OUT = path.join(ROOT, 'public/assets');
 const RELIEF_STRENGTH = {
   cornice: 1, corniceEdge: 1,
   beltCourse: 0.5,
-  brick: 0.6, brickEdge: 0.6,
+  brick: 0.6, brickEdge: 0.6, brickDark: 0.6,
+  corniceDark: 1, plinthDark: 0.5,
   plinth: 0.5, plinthEdge: 0.5,
   kerb: 0.7,
-  window: 0.8, windowWide: 0.8,
+  window: 0.8, windowWide: 0.8, windowLit: 0.8, windowWarm: 0.8,
   door: 0.6,
-  marquee: 0.5, signTower: 0.6, signCap: 0.6,
-  boxOffice: 0.7, posterCase: 0.5,
-  cinemaDoor: 0.6, candyStand: 0.5,
+  marquee: 0.6, signTower: 0.6, signCap: 0.6,
+  boxOffice: 0.7, posterCase: 0.6,
+  cinemaDoors: 0.6, candyStand: 0.6,
+  // The bulb is the one place this set genuinely wants relief: a marquee bulb
+  // is a glass bubble standing off a flat board, and a light raking across a
+  // row of them should catch each one. Strongest value in the table for that
+  // reason -- everything else here is a ledge or a groove, this is a sphere.
+  signBulb: 1.2,
 };
 
 // --- validate + raster -----------------------------------------------------
