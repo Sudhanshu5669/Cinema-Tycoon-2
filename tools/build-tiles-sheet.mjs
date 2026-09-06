@@ -26,7 +26,7 @@ import path from 'node:path';
 import { Bitmap } from './png.mjs';
 import { raster, validateGrid } from './flat.mjs';
 import { normalRaster } from './normals.mjs';
-import { TILE_PALETTE, TILE_HEIGHT } from '../art/flat/palette.mjs';
+import { TILE_PALETTE, TILE_HEIGHT, ROOM_PALETTE, ROOM_HEIGHT } from '../art/flat/palette.mjs';
 import { TILES, FEATURES, W as TW, H as TH } from '../art/flat/tiles.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -59,6 +59,9 @@ const RELIEF_STRENGTH = {
   hydrant: 0.7, bollard: 0.7, planter: 0.5, aBoard: 0.5,
   ticketKiosk: 0.7, candyCart: 0.6, fireEscape: 0.8, acUnit: 0.7,
   marquee: 0.6, signTower: 0.6, signCap: 0.6,
+  // Interiors: shallow, because a dado rail seen through glass from across a
+  // street buys nothing from a bold normal. What it does buy is the stair.
+  roomHall: 0.5, roomFlat: 0.5, roomStair: 0.5, roomLamp: 0.5, roomPlant: 0.5,
   boxOffice: 0.7, posterCase: 0.6,
   cinemaDoors: 0.6, candyStand: 0.6,
   // The bulb is the one place this set genuinely wants relief: a marquee bulb
@@ -144,11 +147,17 @@ for (const [name, grid] of Object.entries({ ...TILES, ...FEATURES })) {
     if (h % TH !== 0) errs.push(`${name}: ${h} rows, not a whole number of ${TH}px tiles`);
     if (w % TW !== 0) errs.push(`${name}: ${w} cols, not a whole number of ${TW}px tiles`);
   }
-  errs.push(...validateGrid(name, grid, w, h, TILE_PALETTE));
+  // Interiors are authored against their own palette -- see ROOM_PALETTE.
+  // `raster` and `validateGrid` already take the palette to draw against, for
+  // exactly this reason, so this is a lookup rather than a second code path.
+  const isRoom = name.startsWith('room');
+  const palette = isRoom ? ROOM_PALETTE : TILE_PALETTE;
+  const heights = isRoom ? ROOM_HEIGHT : TILE_HEIGHT;
+  errs.push(...validateGrid(name, grid, w, h, palette));
   frames.push({
     name, w, h,
-    bmp: raster(grid, TILE_PALETTE),
-    normal: normalRaster(grid, TILE_HEIGHT, RELIEF_STRENGTH[name] ?? 0, GROUND_TILT.has(name) ? GROUND_LEAN : 0),
+    bmp: raster(grid, palette),
+    normal: normalRaster(grid, heights, RELIEF_STRENGTH[name] ?? 0, GROUND_TILT.has(name) ? GROUND_LEAN : 0),
     opening: openingOf(grid),
   });
 }

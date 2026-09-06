@@ -1,218 +1,1149 @@
 {
-  "w": 120,
-  "h": 50,
-  "ground": {
-    "default": "road",
-    "bands": [
-      { "y0": 18, "y1": 22, "tile": "pave" },
-      { "y0": 23, "y1": 23, "tile": "kerb" },
-      { "y0": 24, "y1": 31, "tile": "road" },
-      { "y0": 32, "y1": 49, "tile": "pave" }
-    ],
-    "vbands": [
-      { "x0": 62, "x1": 65, "tile": "road" }
-    ],
-    "cells": [
-      { "x": 9, "y": 19, "tile": "paveCrack" },
-      { "x": 30, "y": 20, "tile": "paveCrack" },
-      { "x": 90, "y": 20, "tile": "paveCrack" },
-      { "x": 101, "y": 19, "tile": "paveCrack" },
-      { "x": 18, "y": 34, "tile": "paveCrack" },
-      { "x": 55, "y": 36, "tile": "paveCrack" },
-      { "x": 70, "y": 47, "tile": "paveCrack" },
-      { "x": 82, "y": 45, "tile": "paveCrack" },
-      { "x": 105, "y": 44, "tile": "paveCrack" },
-      { "x": 15, "y": 41, "tile": "paveStain" },
-      { "x": 58, "y": 44, "tile": "paveStain" },
-      { "x": 95, "y": 42, "tile": "paveStain" },
-
-      { "x": 5, "y": 21, "tile": "manhole" },
-      { "x": 34, "y": 20, "tile": "manhole" },
-      { "x": 68, "y": 21, "tile": "manhole" },
-      { "x": 99, "y": 20, "tile": "manhole" },
-      { "x": 12, "y": 36, "tile": "manhole" },
-      { "x": 44, "y": 41, "tile": "manhole" },
-      { "x": 88, "y": 38, "tile": "manhole" },
-
-      { "x": 13, "y": 23, "tile": "drainGrate" },
-      { "x": 33, "y": 23, "tile": "drainGrate" },
-      { "x": 57, "y": 23, "tile": "drainGrate" },
-      { "x": 74, "y": 23, "tile": "drainGrate" },
-      { "x": 97, "y": 23, "tile": "drainGrate" },
-
-      { "x": 3, "y": 19, "tile": "pavePatch" },
-      { "x": 17, "y": 21, "tile": "pavePatch" },
-      { "x": 28, "y": 19, "tile": "pavePatch" },
-      { "x": 63, "y": 20, "tile": "pavePatch" },
-      { "x": 80, "y": 22, "tile": "pavePatch" },
-      { "x": 93, "y": 19, "tile": "pavePatch" },
-      { "x": 108, "y": 21, "tile": "pavePatch" },
-      { "x": 24, "y": 38, "tile": "pavePatch" },
-      { "x": 61, "y": 40, "tile": "pavePatch" },
-      { "x": 99, "y": 35, "tile": "pavePatch" },
-
-      { "x": 7, "y": 22, "tile": "paveLitter" },
-      { "x": 20, "y": 19, "tile": "paveLitter" },
-      { "x": 37, "y": 22, "tile": "paveLitter" },
-      { "x": 45, "y": 22, "tile": "paveLitter" },
-      { "x": 54, "y": 22, "tile": "paveLitter" },
-      { "x": 66, "y": 21, "tile": "paveLitter" },
-      { "x": 77, "y": 19, "tile": "paveLitter" },
-      { "x": 86, "y": 22, "tile": "paveLitter" },
-      { "x": 104, "y": 19, "tile": "paveLitter" },
-      { "x": 113, "y": 21, "tile": "paveLitter" },
-      { "x": 31, "y": 33, "tile": "paveLitter" },
-      { "x": 72, "y": 35, "tile": "paveLitter" },
-      { "x": 110, "y": 39, "tile": "paveLitter" },
-
-      { "x": 48, "y": 18, "tile": "lobbyCarpet" }, { "x": 49, "y": 18, "tile": "lobbyCarpet" },
-      { "x": 50, "y": 18, "tile": "lobbyCarpet" }, { "x": 51, "y": 18, "tile": "lobbyCarpet" },
-
-      { "x": 47, "y": 21, "tile": "sidewalkStar" }, { "x": 49, "y": 21, "tile": "sidewalkStar" },
-      { "x": 51, "y": 21, "tile": "sidewalkStar" },
-
-      { "x": 47, "y": 24, "tile": "crosswalk" }, { "x": 48, "y": 24, "tile": "crosswalk" },
-      { "x": 49, "y": 24, "tile": "crosswalk" }, { "x": 50, "y": 24, "tile": "crosswalk" },
-      { "x": 51, "y": 24, "tile": "crosswalk" }, { "x": 52, "y": 24, "tile": "crosswalk" },
-      { "x": 47, "y": 26, "tile": "crosswalk" }, { "x": 48, "y": 26, "tile": "crosswalk" },
-      { "x": 49, "y": 26, "tile": "crosswalk" }, { "x": 50, "y": 26, "tile": "crosswalk" },
-      { "x": 51, "y": 26, "tile": "crosswalk" }, { "x": 52, "y": 26, "tile": "crosswalk" },
-      { "x": 47, "y": 28, "tile": "crosswalk" }, { "x": 48, "y": 28, "tile": "crosswalk" },
-      { "x": 49, "y": 28, "tile": "crosswalk" }, { "x": 50, "y": 28, "tile": "crosswalk" },
-      { "x": 51, "y": 28, "tile": "crosswalk" }, { "x": 52, "y": 28, "tile": "crosswalk" },
-      { "x": 47, "y": 30, "tile": "crosswalk" }, { "x": 48, "y": 30, "tile": "crosswalk" },
-      { "x": 49, "y": 30, "tile": "crosswalk" }, { "x": 50, "y": 30, "tile": "crosswalk" },
-      { "x": 51, "y": 30, "tile": "crosswalk" }, { "x": 52, "y": 30, "tile": "crosswalk" }
-    ]
-  },
-  "flat": {
-    "stripes": [
-      { "y": 27, "tile": "roadLine", "step": 2, "offset": 0 }
-    ]
-  },
-  "object": {
-    "cells": [
-      { "x": 26, "y": 47, "tile": "grass" },
-      { "x": 95, "y": 36, "tile": "grass" },
-      { "x": 41, "y": 20, "tile": "newsBox" },
-      { "x": 59, "y": 20, "tile": "trashCan" },
-      { "x": 15, "y": 20, "tile": "trashCan" },
-      { "x": 96, "y": 20, "tile": "trashCan" },
-      { "x": 36, "y": 34, "tile": "trashCan" },
-      { "x": 84, "y": 33, "tile": "newsBox" }
-    ]
-  },
-  "overhead": {
-    "cells": [
-      { "x": 75, "y": 36, "tile": "awning" }
-    ]
-  },
-  "props": [
-    { "x": 40, "y": 18, "w": 2, "tile": "ticketKiosk", "solid": true, "light": "window" },
-    { "x": 58, "y": 18, "w": 2, "tile": "candyCart", "solid": true, "light": "window" },
-    { "x": 71, "y": 21, "w": 2, "tile": "ticketKiosk", "solid": true, "light": "window", "label": "NEWS" },
-
-    { "x": 11, "y": 22, "w": 1, "tile": "hydrant" },
-    { "x": 69, "y": 22, "w": 1, "tile": "hydrant" },
-    { "x": 103, "y": 22, "w": 1, "tile": "hydrant" },
-    { "x": 29, "y": 33, "w": 1, "tile": "hydrant" },
-
-    { "x": 45, "y": 22, "w": 1, "tile": "bollard" },
-    { "x": 46, "y": 22, "w": 1, "tile": "bollard" },
-    { "x": 53, "y": 22, "w": 1, "tile": "bollard" },
-    { "x": 54, "y": 22, "w": 1, "tile": "bollard" },
-
-    { "x": 18, "y": 22, "w": 2, "tile": "planter", "solid": true },
-    { "x": 87, "y": 22, "w": 2, "tile": "planter", "solid": true },
-    { "x": 40, "y": 34, "w": 2, "tile": "planter", "solid": true },
-
-    { "x": 39, "y": 21, "w": 2, "tile": "aBoard" },
-    { "x": 74, "y": 21, "w": 2, "tile": "aBoard" }
+ "w": 120,
+ "h": 50,
+ "ground": {
+  "default": "road",
+  "bands": [
+   {
+    "y0": 18,
+    "y1": 22,
+    "tile": "pave"
+   },
+   {
+    "y0": 23,
+    "y1": 23,
+    "tile": "kerb"
+   },
+   {
+    "y0": 24,
+    "y1": 31,
+    "tile": "road"
+   },
+   {
+    "y0": 32,
+    "y1": 49,
+    "tile": "pave"
+   }
   ],
-  "platforms": [
-    { "x": 30, "y": 39, "w": 12, "h": 7, "e": 2, "top": "grass", "face": "plinth" }
+  "vbands": [
+   {
+    "x0": 62,
+    "x1": 65,
+    "tile": "road"
+   }
   ],
-  "buildings": [
-    {
-      "x": 0, "y": 13, "w": 22, "h": 5, "storeys": 7, "roofDepth": 3,
-      "face": "wall", "base": "brick", "top": "roof",
-      "facade": [
-        { "tile": "door", "fx": 9, "fy": 0 },
-        { "tile": "windowOpen", "fx": 1, "fy": 1, "room": "roomPlant" }, { "tile": "window", "fx": 3, "fy": 1 }, { "tile": "windowOpen", "fx": 6, "fy": 1, "room": "roomStair" },
-        { "tile": "windowOpen", "fx": 12, "fy": 1, "room": "roomDark" }, { "tile": "windowOpen", "fx": 15, "fy": 1, "room": "roomLamp" }, { "tile": "window", "fx": 18, "fy": 1 },
-        { "tile": "acUnit", "fx": 15, "fy": 3 },
-        { "tile": "windowTv", "fx": 1, "fy": 4 }, { "tile": "window", "fx": 6, "fy": 4 },
-        { "tile": "windowWide", "fx": 11, "fy": 4 }, { "tile": "windowOpen", "fx": 16, "fy": 4, "room": "roomLamp" }
-      ]
-    },
-    {
-      "x": 22, "y": 13, "w": 16, "h": 5, "storeys": 9, "roofDepth": 3,
-      "face": "wallDark", "base": "brickDark", "top": "roof",
-      "cornice": "corniceDark", "plinth": "plinthDark",
-      "facade": [
-        { "tile": "fireEscape", "fx": 13, "fy": 1 },
-        { "tile": "window", "fx": 4, "fy": 1 }, { "tile": "windowOpen", "fx": 7, "fy": 1, "room": "roomStair" }, { "tile": "window", "fx": 10, "fy": 1 },
-        { "tile": "windowOpen", "fx": 4, "fy": 4, "room": "roomPlant" }, { "tile": "windowTv", "fx": 7, "fy": 4 }, { "tile": "windowLit", "fx": 10, "fy": 4 },
-        { "tile": "acUnit", "fx": 4, "fy": 6 },
-        { "tile": "window", "fx": 4, "fy": 7 }, { "tile": "windowOpen", "fx": 7, "fy": 7, "room": "roomLamp" }, { "tile": "windowOpen", "fx": 10, "fy": 7, "room": "roomDark" }
-      ]
-    },
-    {
-      "x": 38, "y": 13, "w": 24, "h": 5, "storeys": 10, "roofDepth": 3,
-      "face": "brick", "base": "brick", "top": "roof",
-      "facade": [
-        { "tile": "posterCase", "fx": 5, "fy": 0 }, { "tile": "posterCase", "fx": 7, "fy": 0 },
-        { "tile": "cinemaDoors", "fx": 9, "fy": 0 },
-        { "tile": "posterCase", "fx": 16, "fy": 0 }, { "tile": "posterCase", "fx": 18, "fy": 0 },
-
-        { "tile": "windowOpen", "fx": 1, "fy": 5, "room": "roomLamp" }, { "tile": "windowOpen", "fx": 3, "fy": 5, "room": "roomStair" },
-        { "tile": "windowOpen", "fx": 20, "fy": 5, "room": "roomPlant" }, { "tile": "windowOpen", "fx": 22, "fy": 5, "room": "roomDark" },
-        { "tile": "windowOpen", "fx": 1, "fy": 7, "room": "roomStair" }, { "tile": "windowLit", "fx": 3, "fy": 7 },
-        { "tile": "windowOpen", "fx": 20, "fy": 7, "room": "roomLamp" }, { "tile": "windowWarm", "fx": 22, "fy": 7 }
-      ],
-      "awning": { "fx": 1, "fw": 22, "up": 4, "h": 1, "tile": "marquee" },
-      "panels": [
-        { "fx": 6, "fw": 12, "h": 2, "up": 6, "text": "PIXEL CINEMA" },
-        {
-          "fx": 5, "fw": 15, "h": 3, "up": 9, "bg": "#1d2740",
-          "lines": [
-            { "text": "NOW SHOWING", "scale": 1 },
-            { "text": "8-BIT BLOCKBUSTER", "scale": 2, "color": "#fff2d2" }
-          ]
-        }
-      ],
-      "sign": { "fx": 0, "h": 3, "up": 4 }
-    },
-    {
-      "x": 66, "y": 13, "w": 20, "h": 5, "storeys": 5, "roofDepth": 3,
-      "face": "wallDark", "base": "brickDark", "top": "roof",
-      "cornice": "corniceDark", "plinth": "plinthDark",
-      "facade": [
-        { "tile": "window", "fx": 0, "fy": 1 }, { "tile": "windowWarm", "fx": 3, "fy": 1 }, { "tile": "window", "fx": 6, "fy": 1 },
-        { "tile": "windowOpen", "fx": 9, "fy": 1, "room": "roomStair" }, { "tile": "window", "fx": 12, "fy": 1 }, { "tile": "window", "fx": 15, "fy": 1 },
-        { "tile": "windowTv", "fx": 18, "fy": 1 },
-        { "tile": "windowOpen", "fx": 2, "fy": 3, "room": "roomLamp" }, { "tile": "window", "fx": 9, "fy": 3 }, { "tile": "windowOpen", "fx": 16, "fy": 3, "room": "roomPlant" }
-      ]
-    },
-    {
-      "x": 88, "y": 13, "w": 24, "h": 5, "storeys": 8, "roofDepth": 4,
-      "face": "brickDark", "base": "brickDark", "top": "roof",
-      "cornice": "corniceDark", "plinth": "plinthDark",
-      "facade": [
-        { "tile": "door", "fx": 11, "fy": 0 },
-        { "tile": "fireEscape", "fx": 22, "fy": 1 },
-        { "tile": "window", "fx": 0, "fy": 1 }, { "tile": "windowWarm", "fx": 3, "fy": 1 }, { "tile": "window", "fx": 6, "fy": 1 },
-        { "tile": "window", "fx": 14, "fy": 1 }, { "tile": "windowOpen", "fx": 17, "fy": 1, "room": "roomStair" }, { "tile": "window", "fx": 20, "fy": 1 },
-        { "tile": "acUnit", "fx": 6, "fy": 3 },
-        { "tile": "windowTv", "fx": 0, "fy": 4 }, { "tile": "window", "fx": 4, "fy": 4 }, { "tile": "windowOpen", "fx": 8, "fy": 4, "room": "roomLamp" },
-        { "tile": "window", "fx": 12, "fy": 4 }, { "tile": "windowOpen", "fx": 16, "fy": 4, "room": "roomDark" }, { "tile": "window", "fx": 20, "fy": 4 }
-      ]
-    }
-  ],
-  "streetlamps": [
-    { "x": 8, "y": 22 }, { "x": 22, "y": 22 }, { "x": 36, "y": 22 }, { "x": 44, "y": 22 }, { "x": 55, "y": 22 },
-    { "x": 64, "y": 22 }, { "x": 78, "y": 22 }, { "x": 92, "y": 22 }, { "x": 106, "y": 22 },
-    { "x": 6, "y": 32 }, { "x": 20, "y": 32 }, { "x": 46, "y": 32 }, { "x": 50, "y": 32 }, { "x": 64, "y": 32 },
-    { "x": 78, "y": 32 }, { "x": 92, "y": 32 }, { "x": 106, "y": 32 }
+  "cells": [
+   {
+    "x": 9,
+    "y": 19,
+    "tile": "paveCrack"
+   },
+   {
+    "x": 30,
+    "y": 20,
+    "tile": "paveCrack"
+   },
+   {
+    "x": 90,
+    "y": 20,
+    "tile": "paveCrack"
+   },
+   {
+    "x": 101,
+    "y": 19,
+    "tile": "paveCrack"
+   },
+   {
+    "x": 18,
+    "y": 34,
+    "tile": "paveCrack"
+   },
+   {
+    "x": 55,
+    "y": 36,
+    "tile": "paveCrack"
+   },
+   {
+    "x": 70,
+    "y": 47,
+    "tile": "paveCrack"
+   },
+   {
+    "x": 82,
+    "y": 45,
+    "tile": "paveCrack"
+   },
+   {
+    "x": 105,
+    "y": 44,
+    "tile": "paveCrack"
+   },
+   {
+    "x": 15,
+    "y": 41,
+    "tile": "paveStain"
+   },
+   {
+    "x": 58,
+    "y": 44,
+    "tile": "paveStain"
+   },
+   {
+    "x": 95,
+    "y": 42,
+    "tile": "paveStain"
+   },
+   {
+    "x": 5,
+    "y": 21,
+    "tile": "manhole"
+   },
+   {
+    "x": 34,
+    "y": 20,
+    "tile": "manhole"
+   },
+   {
+    "x": 68,
+    "y": 21,
+    "tile": "manhole"
+   },
+   {
+    "x": 99,
+    "y": 20,
+    "tile": "manhole"
+   },
+   {
+    "x": 12,
+    "y": 36,
+    "tile": "manhole"
+   },
+   {
+    "x": 44,
+    "y": 41,
+    "tile": "manhole"
+   },
+   {
+    "x": 88,
+    "y": 38,
+    "tile": "manhole"
+   },
+   {
+    "x": 13,
+    "y": 23,
+    "tile": "drainGrate"
+   },
+   {
+    "x": 33,
+    "y": 23,
+    "tile": "drainGrate"
+   },
+   {
+    "x": 57,
+    "y": 23,
+    "tile": "drainGrate"
+   },
+   {
+    "x": 74,
+    "y": 23,
+    "tile": "drainGrate"
+   },
+   {
+    "x": 97,
+    "y": 23,
+    "tile": "drainGrate"
+   },
+   {
+    "x": 3,
+    "y": 19,
+    "tile": "pavePatch"
+   },
+   {
+    "x": 17,
+    "y": 21,
+    "tile": "pavePatch"
+   },
+   {
+    "x": 28,
+    "y": 19,
+    "tile": "pavePatch"
+   },
+   {
+    "x": 63,
+    "y": 20,
+    "tile": "pavePatch"
+   },
+   {
+    "x": 80,
+    "y": 22,
+    "tile": "pavePatch"
+   },
+   {
+    "x": 93,
+    "y": 19,
+    "tile": "pavePatch"
+   },
+   {
+    "x": 108,
+    "y": 21,
+    "tile": "pavePatch"
+   },
+   {
+    "x": 24,
+    "y": 38,
+    "tile": "pavePatch"
+   },
+   {
+    "x": 61,
+    "y": 40,
+    "tile": "pavePatch"
+   },
+   {
+    "x": 99,
+    "y": 35,
+    "tile": "pavePatch"
+   },
+   {
+    "x": 7,
+    "y": 22,
+    "tile": "paveLitter"
+   },
+   {
+    "x": 20,
+    "y": 19,
+    "tile": "paveLitter"
+   },
+   {
+    "x": 37,
+    "y": 22,
+    "tile": "paveLitter"
+   },
+   {
+    "x": 45,
+    "y": 22,
+    "tile": "paveLitter"
+   },
+   {
+    "x": 54,
+    "y": 22,
+    "tile": "paveLitter"
+   },
+   {
+    "x": 66,
+    "y": 21,
+    "tile": "paveLitter"
+   },
+   {
+    "x": 77,
+    "y": 19,
+    "tile": "paveLitter"
+   },
+   {
+    "x": 86,
+    "y": 22,
+    "tile": "paveLitter"
+   },
+   {
+    "x": 104,
+    "y": 19,
+    "tile": "paveLitter"
+   },
+   {
+    "x": 113,
+    "y": 21,
+    "tile": "paveLitter"
+   },
+   {
+    "x": 31,
+    "y": 33,
+    "tile": "paveLitter"
+   },
+   {
+    "x": 72,
+    "y": 35,
+    "tile": "paveLitter"
+   },
+   {
+    "x": 110,
+    "y": 39,
+    "tile": "paveLitter"
+   },
+   {
+    "x": 48,
+    "y": 18,
+    "tile": "lobbyCarpet"
+   },
+   {
+    "x": 49,
+    "y": 18,
+    "tile": "lobbyCarpet"
+   },
+   {
+    "x": 50,
+    "y": 18,
+    "tile": "lobbyCarpet"
+   },
+   {
+    "x": 51,
+    "y": 18,
+    "tile": "lobbyCarpet"
+   },
+   {
+    "x": 47,
+    "y": 21,
+    "tile": "sidewalkStar"
+   },
+   {
+    "x": 49,
+    "y": 21,
+    "tile": "sidewalkStar"
+   },
+   {
+    "x": 51,
+    "y": 21,
+    "tile": "sidewalkStar"
+   },
+   {
+    "x": 47,
+    "y": 24,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 48,
+    "y": 24,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 49,
+    "y": 24,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 50,
+    "y": 24,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 51,
+    "y": 24,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 52,
+    "y": 24,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 47,
+    "y": 26,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 48,
+    "y": 26,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 49,
+    "y": 26,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 50,
+    "y": 26,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 51,
+    "y": 26,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 52,
+    "y": 26,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 47,
+    "y": 28,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 48,
+    "y": 28,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 49,
+    "y": 28,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 50,
+    "y": 28,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 51,
+    "y": 28,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 52,
+    "y": 28,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 47,
+    "y": 30,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 48,
+    "y": 30,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 49,
+    "y": 30,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 50,
+    "y": 30,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 51,
+    "y": 30,
+    "tile": "crosswalk"
+   },
+   {
+    "x": 52,
+    "y": 30,
+    "tile": "crosswalk"
+   }
   ]
+ },
+ "flat": {
+  "stripes": [
+   {
+    "y": 27,
+    "tile": "roadLine",
+    "step": 2,
+    "offset": 0
+   }
+  ]
+ },
+ "object": {
+  "cells": [
+   {
+    "x": 26,
+    "y": 47,
+    "tile": "grass"
+   },
+   {
+    "x": 95,
+    "y": 36,
+    "tile": "grass"
+   },
+   {
+    "x": 41,
+    "y": 20,
+    "tile": "newsBox"
+   },
+   {
+    "x": 59,
+    "y": 20,
+    "tile": "trashCan"
+   },
+   {
+    "x": 15,
+    "y": 20,
+    "tile": "trashCan"
+   },
+   {
+    "x": 96,
+    "y": 20,
+    "tile": "trashCan"
+   },
+   {
+    "x": 36,
+    "y": 34,
+    "tile": "trashCan"
+   },
+   {
+    "x": 84,
+    "y": 33,
+    "tile": "newsBox"
+   }
+  ]
+ },
+ "overhead": {
+  "cells": [
+   {
+    "x": 75,
+    "y": 36,
+    "tile": "awning"
+   }
+  ]
+ },
+ "props": [
+  {
+   "x": 40,
+   "y": 18,
+   "w": 2,
+   "tile": "ticketKiosk",
+   "solid": true,
+   "light": "window"
+  },
+  {
+   "x": 58,
+   "y": 18,
+   "w": 2,
+   "tile": "candyCart",
+   "solid": true,
+   "light": "window"
+  },
+  {
+   "x": 71,
+   "y": 21,
+   "w": 2,
+   "tile": "ticketKiosk",
+   "solid": true,
+   "light": "window",
+   "label": "NEWS"
+  },
+  {
+   "x": 11,
+   "y": 22,
+   "w": 1,
+   "tile": "hydrant"
+  },
+  {
+   "x": 69,
+   "y": 22,
+   "w": 1,
+   "tile": "hydrant"
+  },
+  {
+   "x": 103,
+   "y": 22,
+   "w": 1,
+   "tile": "hydrant"
+  },
+  {
+   "x": 29,
+   "y": 33,
+   "w": 1,
+   "tile": "hydrant"
+  },
+  {
+   "x": 45,
+   "y": 22,
+   "w": 1,
+   "tile": "bollard"
+  },
+  {
+   "x": 46,
+   "y": 22,
+   "w": 1,
+   "tile": "bollard"
+  },
+  {
+   "x": 53,
+   "y": 22,
+   "w": 1,
+   "tile": "bollard"
+  },
+  {
+   "x": 54,
+   "y": 22,
+   "w": 1,
+   "tile": "bollard"
+  },
+  {
+   "x": 18,
+   "y": 22,
+   "w": 2,
+   "tile": "planter",
+   "solid": true
+  },
+  {
+   "x": 87,
+   "y": 22,
+   "w": 2,
+   "tile": "planter",
+   "solid": true
+  },
+  {
+   "x": 40,
+   "y": 34,
+   "w": 2,
+   "tile": "planter",
+   "solid": true
+  },
+  {
+   "x": 39,
+   "y": 21,
+   "w": 2,
+   "tile": "aBoard"
+  },
+  {
+   "x": 74,
+   "y": 21,
+   "w": 2,
+   "tile": "aBoard"
+  }
+ ],
+ "platforms": [
+  {
+   "x": 30,
+   "y": 39,
+   "w": 12,
+   "h": 7,
+   "e": 2,
+   "top": "grass",
+   "face": "plinth"
+  }
+ ],
+ "buildings": [
+  {
+   "x": 0,
+   "y": 13,
+   "w": 22,
+   "h": 5,
+   "storeys": 7,
+   "roofDepth": 3,
+   "face": "wall",
+   "base": "brick",
+   "top": "roof",
+   "facade": [
+    {
+     "tile": "door",
+     "fx": 9,
+     "fy": 0
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 1,
+     "fy": 1,
+     "room": "roomPlant"
+    },
+    {
+     "tile": "window",
+     "fx": 3,
+     "fy": 1
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 6,
+     "fy": 1,
+     "room": "roomStair"
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 12,
+     "fy": 1,
+     "light": "window"
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 14,
+     "fy": 1
+    },
+    {
+     "tile": "window",
+     "fx": 18,
+     "fy": 1
+    },
+    {
+     "tile": "acUnit",
+     "fx": 15,
+     "fy": 3
+    },
+    {
+     "tile": "windowTv",
+     "fx": 1,
+     "fy": 4
+    },
+    {
+     "tile": "window",
+     "fx": 6,
+     "fy": 4
+    },
+    {
+     "tile": "windowWide",
+     "fx": 11,
+     "fy": 4
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 16,
+     "fy": 4,
+     "room": "roomLamp"
+    }
+   ],
+   "interior": [
+    {
+     "tile": "roomHall",
+     "fx": 11,
+     "fy": 1
+    }
+   ]
+  },
+  {
+   "x": 22,
+   "y": 13,
+   "w": 16,
+   "h": 5,
+   "storeys": 9,
+   "roofDepth": 3,
+   "face": "wallDark",
+   "base": "brickDark",
+   "top": "roof",
+   "cornice": "corniceDark",
+   "plinth": "plinthDark",
+   "facade": [
+    {
+     "tile": "fireEscape",
+     "fx": 13,
+     "fy": 1
+    },
+    {
+     "tile": "window",
+     "fx": 4,
+     "fy": 1
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 7,
+     "fy": 1,
+     "room": "roomStair"
+    },
+    {
+     "tile": "window",
+     "fx": 10,
+     "fy": 1
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 4,
+     "fy": 4,
+     "room": "roomPlant"
+    },
+    {
+     "tile": "windowTv",
+     "fx": 7,
+     "fy": 4
+    },
+    {
+     "tile": "windowLit",
+     "fx": 10,
+     "fy": 4
+    },
+    {
+     "tile": "acUnit",
+     "fx": 4,
+     "fy": 6
+    },
+    {
+     "tile": "window",
+     "fx": 4,
+     "fy": 7
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 7,
+     "fy": 7,
+     "light": "window"
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 9,
+     "fy": 7,
+     "light": "window"
+    }
+   ],
+   "interior": [
+    {
+     "tile": "roomFlat",
+     "fx": 6,
+     "fy": 7
+    }
+   ]
+  },
+  {
+   "x": 38,
+   "y": 13,
+   "w": 24,
+   "h": 5,
+   "storeys": 10,
+   "roofDepth": 3,
+   "face": "brick",
+   "base": "brick",
+   "top": "roof",
+   "facade": [
+    {
+     "tile": "posterCase",
+     "fx": 5,
+     "fy": 0
+    },
+    {
+     "tile": "posterCase",
+     "fx": 7,
+     "fy": 0
+    },
+    {
+     "tile": "cinemaDoors",
+     "fx": 9,
+     "fy": 0
+    },
+    {
+     "tile": "posterCase",
+     "fx": 16,
+     "fy": 0
+    },
+    {
+     "tile": "posterCase",
+     "fx": 18,
+     "fy": 0
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 1,
+     "fy": 5
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 3,
+     "fy": 5,
+     "light": "window"
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 20,
+     "fy": 5,
+     "room": "roomPlant"
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 22,
+     "fy": 5,
+     "room": "roomDark"
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 1,
+     "fy": 7,
+     "room": "roomStair"
+    },
+    {
+     "tile": "windowLit",
+     "fx": 3,
+     "fy": 7
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 20,
+     "fy": 7,
+     "room": "roomLamp"
+    },
+    {
+     "tile": "windowWarm",
+     "fx": 22,
+     "fy": 7
+    }
+   ],
+   "awning": {
+    "fx": 1,
+    "fw": 22,
+    "up": 4,
+    "h": 1,
+    "tile": "marquee"
+   },
+   "panels": [
+    {
+     "fx": 6,
+     "fw": 12,
+     "h": 2,
+     "up": 6,
+     "text": "PIXEL CINEMA"
+    },
+    {
+     "fx": 5,
+     "fw": 15,
+     "h": 3,
+     "up": 9,
+     "bg": "#1d2740",
+     "lines": [
+      {
+       "text": "NOW SHOWING",
+       "scale": 1
+      },
+      {
+       "text": "8-BIT BLOCKBUSTER",
+       "scale": 2,
+       "color": "#fff2d2"
+      }
+     ]
+    }
+   ],
+   "sign": {
+    "fx": 0,
+    "h": 3,
+    "up": 4
+   },
+   "interior": [
+    {
+     "tile": "roomHall",
+     "fx": 0,
+     "fy": 5
+    }
+   ]
+  },
+  {
+   "x": 66,
+   "y": 13,
+   "w": 20,
+   "h": 5,
+   "storeys": 5,
+   "roofDepth": 3,
+   "face": "wallDark",
+   "base": "brickDark",
+   "top": "roof",
+   "cornice": "corniceDark",
+   "plinth": "plinthDark",
+   "facade": [
+    {
+     "tile": "window",
+     "fx": 0,
+     "fy": 1
+    },
+    {
+     "tile": "windowWarm",
+     "fx": 3,
+     "fy": 1
+    },
+    {
+     "tile": "window",
+     "fx": 6,
+     "fy": 1
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 9,
+     "fy": 1,
+     "room": "roomStair"
+    },
+    {
+     "tile": "window",
+     "fx": 12,
+     "fy": 1
+    },
+    {
+     "tile": "window",
+     "fx": 15,
+     "fy": 1
+    },
+    {
+     "tile": "windowTv",
+     "fx": 18,
+     "fy": 1
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 2,
+     "fy": 3,
+     "light": "window"
+    },
+    {
+     "tile": "window",
+     "fx": 9,
+     "fy": 3
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 4,
+     "fy": 3
+    }
+   ],
+   "interior": [
+    {
+     "tile": "roomFlat",
+     "fx": 1,
+     "fy": 3
+    }
+   ]
+  },
+  {
+   "x": 88,
+   "y": 13,
+   "w": 24,
+   "h": 5,
+   "storeys": 8,
+   "roofDepth": 4,
+   "face": "brickDark",
+   "base": "brickDark",
+   "top": "roof",
+   "cornice": "corniceDark",
+   "plinth": "plinthDark",
+   "facade": [
+    {
+     "tile": "door",
+     "fx": 11,
+     "fy": 0
+    },
+    {
+     "tile": "fireEscape",
+     "fx": 22,
+     "fy": 1
+    },
+    {
+     "tile": "window",
+     "fx": 0,
+     "fy": 1
+    },
+    {
+     "tile": "windowWarm",
+     "fx": 3,
+     "fy": 1
+    },
+    {
+     "tile": "window",
+     "fx": 6,
+     "fy": 1
+    },
+    {
+     "tile": "window",
+     "fx": 14,
+     "fy": 1
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 17,
+     "fy": 1,
+     "room": "roomStair"
+    },
+    {
+     "tile": "window",
+     "fx": 20,
+     "fy": 1
+    },
+    {
+     "tile": "acUnit",
+     "fx": 6,
+     "fy": 3
+    },
+    {
+     "tile": "windowTv",
+     "fx": 0,
+     "fy": 4
+    },
+    {
+     "tile": "window",
+     "fx": 4,
+     "fy": 4
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 8,
+     "fy": 4
+    },
+    {
+     "tile": "window",
+     "fx": 12,
+     "fy": 4
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 10,
+     "fy": 4,
+     "light": "window"
+    },
+    {
+     "tile": "window",
+     "fx": 20,
+     "fy": 4
+    }
+   ],
+   "interior": [
+    {
+     "tile": "roomHall",
+     "fx": 7,
+     "fy": 4
+    }
+   ]
+  }
+ ],
+ "streetlamps": [
+  {
+   "x": 8,
+   "y": 22
+  },
+  {
+   "x": 22,
+   "y": 22
+  },
+  {
+   "x": 36,
+   "y": 22
+  },
+  {
+   "x": 44,
+   "y": 22
+  },
+  {
+   "x": 55,
+   "y": 22
+  },
+  {
+   "x": 64,
+   "y": 22
+  },
+  {
+   "x": 78,
+   "y": 22
+  },
+  {
+   "x": 92,
+   "y": 22
+  },
+  {
+   "x": 106,
+   "y": 22
+  },
+  {
+   "x": 6,
+   "y": 32
+  },
+  {
+   "x": 20,
+   "y": 32
+  },
+  {
+   "x": 46,
+   "y": 32
+  },
+  {
+   "x": 50,
+   "y": 32
+  },
+  {
+   "x": 64,
+   "y": 32
+  },
+  {
+   "x": 78,
+   "y": 32
+  },
+  {
+   "x": 92,
+   "y": 32
+  },
+  {
+   "x": 106,
+   "y": 32
+  }
+ ]
 }

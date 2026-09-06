@@ -177,11 +177,17 @@ export const TILE_PALETTE = {
   // Terrazzo: the dark inset a sidewalk star sits in.
   O: '#3b3735',
 
-  // The cinema door's own glass -- warm amber, not the ordinary window's
-  // cold blue-grey (`I`/`i`): per user reference, the entrance glows with
-  // interior light spilling out, not a dark reflective pane.
-  M: '#f0c274',
-  R: '#b8863f',
+  // A LIT window's glass, on the buildings whose interiors are painted rather
+  // than seen through (WINDOW_LIT, WINDOW_WARM, WINDOW_STAIR -- the cheap
+  // version, for background buildings where nobody can tell). These were the
+  // cinema door's glass too, which is why they were authored near-white: the
+  // entrance was supposed to glow. The doors are real joinery now and no
+  // longer use them, so these are free to be what a lit room actually looks
+  // like from across a street -- warm, but a long way from the brightest
+  // thing in the frame. At the old values every painted lit window blew out
+  // to a flat cream rectangle with nothing readable in it.
+  M: '#b9a78c',
+  R: '#8f7c5f',
 
   // --- cinema signage ------------------------------------------------------
   // The reference's marquee is built from four things this set had no colour
@@ -218,6 +224,79 @@ export const TILE_PALETTE = {
   '#': '#3c1e22', // door leaf
   '~': '#2a1418', // leaf panel, rebated -- and the bottom rail's own shadow
   '^': '#55292c', // top rail, the one edge the marquee above actually reaches
+};
+
+/**
+ * Interior palette. A third namespace, for the same reason the tile palette is
+ * a second one: a room is drawn on its own layer, behind the wall, and the
+ * things it is made of (a dado rail, a stair tread, a picture frame) have
+ * nothing to say about a pavement. The tile palette has no letters left --
+ * every one of a-z and A-Z is spoken for -- so sharing it would mean spending
+ * punctuation on a wainscot.
+ *
+ * **This exists because three tones could not describe a room.** Every lit
+ * room in the set was drawn in `M`, `R` and `X`: two saturated ambers and the
+ * window frame's own shadow tone borrowed as "dark". There was no wall colour
+ * in that vocabulary at all, so a room could only ever be a glowing rectangle,
+ * which is exactly how they read. The reference's rooms are a neutral cream
+ * wall over a maroon dado, and no amount of re-toning gets there from two
+ * ambers.
+ *
+ * **Light direction is authored in.** The world outside is lit by a shader;
+ * a room is not -- it is a flat image hung behind a hole, and the Light2D
+ * pass reaches it as one nearly-uniform wash. So the interior's own key comes
+ * from the paint: upper-left, consistent across every room. The wall steps
+ * down in three tones from the window head to the floor, tread nosings catch
+ * it, balusters are lit down their left edge, and the underside of a stair
+ * flight is the darkest thing in the set. Without that a room is a flat
+ * cutout however good its silhouette is.
+ */
+export const ROOM_PALETTE = {
+  w: '#b3a89b', // wall, at the window head where the light comes in
+  W: '#948a7e', // wall, mid
+  n: '#756d63', // wall, down at the floor -- the vertical falloff, in paint
+
+  d: '#66353a', // dado / wainscot panelling below the rail
+  D: '#4b262b', // dado, in shadow
+  r: '#3a2d28', // rail, skirting, handrail -- dark stained timber
+  R: '#54443c', // the same timber where the light catches its top edge
+
+  t: '#a4988a', // stair tread nosing: the lit edge that makes a stair a stair
+  T: '#786e64', // tread riser, turned away from the light
+  s: '#241d1a', // the soffit under a flight -- the darkest tone in the set
+
+  b: '#5a3035', // baluster
+  B: '#3c2226', // baluster, its shaded right-hand side
+
+  f: '#8a6a3c', // picture frame, gilt
+  a: '#33553f', // picture, in its own colours
+  A: '#4b7355', // picture, its lit half
+
+  o: '#5c4a3e', // interior door / cupboard front
+  O: '#41342b', // that door, in shadow
+
+  l: '#e8cfa0', // a lamp's own glass -- the brightest thing in any room
+  L: '#8a6f4e', // its shade and the bloom immediately around it
+
+  x: '#191417', // an unlit doorway, or a room with nobody home
+  X: '#241e22', // the same, a step off it, so a dark room still has shape
+};
+
+/**
+ * Relief for ROOM_PALETTE, same idea as TILE_HEIGHT -- but shallower, because
+ * everything in a room is seen through glass from across a street and a bold
+ * normal on a dado rail buys nothing at that distance. What it does buy is
+ * the stair reading as stepped rather than as a smooth ramp.
+ */
+export const ROOM_HEIGHT = {
+  r: 1, R: 1,     // rail and skirting stand proud of the wall
+  t: 1, T: -1,    // a tread's nosing juts, its riser sets back
+  s: -2,          // the soffit is a real void behind the flight
+  b: 1, B: 1,     // balusters are turnings, in front of the wall
+  f: 1,           // a picture frame hangs off the wall
+  a: -1, A: -1,   // its canvas sits back inside that frame
+  d: -1, D: -1,   // panelling is rebated behind its own rail
+  o: -1, O: -1,
 };
 
 /**

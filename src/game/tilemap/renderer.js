@@ -106,6 +106,25 @@ const PARALLAX_MAX = 4;
  *  it can never tie with a whole-pixel structure depth. */
 const DEPTH_INTERIOR_BEHIND = 0.2;
 
+/**
+ * A flat multiplier on the interior layer, applied before the lighting pass.
+ *
+ * A lit window registers a light AT the window (see `_lights`), and the room
+ * behind it is a separate image sitting a fraction of a pixel away in depth
+ * -- so Light2D, which only knows 2D distance, puts that light essentially
+ * on top of the room and lights it at nearly full attenuation. The result was
+ * a lit room blowing out to a flat cream rectangle with its own furniture
+ * washed off it: the one window on the street where you can actually see a
+ * room was the one where you could not.
+ *
+ * This stands in for the depth the shader cannot see. It is also just true of
+ * glass -- an interior read through a pane is dimmer than the same interior
+ * in the open -- and it is what lets the rooms keep the light direction that
+ * is authored into them (see ROOM_PALETTE) instead of having it flattened by
+ * a light source parked on the glass.
+ */
+const INTERIOR_TINT = 0x8a8a8a;
+
 /** The room shown behind a see-through window that does not name one. An
  *  unlit room rather than nothing: a hole with nothing behind it is a hole. */
 const DEFAULT_ROOM = 'roomDark';
@@ -483,12 +502,30 @@ export class TileMapRenderer {
     // wall is the same distance behind it, so they share a parallax offset,
     // and a single image is one draw call instead of one per window.
     const rooms = (b.facade ?? []).filter((d) => frameOpening(this.scene, d.tile));
+    /** Building-wide interior art (`interior`), placed in the same face space
+     *  the facade uses. This is what lets one room be seen through several
+     *  windows: a `roomHall` strip four tiles wide sits behind two openings,
+     *  so its staircase climbs past the mullion between them and its dado
+     *  rail runs unbroken across both. Centring a room on its own opening --
+     *  which is all there was before, and is still what `room` does below --
+     *  cannot express that, because each window is then a sealed diorama and
+     *  nothing may cross between two of them. */
+    const interior = b.interior ?? [];
     if (rooms.length) {
       const interiorKey = bake(this.scene, b.w * TILE, faceH, (g) => {
+        for (const it of interior) {
+          const rs = frameSize(this.scene, it.tile);
+          g.tile(it.tile, it.fx * TILE, faceH - (it.fy ?? 0) * TILE - rs.h);
+        }
         for (const d of rooms) {
+          // A building with an `interior` needs no per-window default: what
+          // is behind the glass is the strip. Without one, an opening that
+          // names no room still gets an unlit flat rather than a hole into
+          // nothing.
+          const room = d.room ?? (interior.length ? null : DEFAULT_ROOM);
+          if (!room) continue;
           const size = frameSize(this.scene, d.tile);
           const op = frameOpening(this.scene, d.tile);
-          const room = d.room ?? DEFAULT_ROOM;
           const rs = frameSize(this.scene, room);
           const localY = faceH - (d.fy ?? 0) * TILE - size.h;
           // Centre the room on its opening, so its overhang -- the parallax
@@ -499,6 +536,7 @@ export class TileMapRenderer {
         }
       });
       const img = this._place(interiorKey, b.x * TILE, faceTop, frontY - DEPTH_INTERIOR_BEHIND);
+      img.setTint(INTERIOR_TINT);
       this._interiors.push({
         img, baseX: b.x * TILE, centreX: (b.x + b.w / 2) * TILE,
         baseY: faceTop, centreY: faceTop + faceH / 2,
@@ -551,7 +589,14 @@ export class TileMapRenderer {
         // a sticker, not a lamp.
         // A see-through window's light comes from its room; a painted one's
         // from its own art. Either way it is one light at the opening.
-        const emits = LIT_FACADE[d.tile] ?? (opening ? LIT_ROOMS[d.room ?? DEFAULT_ROOM] : undefined);
+        // `d.light` is how an opening into a building-wide interior says it
+        // is lit: the strip behind it is shared by several windows and cannot
+        // answer "is THIS pane lit", which is a fact about the window, not
+        // about the room -- a dark stairwell with one lit landing is one
+        // interior and two different windows.
+        const emits = LIT_FACADE[d.tile]
+          ?? d.light
+          ?? (opening ? LIT_ROOMS[d.room ?? DEFAULT_ROOM] : undefined);
         if (emits) {
           this._lights.push({
             x: b.x * TILE + localX + size.w / 2,
