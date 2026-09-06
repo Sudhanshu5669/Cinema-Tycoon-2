@@ -28,7 +28,7 @@
 import {
   TILE, STEP, DEPTH_GROUND, DEPTH_OVERHEAD, footY, surfaceY,
 } from './projection.js';
-import { preloadTiles, tilesReady, bake, frameSize, TILES_KEY } from './atlas.js';
+import { preloadTiles, tilesReady, bake, frameSize, frameOpening, TILES_KEY } from './atlas.js';
 import { measureWidth, CHAR_H } from './font.js';
 import {
   BULB, SIGN_LINE_GAP, SIGN_GOLD, SIGN_FIELD_COLOR, SIGN_BACK_COLOR,
@@ -59,7 +59,7 @@ const FACADE_LABELS = {
   // clear for one, so a plate lands straight on the striped hood (tried, and
   // it looked exactly like that), and at 32px across two lit popcorn boxes
   // say "candy" more legibly than five letters at scale 1 ever will.
-  ticketKiosk: { text: 'TICKET', y: 8 },
+  ticketKiosk: { text: 'TICKET', y: 7 },
 };
 const LABEL_SCALE = 1;
 const PLAQUE_BG_COLOR = '#201c26';
@@ -73,6 +73,36 @@ const PLAQUE_BG_COLOR = '#201c26';
 const ALCOVE_COLOR = '#1b1218';
 const ALCOVE_GLOW_COLOR = '#ffca7d';  // palette '@'
 const ALCOVE_MARGIN = 4;
+
+/**
+ * How far a building's interior layer slides against its own facade as the
+ * camera passes, and the cap on it, in world px.
+ *
+ * This is the whole reason a see-through window is worth more than a painted
+ * one. A painted interior is stuck to the wall: walk past it and it tracks the
+ * bricks exactly, which is what tells the eye it is a picture of a room rather
+ * than a room. A real one is a few feet *behind* the wall plane, so it moves
+ * less than the wall does -- the parallax that every 2D game with a
+ * multi-layer backdrop uses for depth, applied here through a hole the size of
+ * a window instead of across the whole screen.
+ *
+ * Driven from the camera's offset from each building (see `update`), never
+ * from Phaser's `scrollFactor`: a scroll factor is applied to *absolute*
+ * scroll, so at the far end of a 1920px map it would displace a room by
+ * thirty pixels and swing it clean out of its own window. The cap is sized
+ * against the margin the ROOM_* art carries beyond its opening (6px each
+ * side), so the room can never run out of itself.
+ */
+const PARALLAX = 0.02;
+const PARALLAX_MAX = 4;
+
+/** Interiors sit just behind the facade they are seen through. Fractional so
+ *  it can never tie with a whole-pixel structure depth. */
+const DEPTH_INTERIOR_BEHIND = 0.2;
+
+/** The room shown behind a see-through window that does not name one. An
+ *  unlit room rather than nothing: a hole with nothing behind it is a hole. */
+const DEFAULT_ROOM = 'roomDark';
 
 /**
  * Facade tiles whose own art is lit from inside, and the kind of light each
@@ -97,6 +127,21 @@ const ALCOVE_MARGIN = 4;
  * So the rule is now simply: a tile emits light if, and only if, its own
  * authored art has warm interior in it.
  */
+/**
+ * Rooms bright enough to throw light out of the window they sit behind, and
+ * the kind of light that is.
+ *
+ * A see-through window is not on LIT_FACADE and cannot be: the frame is just
+ * glass, and whether light comes out of it is a fact about the *room*, not
+ * about the pane. `roomDark` is absent, which is the whole point -- an unlit
+ * flat is a real room you can see into that happens to be dark, and it emits
+ * nothing. That is the same rule LIT_FACADE now follows (a tile emits iff its
+ * own art is lit), just applied one layer further back.
+ */
+const LIT_ROOMS = {
+  roomStair: 'window', roomLamp: 'window', roomPlant: 'window',
+};
+
 const LIT_FACADE = {
   // `window` and `windowWide` are absent for exactly that reason -- both are
   // authored with cold `i`/`I` glass, so both are unlit windows and neither
@@ -146,6 +191,9 @@ export class TileMapRenderer {
     this._lights = [];
     /** @type {LightingLayer | null} set by build(). */
     this.lighting = null;
+    /** Per-building interior layers -- see _buildBuilding's `rooms` pass and
+     *  `update`'s parallax. `{ img, baseX, centreX }`. */
+    this._interiors = [];
     /** World-space bulb centres, one perimeter-ordered ring per signboard --
      *  filled as panels are built, consumed by the chase. */
     this._bulbRings = [];
@@ -157,6 +205,9 @@ export class TileMapRenderer {
     this.glow = null;
     /** Current hour driving the cast shadows and the lighting layer. */
     this.hours = 12;
+    /** Live-tunable scale on the interior parallax -- 1 is PARALLAX as
+     *  authored, 0 pins every room to its wall. Driven by the dev menu. */
+    this.parallaxScale = 1;
   }
 
   // --- queries other systems lean on ---------------------------------------
@@ -258,7 +309,60 @@ export class TileMapRenderer {
     this.chase?.update(timeMs);
     this.lighting?.update(timeMs);
     this.glow?.update(timeMs);
+    this._updateParallax();
   }
+
+  /**
+   * Slide each building's interior layer against its own facade, by how far
+   * the camera is off to one side of that building.
+   *
+   * The sign is the part worth stating, because it is the opposite of the
+   * instinct: standing to the RIGHT of a window you see the part of the room
+   * that is further LEFT, so to put that part in the opening the room image
+   * has to move right, *with* the camera. Get it backwards and the effect is
+   * just as strong and reads as the room being in front of the wall.
+   */
+  _updateParallax() {
+    if (!this._interiors.length) return;
+    const cam = this.scene.cameras.main;
+    const camCentre = cam.scrollX + cam.width / 2;
+    for (const it of this._interiors) {
+      const off = (camCentre - it.centreX) * PARALLAX * this.parallaxScale;
+      it.img.x = it.baseX + Math.max(-PARALLAX_MAX, Math.min(PARALLAX_MAX, off));
+    }
+  }
+
+  /**
+   * Show or hide one visual layer by name. A dev-menu affordance, not a
+   * gameplay one: the fastest way to tell what a layer is actually
+   * contributing is to switch it off and look at what changed.
+   * @param {'shadows'|'glow'|'chase'|'interiors'} name @param {boolean} on
+   */
+  setLayerVisible(name, on) {
+    if (name === 'shadows') {
+      if (this.shadows) {
+        this.shadows.image.setVisible(on && this.shadows.image.alpha > 0);
+        this.shadows.playerImage?.setVisible(on);
+        for (const l of this.shadows.surfaceLayers) l.image.setVisible(on && l.image.visible);
+      }
+    } else if (name === 'glow' && this.glow) {
+      this.glow.enabled = on;
+      this.glow.refresh(this.hours);
+    } else if (name === 'chase' && this.chase) {
+      this.chase.enabled = on;
+      this.chase.refresh(this.hours);
+    } else if (name === 'interiors') {
+      for (const it of this._interiors) it.img.setVisible(on);
+    }
+  }
+
+  /** How many buildings carry an interior layer -- see-through windows had to
+   *  find at least one room to build one. For the smoke test. */
+  get interiorCount() { return this._interiors.length; }
+
+  /** Each interior layer's current parallax offset against its own facade, in
+   *  px. For the smoke test -- see _updateParallax. */
+  interiorOffsets() { return this._interiors.map((it) => it.img.x - it.baseX); }
 
   _place(key, x, y, depth) {
     const img = this.scene.add.image(x, y, key).setOrigin(0, 0);
@@ -353,12 +457,50 @@ export class TileMapRenderer {
       wall: b.face ?? 'wall', base: b.base ?? 'brick',
       cornice: b.cornice ?? 'cornice', plinth: b.plinth ?? 'plinth',
     });
+    // Interior layer: whatever is visible through this building's see-through
+    // windows, baked as one image the size of the face and hung just behind
+    // it. Built first because the face bake below decides where the holes go,
+    // and both have to agree on that to the pixel.
+    //
+    // One layer per building, not one per window: every room behind the same
+    // wall is the same distance behind it, so they share a parallax offset,
+    // and a single image is one draw call instead of one per window.
+    const rooms = (b.facade ?? []).filter((d) => frameOpening(this.scene, d.tile));
+    if (rooms.length) {
+      const interiorKey = bake(this.scene, b.w * TILE, faceH, (g) => {
+        for (const d of rooms) {
+          const size = frameSize(this.scene, d.tile);
+          const op = frameOpening(this.scene, d.tile);
+          const room = d.room ?? DEFAULT_ROOM;
+          const rs = frameSize(this.scene, room);
+          const localY = faceH - (d.fy ?? 0) * TILE - size.h;
+          // Centre the room on its opening, so its overhang -- the parallax
+          // margin -- is even on every side.
+          g.tile(room,
+            d.fx * TILE + op.x - (rs.w - op.w) / 2,
+            localY + op.y - (rs.h - op.h) / 2);
+        }
+      });
+      const img = this._place(interiorKey, b.x * TILE, faceTop, frontY - DEPTH_INTERIOR_BEHIND);
+      this._interiors.push({
+        img, baseX: b.x * TILE, centreX: (b.x + b.w / 2) * TILE,
+      });
+    }
+
     const faceKey = bake(this.scene, b.w * TILE, faceH, (g) => {
       rows.forEach((frame, r) => g.fill(frame, 0, r * TILE, b.w * TILE, TILE));
       for (const d of b.facade ?? []) {
         const size = frameSize(this.scene, d.tile);
         const localY = faceH - (d.fy ?? 0) * TILE - size.h;
         const localX = d.fx * TILE;
+
+        // A see-through tile is a hole in the wall, so take the wall out
+        // before drawing it. The punch is the opening's bounding box and the
+        // tile goes on top, so the mullion and transom inside that box are
+        // painted straight back over the hole and end up dividing the room
+        // behind into real panes.
+        const opening = frameOpening(this.scene, d.tile);
+        if (opening) g.cut(localX + opening.x, localY + opening.y, opening.w, opening.h);
 
         // A theatre door bank sits recessed, not glued flat to the wall: a
         // dark alcove drawn first, wider on every side but the bottom (which
@@ -389,7 +531,10 @@ export class TileMapRenderer {
         // this list because their own art is lit from inside: a glowing
         // booth that casts no light on the pavement in front of it reads as
         // a sticker, not a lamp.
-        if (LIT_FACADE[d.tile]) {
+        // A see-through window's light comes from its room; a painted one's
+        // from its own art. Either way it is one light at the opening.
+        const emits = LIT_FACADE[d.tile] ?? (opening ? LIT_ROOMS[d.room ?? DEFAULT_ROOM] : undefined);
+        if (emits) {
           this._lights.push({
             x: b.x * TILE + localX + size.w / 2,
             y: faceTop + localY + size.h / 2,
@@ -401,7 +546,7 @@ export class TileMapRenderer {
             // skews the shadow's direction to match -- see gy on the
             // streetlamp below for the same mistake, actually made once.
             gx: b.x * TILE + localX + size.w / 2, gy: frontY,
-            kind: LIT_FACADE[d.tile],
+            kind: emits,
           });
         }
 

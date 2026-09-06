@@ -48,10 +48,26 @@ export function frameSize(scene, name) {
 }
 
 /**
+ * The see-through opening in a named frame, in that frame's own pixel
+ * coordinates, or null if the art is solid.
+ *
+ * Derived at build time from the authored grid, never declared here -- see
+ * `openingOf` in tools/build-tiles-sheet.mjs for the rule (transparency that
+ * does not touch the frame's edge). It rides into the runtime on the frame's
+ * own atlas entry, which Phaser clones wholesale onto `Frame#customData`, so
+ * there is no second file mapping tile names to holes and therefore no second
+ * file to fall out of step with the art.
+ */
+export function frameOpening(scene, name) {
+  return scene.textures.getFrame(TILES_KEY, name).customData?.opening ?? null;
+}
+
+/**
  * Bake a w x h canvas texture. `paint` is called with a small painter:
  *   p.tile(name, dx, dy)              one frame at a pixel offset
  *   p.fill(name, x0, y0, w, h)        tile a frame across a rect (clipped)
  *   p.rect(color, x0, y0, w, h)       a flat filled rect, no atlas frame
+ *   p.cut(x0, y0, w, h)               erase a rect back to transparent
  *   p.text(str, x0, y0, scale, color, font) baked, data-driven signage (font.js)
  * Returns a unique texture key; add it with scene.add.image(x, y, key).
  *
@@ -117,6 +133,22 @@ export function bake(scene, w, h, paint) {
     rect(color, x0, y0, rw, rh) {
       ctx.fillStyle = color;
       ctx.fillRect(Math.round(x0), Math.round(y0), Math.round(rw), Math.round(rh));
+    },
+    /**
+     * Punch a hole. The one op here that *removes* rather than adds, and the
+     * only way a baked composite can be seen through -- drawing a tile whose
+     * own pixels are transparent does not erase the wall already painted
+     * underneath it, it just leaves that wall showing.
+     *
+     * Clears the normal canvas in lockstep. Strictly that is invisible (a
+     * fully transparent pixel is never shaded, so whatever normal sits behind
+     * it cannot matter), but leaving a flat normal in a hole would be one
+     * more place where the two canvases say different things about the same
+     * pixel, and this file's whole discipline is that they never do.
+     */
+    cut(x0, y0, rw, rh) {
+      ctx.clearRect(Math.round(x0), Math.round(y0), Math.round(rw), Math.round(rh));
+      nctx?.clearRect(Math.round(x0), Math.round(y0), Math.round(rw), Math.round(rh));
     },
     text(str, x0, y0, scale, color, font) {
       drawText(ctx, str, x0, y0, scale, color, font);

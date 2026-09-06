@@ -66,6 +66,10 @@ export class BulbChase {
     /** @type {{images: Phaser.GameObjects.Image[]}[]} */
     this.rings = [];
     this._lit = 0;
+    /** Bulbs travelled per second, and whether the chase runs at all. Both
+     *  live-settable from the dev menu -- see SPEED for the authored value. */
+    this.speed = SPEED;
+    this.enabled = true;
     if (!this.active) return;
 
     const key = bakeGradient(scene, 'glow-bulb', BULB_GLOW_R);
@@ -87,7 +91,7 @@ export class BulbChase {
     if (!this.active) return;
     const { color, intensity } = glowFor(hours, 'marquee');
     this._lit = intensity;
-    const on = intensity > 0.004;
+    const on = this.enabled && intensity > 0.004;
     for (const ring of this.rings) {
       for (const img of ring.images) {
         img.setVisible(on);
@@ -104,7 +108,7 @@ export class BulbChase {
    */
   update(timeMs) {
     if (!this.active || this._lit <= 0.004) return;
-    const t = (timeMs / 1000) * SPEED;
+    const t = (timeMs / 1000) * this.speed;
     for (const ring of this.rings) {
       const n = ring.images.length;
       if (!n) continue;
@@ -126,6 +130,10 @@ export class BulbChase {
       }
     }
   }
+
+  /** Re-apply at the current hour -- setHours memoises nothing here, but the
+   *  visibility it sets depends on `enabled`, so a toggle needs a re-run. */
+  refresh(hours) { this.setHours(hours); }
 
   destroy() {
     for (const ring of this.rings) for (const img of ring.images) img.destroy();

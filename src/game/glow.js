@@ -148,6 +148,11 @@ export class GlowLayer {
     this.scene = scene;
     this.active = scene.renderer?.type === Phaser.WEBGL;
     this._bucket = null;
+    /** Global multiplier on every glow's alpha. 1 is as authored; the dev
+     *  menu drives it so the layer can be tuned against a live scene rather
+     *  than by editing PEAK and reloading. */
+    this.strength = 1;
+    this.enabled = true;
     /** @type {{halo: Phaser.GameObjects.Image, pool: Phaser.GameObjects.Image|null, kind: string, peak: number}[]} */
     this.glows = [];
     if (!this.active) return;
@@ -207,11 +212,11 @@ export class GlowLayer {
 
     for (const g of this.glows) {
       const { color, intensity } = glowFor(hours, g.kind);
-      const a = g.peak * intensity;
+      const a = g.peak * intensity * this.strength;
       // Hidden rather than alpha-0 in full daylight: an invisible object is
       // skipped before it reaches the batch at all, so the whole layer costs
       // literally nothing for the two thirds of the day it is switched off.
-      const on = a > 0.004;
+      const on = this.enabled && a > 0.004;
       g.halo.setVisible(on);
       g.pool?.setVisible(on);
       if (!on) continue;
@@ -241,6 +246,12 @@ export class GlowLayer {
       g.pool?.setAlpha(v * g.poolStrength * 0.55);
     }
   }
+
+  /** Re-apply at the current hour. `setHours` short-circuits on an unchanged
+   *  hour bucket, so anything that changes what an hour *means* -- strength,
+   *  enabled -- has to clear that memo or the change lands on the next hour
+   *  the player happens to cross and not before. */
+  refresh(hours) { this._bucket = null; this.setHours(hours); }
 
   destroy() {
     for (const g of this.glows) { g.halo.destroy(); g.pool?.destroy(); }

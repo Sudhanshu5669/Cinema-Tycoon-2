@@ -183,6 +183,12 @@ export function loadCityMap(raw, scene) {
         errs.push(`${dlabel}: fx=${d.fx} outside the building's own width ${b.w}`);
       }
       if (d.fy !== undefined && !(Number.isInteger(d.fy) && d.fy >= 0)) errs.push(`${dlabel}: fy must be a non-negative integer, got ${d.fy}`);
+      // `room` is what shows through a see-through window (renderer.js's
+      // interior layer). Only the tile name is checked here -- whether the
+      // window it is behind actually has a hole in it is a fact the atlas
+      // carries, so the renderer is the honest place for that, and an unused
+      // `room` is inert rather than wrong.
+      if (d.room !== undefined && !validTile(d.room)) errs.push(`${dlabel}.room: unknown tile "${d.room}"`);
     });
     if (b.awning) {
       const { fx, fw } = b.awning;

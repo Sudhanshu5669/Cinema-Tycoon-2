@@ -548,19 +548,43 @@ await page.screenshot({ path: path.join(OUT, 'city-glow-night.png') });
 // sort against the player by its own contact row.
 const props = await page.evaluate(() => window.__dev.tiles());
 check('the map builds freestanding props', props.propCount > 0, `${props.propCount} props`);
-// The candy cart stands on tiles 55-56 of row 21 -- world x 880..912, ground
-// row y 336..352 -- and is marked solid.
-const cartProbe = await page.evaluate(() => window.__dev.probe(896, 344));
+// The candy stall projects from the cinema frontage on tiles 58-59 of row 18
+// -- world x 928..960, ground row y 288..304 -- and is marked solid.
+const cartProbe = await page.evaluate(() => window.__dev.probe(944, 296));
 check('a prop marked solid blocks like a building does', cartProbe.solid === true);
-const openProbe = await page.evaluate(() => window.__dev.probe(896, 376));
-check('the pavement one row south of it is still walkable', openProbe.solid === false);
-await page.evaluate(() => window.__dev.warp(896, 380));
+const openProbe = await page.evaluate(() => window.__dev.probe(944, 328));
+check('the pavement two rows south of it is still walkable', openProbe.solid === false);
+await page.evaluate(() => window.__dev.warp(944, 348));
 await hold(page, 'ArrowUp', 700);
 const blocked = await state(page);
-check('walking into a prop stops the player short of it', blocked.y > 352,
-  `stopped at y ${blocked.y.toFixed(1)}, prop footprint ends at 352`);
+check('walking into a prop stops the player short of it', blocked.y > 304,
+  `stopped at y ${blocked.y.toFixed(1)}, prop footprint ends at 304`);
 check('the player never enters the prop\'s footprint',
-  (await page.evaluate((y) => window.__dev.probe(896, y), blocked.y)).solid === false);
+  (await page.evaluate((y) => window.__dev.probe(944, y), blocked.y)).solid === false);
+
+// --- see-through windows ---------------------------------------------------
+// The other kind of hole in a wall. A painted interior and a real one look
+// alike in a still, so what is checked here is the thing only a real one can
+// do: sit at its own depth behind the facade and move against it.
+const seeThrough = await page.evaluate(() => window.__dev.tiles());
+check('buildings with see-through windows build an interior layer',
+  seeThrough.interiorCount > 0, `${seeThrough.interiorCount} buildings`);
+const offsetsAt = async (x) => {
+  await page.evaluate((xx) => window.__dev.warp(xx, 348), x);
+  await page.waitForTimeout(140);
+  return page.evaluate(() => window.__dev.interiors());
+};
+const westOf = await offsetsAt(120);
+const eastOf = await offsetsAt(700);
+// Parallax is per building, from the camera's offset to *that* building, so
+// approaching from opposite sides has to move a room in opposite directions.
+// A single global scroll offset would move them all the same way, and a
+// painted interior would not move at all.
+check('rooms parallax against their own facade as the camera passes',
+  westOf.some((v, i) => v !== eastOf[i]),
+  `${westOf.map((v) => v.toFixed(1)).join(',')} -> ${eastOf.map((v) => v.toFixed(1)).join(',')}`);
+check('...and never further than the room art can cover',
+  [...westOf, ...eastOf].every((v) => Math.abs(v) <= 4.001));
 
 await page.evaluate(() => window.__dev.setTime(15));
 await page.waitForTimeout(150);

@@ -108,7 +108,8 @@
     ]
   },
   "props": [
-    { "x": 55, "y": 21, "w": 2, "tile": "candyCart", "solid": true, "light": "window" },
+    { "x": 40, "y": 18, "w": 2, "tile": "ticketKiosk", "solid": true, "light": "window" },
+    { "x": 58, "y": 18, "w": 2, "tile": "candyCart", "solid": true, "light": "window" },
     { "x": 71, "y": 21, "w": 2, "tile": "ticketKiosk", "solid": true, "light": "window", "label": "NEWS" },
 
     { "x": 11, "y": 22, "w": 1, "tile": "hydrant" },
@@ -137,11 +138,11 @@
       "face": "wall", "base": "brick", "top": "roof",
       "facade": [
         { "tile": "door", "fx": 9, "fy": 0 },
-        { "tile": "windowWarm", "fx": 0, "fy": 1 }, { "tile": "window", "fx": 3, "fy": 1 }, { "tile": "windowStair", "fx": 6, "fy": 1 },
-        { "tile": "window", "fx": 12, "fy": 1 }, { "tile": "windowLit", "fx": 15, "fy": 1 }, { "tile": "window", "fx": 18, "fy": 1 },
+        { "tile": "windowOpen", "fx": 1, "fy": 1, "room": "roomPlant" }, { "tile": "window", "fx": 3, "fy": 1 }, { "tile": "windowOpen", "fx": 6, "fy": 1, "room": "roomStair" },
+        { "tile": "windowOpen", "fx": 12, "fy": 1, "room": "roomDark" }, { "tile": "windowOpen", "fx": 15, "fy": 1, "room": "roomLamp" }, { "tile": "window", "fx": 18, "fy": 1 },
         { "tile": "acUnit", "fx": 15, "fy": 3 },
         { "tile": "windowTv", "fx": 1, "fy": 4 }, { "tile": "window", "fx": 6, "fy": 4 },
-        { "tile": "windowWide", "fx": 11, "fy": 4 }, { "tile": "windowWarm", "fx": 16, "fy": 4 }
+        { "tile": "windowWide", "fx": 11, "fy": 4 }, { "tile": "windowOpen", "fx": 16, "fy": 4, "room": "roomLamp" }
       ]
     },
     {
@@ -150,26 +151,24 @@
       "cornice": "corniceDark", "plinth": "plinthDark",
       "facade": [
         { "tile": "fireEscape", "fx": 13, "fy": 1 },
-        { "tile": "window", "fx": 4, "fy": 1 }, { "tile": "windowStair", "fx": 7, "fy": 1 }, { "tile": "window", "fx": 10, "fy": 1 },
-        { "tile": "windowWarm", "fx": 4, "fy": 4 }, { "tile": "windowTv", "fx": 7, "fy": 4 }, { "tile": "windowLit", "fx": 10, "fy": 4 },
+        { "tile": "window", "fx": 4, "fy": 1 }, { "tile": "windowOpen", "fx": 7, "fy": 1, "room": "roomStair" }, { "tile": "window", "fx": 10, "fy": 1 },
+        { "tile": "windowOpen", "fx": 4, "fy": 4, "room": "roomPlant" }, { "tile": "windowTv", "fx": 7, "fy": 4 }, { "tile": "windowLit", "fx": 10, "fy": 4 },
         { "tile": "acUnit", "fx": 4, "fy": 6 },
-        { "tile": "window", "fx": 4, "fy": 7 }, { "tile": "windowWarm", "fx": 7, "fy": 7 }, { "tile": "window", "fx": 10, "fy": 7 }
+        { "tile": "window", "fx": 4, "fy": 7 }, { "tile": "windowOpen", "fx": 7, "fy": 7, "room": "roomLamp" }, { "tile": "windowOpen", "fx": 10, "fy": 7, "room": "roomDark" }
       ]
     },
     {
       "x": 38, "y": 13, "w": 24, "h": 5, "storeys": 10, "roofDepth": 3,
       "face": "brick", "base": "brick", "top": "roof",
       "facade": [
-        { "tile": "boxOffice", "fx": 2, "fy": 0 },
         { "tile": "posterCase", "fx": 5, "fy": 0 }, { "tile": "posterCase", "fx": 7, "fy": 0 },
         { "tile": "cinemaDoors", "fx": 9, "fy": 0 },
         { "tile": "posterCase", "fx": 16, "fy": 0 }, { "tile": "posterCase", "fx": 18, "fy": 0 },
-        { "tile": "candyStand", "fx": 20, "fy": 0 },
 
-        { "tile": "windowLit", "fx": 1, "fy": 5 }, { "tile": "windowWarm", "fx": 3, "fy": 5 },
-        { "tile": "windowWarm", "fx": 20, "fy": 5 }, { "tile": "windowLit", "fx": 22, "fy": 5 },
-        { "tile": "windowStair", "fx": 1, "fy": 7 }, { "tile": "windowLit", "fx": 3, "fy": 7 },
-        { "tile": "windowLit", "fx": 20, "fy": 7 }, { "tile": "windowWarm", "fx": 22, "fy": 7 }
+        { "tile": "windowOpen", "fx": 1, "fy": 5, "room": "roomLamp" }, { "tile": "windowOpen", "fx": 3, "fy": 5, "room": "roomStair" },
+        { "tile": "windowOpen", "fx": 20, "fy": 5, "room": "roomPlant" }, { "tile": "windowOpen", "fx": 22, "fy": 5, "room": "roomDark" },
+        { "tile": "windowOpen", "fx": 1, "fy": 7, "room": "roomStair" }, { "tile": "windowLit", "fx": 3, "fy": 7 },
+        { "tile": "windowOpen", "fx": 20, "fy": 7, "room": "roomLamp" }, { "tile": "windowWarm", "fx": 22, "fy": 7 }
       ],
       "awning": { "fx": 1, "fw": 22, "up": 4, "h": 1, "tile": "marquee" },
       "panels": [
@@ -190,9 +189,9 @@
       "cornice": "corniceDark", "plinth": "plinthDark",
       "facade": [
         { "tile": "window", "fx": 0, "fy": 1 }, { "tile": "windowWarm", "fx": 3, "fy": 1 }, { "tile": "window", "fx": 6, "fy": 1 },
-        { "tile": "windowStair", "fx": 9, "fy": 1 }, { "tile": "window", "fx": 12, "fy": 1 }, { "tile": "window", "fx": 15, "fy": 1 },
+        { "tile": "windowOpen", "fx": 9, "fy": 1, "room": "roomStair" }, { "tile": "window", "fx": 12, "fy": 1 }, { "tile": "window", "fx": 15, "fy": 1 },
         { "tile": "windowTv", "fx": 18, "fy": 1 },
-        { "tile": "windowLit", "fx": 2, "fy": 3 }, { "tile": "window", "fx": 9, "fy": 3 }, { "tile": "windowWarm", "fx": 16, "fy": 3 }
+        { "tile": "windowOpen", "fx": 2, "fy": 3, "room": "roomLamp" }, { "tile": "window", "fx": 9, "fy": 3 }, { "tile": "windowOpen", "fx": 16, "fy": 3, "room": "roomPlant" }
       ]
     },
     {
@@ -203,10 +202,10 @@
         { "tile": "door", "fx": 11, "fy": 0 },
         { "tile": "fireEscape", "fx": 22, "fy": 1 },
         { "tile": "window", "fx": 0, "fy": 1 }, { "tile": "windowWarm", "fx": 3, "fy": 1 }, { "tile": "window", "fx": 6, "fy": 1 },
-        { "tile": "window", "fx": 14, "fy": 1 }, { "tile": "windowStair", "fx": 17, "fy": 1 }, { "tile": "window", "fx": 20, "fy": 1 },
+        { "tile": "window", "fx": 14, "fy": 1 }, { "tile": "windowOpen", "fx": 17, "fy": 1, "room": "roomStair" }, { "tile": "window", "fx": 20, "fy": 1 },
         { "tile": "acUnit", "fx": 6, "fy": 3 },
-        { "tile": "windowTv", "fx": 0, "fy": 4 }, { "tile": "window", "fx": 4, "fy": 4 }, { "tile": "windowLit", "fx": 8, "fy": 4 },
-        { "tile": "window", "fx": 12, "fy": 4 }, { "tile": "windowWarm", "fx": 16, "fy": 4 }, { "tile": "window", "fx": 20, "fy": 4 }
+        { "tile": "windowTv", "fx": 0, "fy": 4 }, { "tile": "window", "fx": 4, "fy": 4 }, { "tile": "windowOpen", "fx": 8, "fy": 4, "room": "roomLamp" },
+        { "tile": "window", "fx": 12, "fy": 4 }, { "tile": "windowOpen", "fx": 16, "fy": 4, "room": "roomDark" }, { "tile": "window", "fx": 20, "fy": 4 }
       ]
     }
   ],

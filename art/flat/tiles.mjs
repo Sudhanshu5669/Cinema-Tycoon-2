@@ -1521,8 +1521,28 @@ export const PAVE_LITTER = [
 // what its depth and its shadow are both derived from. So they may be any
 // height; only their footprint has to agree with the tile grid.
 
+
+// **Both stalls are authored as boxes that PROJECT, not as panels.** Three
+// marks do that, and they are the same three the buildings already use, which
+// is why a stall reads as belonging to this street rather than as a sprite
+// parked on it:
+//
+//   the TOP     several rows of roof surface seen from above, foreshortened
+//               the way a building's roof cap is -- you are looking down onto
+//               the thing, so it has a top at all
+//   the LIP     one bright row (`l`) with a hard shadow row (`L`) directly
+//               under it, exactly CORNICE's trick. This is what says the top
+//               and the front are two different planes meeting at an edge
+//   the RETURN  the rightmost 3 columns in shaded tones all the way down
+//               (`o`/`N`/`y`/`W`/`U`), which is WALL_EDGE's rule -- light
+//               comes from the left, so the side of a box turned away from it
+//               is the right one
+//
+// Without the return in particular a stall is a flat sticker however nicely
+// its front is drawn, because nothing in the image says it has a side at all.
+
 /**
- * 32 x 44 -- the cinema's ticket booth, out on the pavement.
+ * 32 x 46 -- the cinema's ticket booth, projecting from the frontage.
  *
  * Built like a small building rather than like a sign, because that is what
  * it is: a lipped roof cap catching the light at the top, a dark fascia for
@@ -1532,54 +1552,60 @@ export const PAVE_LITTER = [
  * is open tonight.
  */
 export const TICKET_KIOSK = [
-  '..llllllllllllllllllllllllllll..',
-  '.llllllllllllllllllllllllllllll.',
-  'llllllllllllllllllllllllllllllll',
-  'LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL',
-  '.ffffffffffffffffffffffffffffff.',
-  '.ffffffFfffffffffffffffFffffffff',
-  '.LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL.',
-  '.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%.',
-  '.%============================%.',
-  '.%============================%.',
-  '.%============================%.',
-  '.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%.',
-  '.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.',
-  '.xXXXXXXXXXXXXXXXXXXXXXXXXXXXXx.',
-  '.xXMMMMMMMMMMMXMMMMMMMMMMMMMMXx.',
-  '.xXMMMMMMMMMMMXMMMMMMMMMMMMMMXx.',
-  '.xXMMMMMMMMMMMXMMMMMMMMMMMMMMXx.',
-  '.xXMMMMMMMMMMMXMMMMXXXXXXMMMMXx.',
-  '.xXMMMMMMMMMMMXMMMXXXXXXXXMMMXx.',
-  '.xXMMMMMMMMMMMXMMMXXXXXXXXMMMXx.',
-  '.xXMMMMMMMMMMMXMMMMXXXXXXMMMMXx.',
-  '.xXMMMMMMMMMMMXMMMMMXXXXMMMMMXx.',
-  '.xXMMMMMMMMMMMXMMMXXXXXXXXMMMXx.',
-  '.xXMMMMMMMMMMMXMMXXXXXXXXXXMMXx.',
-  '.xXMMMMMMMMMMMXMMXXXXXXXXXXMMXx.',
-  '.xXMMMMMMMMMMMXMXXXXXXXXXXXXMXx.',
-  '.xXRRRRRRRRRRRXMXXXXXXXXXXXXMXx.',
-  '.xXXXXXXXXXXXXXXXXXXXXXXXXXXXXx.',
-  '.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.',
-  '.wwwwwwwwwwwwwwwwwwwwwwwwwwwwww.',
-  '.wWWWWWWWWWWWWWWWWWWWWWWWWWWWWw.',
-  '.wWwwwwwwwwwwwWwwwwwwwwwwwwwwWw.',
-  '.wWwwwwwwwwwwwWwwwwwwwwwwwwwwWw.',
-  '.wWwwwwwwwwwwwWwwwwwwwwwwwwwwWw.',
-  '.wWwwwwwwwwwwwWwwwwwwwwwwwwwwWw.',
-  '.wWwwwwwwwwwwwWwwwwwwwwwwwwwwWw.',
-  '.wWWWWWWWWWWWWWWWWWWWWWWWWWWWWw.',
-  '.wwwwwwwwwwwwwwwwwwwwwwwwwwwwww.',
-  '.tttttttttttttttttttttttttttttt.',
-  '.tTTTTTTTTTTTTTTTTTTTTTTTTTTTTt.',
-  '.tTttttttttttttttttttttttttttTt.',
-  '.tTttttttttttttttttttttttttttTt.',
-  '.TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.',
-  '.UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU.',
+  'FFFFFFFFFFFFFFFFFFFFFFFFFFFFFNNN',
+  'fffFfffffffffffffFffffffffFffooo',
+  'fffffffffffffffffffffffffffffooo',
+  'ffffffffFffffffffffffFfffffffooo',
+  'fffffffffffffffffffffffffffffooo',
+  'lllllllllllllllllllllllllllllooo',
+  'LLLLLLLLLLLLLLLLLLLLLLLLLLLLLNNN',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  '=============================%%%',
+  '=============================%%%',
+  '=============================%%%',
+  '=============================%%%',
+  '=============================%%%',
+  '=============================%%%',
+  '=============================%%%',
+  '%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%',
+  'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxXXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XMMMMMMMMMMMXMMMMMMMMMMMMMMMXyXX',
+  'XMMMMMMMMMMMXMMMMMMMMMMMMMMMXyXX',
+  'XMMMMMMMMMMMXMMMMMMMMMMMMMMMXyXX',
+  'XMMMMMMMMMMMXMMMMMMMMMMMMMMMXyXX',
+  'XMMMMMMMMMMMXMMMMMMMMMMMMMMMXyXX',
+  'XMMMMMMMMMMMXMMMMMMMMMMMMMMMXyXX',
+  'XMMMMMMMMMMMXMMMMMXXXXXXMMMMXyXX',
+  'XMMMMMMMMMMMXMMMMMXXXXXXMMMMXyXX',
+  'XMMMMMMMMMMMXMMMMMXXXXXXMMMMXyXX',
+  'XMMMMMMMMMMMXMMXXXXXXXXXXXMMXyXX',
+  'XMMMMMMMMMMMXMMXXXXXXXXXXXMMXyXX',
+  'XMMMMMMMMMMMXMMXXXXXXXXXXXMMXyXX',
+  'XMMMMMMMMMMMXMMXXXXXXXXXXXMMXyXX',
+  'XMMMMMMMMMMMXMXXXXXXXXXXXXXMXyXX',
+  'XRRRRRRRRRRRXRRRRRRRRRRRRRRRXyXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxXXX',
+  'wwwwwwwwwwwwwwwwwwwwwwwwwwwwwWWW',
+  'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW',
+  'WwwwwwwwwwwwWwwwwwwwwwwwwwwwWyWW',
+  'WwwwwwwwwwwwWwwwwwwwwwwwwwwwWyWW',
+  'WwwwwwwwwwwwWwwwwwwwwwwwwwwwWyWW',
+  'WwwwwwwwwwwwWwwwwwwwwwwwwwwwWyWW',
+  'WwwwwwwwwwwwWwwwwwwwwwwwwwwwWyWW',
+  'WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW',
+  'wwwwwwwwwwwwwwwwwwwwwwwwwwwwwWWW',
+  'tttttttttttttttttttttttttttttuuu',
+  'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTUUU',
+  'TtttttttttttttttttttttttttttTuUU',
+  'TtttttttttttttttttttttttttttTuUU',
+  'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTUUU',
+  'UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU',
 ];
 
 /**
- * 32 x 34 -- the candy stand, wheeled out onto the footpath beside the doors.
+ * 32 x 40 -- the candy stall, projecting from the frontage beside the doors.
  *
  * A scalloped striped hood over a warm glass case, on legs. The stripes reuse
  * the awning's red and cream exactly, so the cart reads as belonging to the
@@ -1587,40 +1613,43 @@ export const TICKET_KIOSK = [
  * there -- the same containment rule the marquee red already follows.
  */
 export const CANDY_CART = [
-  '....vvvvvvvvvvvvvvvvvvvvvvvv....',
-  '...vvssvvssvvssvvssvvssvvssvv...',
-  '..vvssvvssvvssvvssvvssvvssvvvv..',
-  '..VssvvssvvssvvssvvssvvssvvssV..',
-  '..VvssvvssvvssvvssvvssvvssvvsV..',
-  '..VVssvvssvvssvvssvvssvvssvvVV..',
-  '..VvVvVvVvVvVvVvVvVvVvVvVvVvVV..',
-  '...VV.VV.VV.VV.VV.VV.VV.VV.VV...',
-  '..xxxxxxxxxxxxxxxxxxxxxxxxxxxx..',
-  '..xXXXXXXXXXXXXXXXXXXXXXXXXXXx..',
-  '..xXMMMMMMMMMMMMXMMMMMMMMMMMXx..',
-  '..xXMMMMMMMMMMMMXMMMMMMMMMMMXx..',
-  '..xXMMMsssssMMMMXMMMMMMMMMMMXx..',
-  '..xXMMssvssvsMMMXMMMMsssssMMXx..',
-  '..xXMMsvssvssMMMXMMMsvssvsMMXx..',
-  '..xXMMssvssvsMMMXMMMssvssvsMXx..',
-  '..xXMMsvssvssMMMXMMMsvssvssMXx..',
-  '..xXMMssvssvsMMMXMMMssvssvsMXx..',
-  '..xXMMsvssvssMMMXMMMsvssvssMXx..',
-  '..xXMMSSSSSSSMMMXMMMSSSSSSSMXx..',
-  '..xXMMMMMMMMMMMMXMMMMMMMMMMMXx..',
-  '..xXRRRRRRRRRRRRXRRRRRRRRRRRXx..',
-  '..xXXXXXXXXXXXXXXXXXXXXXXXXXXx..',
-  '..xxxxxxxxxxxxxxxxxxxxxxxxxxxx..',
-  '..tttttttttttttttttttttttttttt..',
-  '..tTTTTTTTTTTTTTTTTTTTTTTTTTTt..',
-  '..TTTTTTTTTTTTTTTTTTTTTTTTTTTT..',
-  '...HH....................HH.....',
-  '...HH....................HH.....',
-  '...HH....................HH.....',
-  '...HH....................HH.....',
-  '...HH....................HH.....',
-  '..EEEE..................EEEE....',
-  '..EEEE..................EEEE....',
+  'VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV',
+  'vvssvvssvvssvvssvvssvvssvvssvVVV',
+  'vvssvvssvvssvvssvvssvvssvvssvVVV',
+  'ssvvssvvssvvssvvssvvssvvssvvsVVV',
+  'ssvvssvvssvvssvvssvvssvvssvvsVVV',
+  'vvssvvssvvssvvssvvssvvssvvssvVVV',
+  'vvssvvssvvssvvssvvssvvssvvssvVVV',
+  'VvVvVvVvVvVvVvVvVvVvVvVvVvVvVVVV',
+  'VV.VV.VV.VV.VV.VV.VV.VV.VV.VVVV.',
+  'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxXXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XMMMMMMMMMMMXMMMMMMMMMMMMMMMXyXX',
+  'XMMMMMMMMMMMXMMMMMMMMMMMMMMMXyXX',
+  'XMMssssssMMMXMMMMsssssssMMMMXyXX',
+  'XMMssssssMMMXMMMMsssssssMMMMXyXX',
+  'XMMssssssMMMXMMMMsssssssMMMMXyXX',
+  'XMMssssssMMMXMMMMsssssssMMMMXyXX',
+  'XMMssssssMMMXMMMMsssssssMMMMXyXX',
+  'XMMssssssMMMXMMMMsssssssMMMMXyXX',
+  'XMMssssssMMMXMMMMsssssssMMMMXyXX',
+  'XMMSSSSSSMMMXMMMMSSSSSSSMMMMXyXX',
+  'XRRRRRRRRRRRXRRRRRRRRRRRRRRRXyXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxXXX',
+  'tttttttttttttttttttttttttttttuuu',
+  'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTUUU',
+  'TtttttttttttttttttttttttttttTuUU',
+  'TtttttttttttttttttttttttttttTuUU',
+  'TTTTTTTTTTTTTTTTTTTTTTTTTTTTTUUU',
+  'UUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUU',
+  '.HH......................HH.....',
+  '.HH......................HH.....',
+  '.HH......................HH.....',
+  '.HH......................HH.....',
+  '.HH......................HH.....',
+  '.EE......................EE.....',
+  '.EE......................EE.....',
 ];
 
 /** A fire hydrant. The one place on the street the awning red is spent
@@ -1909,6 +1938,283 @@ export const WINDOW_TV = [
   '.LLLLLLLLLLLLLLLLLLLLLL.',
 ];
 
+/**
+ * 24 x 32 -- a window that is actually a HOLE.
+ *
+ * Every other window in this set paints its glass. This one leaves it as `.`,
+ * and the build tool notices: transparency that does not touch the frame's
+ * outer edge can only be a gap the artist meant you to see through, so
+ * `tools/build-tiles-sheet.mjs` derives an `opening` rect for it with nothing
+ * declared anywhere. The renderer punches that rect out of the building's
+ * baked face and draws a ROOM_* tile behind the wall, which is what you then
+ * see through the glass.
+ *
+ * Note this tile carries NO transparent margin, unlike WINDOW and DOOR --
+ * that is load-bearing, not tidiness. Their 1px `.` inset touches the edge,
+ * which is exactly how the tool tells a margin apart from an opening; give
+ * this one a margin and its "opening" would be the whole tile and the punch
+ * would delete the wall around it.
+ *
+ * The mullion and transom are opaque and stay opaque: the punch takes the
+ * bounding box and the tile is drawn back over it, so the bars survive on top
+ * of the hole and divide the room behind into real panes.
+ */
+export const WINDOW_OPEN = [
+  'xxxxxxxxxxxxxxxxxxxxxxxx',
+  'xXXXXXXXXXXXXXXXXXXXXXXx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xXXXXXXXXXXXXXXXXXXXXXXx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xX.........XX.........Xx',
+  'xxxxxxxxxxxxxxxxxxxxxxxx',
+  'XXXXXXXXXXXXXXXXXXXXXXXX',
+  'llllllllllllllllllllllll',
+  'LLLLLLLLLLLLLLLLLLLLLLLL',
+];
+
+// --- rooms -------------------------------------------------------------------
+//
+// 32 x 40 each, and drawn BEHIND the facade, visible only through a
+// WINDOW_OPEN's punched glass. Bigger than the opening they sit behind (20 x
+// 26) on purpose: the interior layer slides a few pixels against the wall as
+// the camera passes (renderer.js's PARALLAX), and the overhang is the margin
+// that lets it do that without an edge of the room swinging into view.
+//
+// These are lit by the same Light2D pass as everything else, through the same
+// window light the facade entry already registers -- a room is a surface like
+// any other, so a dark room at night is dark because the ambient says so, not
+// because it was authored dark twice.
+
+/**
+ * A staircase climbing across the window, with a handrail over it.
+ *
+ * The single most valuable room in the set: a lit rectangle says a light is
+ * on, a flight of stairs behind glass says there is a building back there
+ * with floors in it.
+ *
+ * **Authored as real treads, not a diagonal.** The first version drew the
+ * stair's soffit as one smooth diagonal band, on the reasoning that at 20px
+ * across nobody would count the steps -- and through the window it read as a
+ * lampshade, because a smooth triangle is not what a staircase looks like,
+ * it is what a *shade* looks like. What actually carries it is the stepping
+ * itself: eight 4px treads rising 3px each, every one with a lit nosing, and
+ * the rail running parallel above them. Even at this size the eye reads
+ * "repeated horizontal edges going up" as stairs and nothing else. */
+export const ROOM_STAIR = [
+  'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+  'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+  'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMMMMMMMMMRRRRMMMMMMMM',
+  'MMMMMMMMMMMMMMMMMMMMMRMMMMMMRRRR',
+  'MMMMMMMMMMMMMMMMMMMMMRMMMMMMXXXX',
+  'MMMMMMMMMMMMMMMMRRRRMRMMMMMMXXXX',
+  'MMMMMMMMMMMMMMMMMRMMMRMMRRRRXXXX',
+  'MMMMMMMMMMMMMMMMMRMMMRMMXXXXXXXX',
+  'MMMMMMMMMMMMRRRRMRMMMRMMXXXXXXXX',
+  'MMMMMMMMMMMMMRMMMRMMRRRRXXXXXXXX',
+  'MMMMMMMMMMMMMRMMMRMMXXXXXXXXXXXX',
+  'MMMMMMMMRRRRMRMMMRMMXXXXXXXXXXXX',
+  'MMMMMMMMMRMMMRMMRRRRXXXXXXXXXXXX',
+  'MMMMMMMMMRMMMRMMXXXXXXXXXXXXXXXX',
+  'MMMMRRRRMRMMMRMMXXXXXXXXXXXXXXXX',
+  'MMMMMRMMMRMMRRRRXXXXXXXXXXXXXXXX',
+  'MMMMMRMMMRMMXXXXXXXXXXXXXXXXXXXX',
+  'RRRRMRMMMRMMXXXXXXXXXXXXXXXXXXXX',
+  'MRMMMRMMRRRRXXXXXXXXXXXXXXXXXXXX',
+  'MRMMMRMMXXXXXXXXXXXXXXXXXXXXXXXX',
+  'MRMMMRMMXXXXXXXXXXXXXXXXXXXXXXXX',
+  'MRMMRRRRXXXXXXXXXXXXXXXXXXXXXXXX',
+  'MRMMXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'MRMMXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'RRRRXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+];
+
+/** A desk under a picture, with someone sitting at it. The head and shoulders
+ *  are the whole point -- one occupied room in a row of empty ones is what
+ *  makes the others read as rooms rather than as texture. */
+export const ROOM_LAMP = [
+  'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+  'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+  'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM',
+  'MMMMMMMXXXXXXXXXXXXMMMMMMMMMMMMM',
+  'MMMMMMMXMMMMMMMMMMXMMMMMMMMMMMMM',
+  'MMMMMMMXMMMMMMMMMMXMMMMMMMMMMMMM',
+  'MMMMMMMXMMMMMMMMMMXMMMMMMMMMMMMM',
+  'MMMMMMMXMMMMMMMMMMXMMMMMMMMMMMMM',
+  'MMMMMMMXXXXXXXXXXXXMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMMMMMMMMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMMXXXXMMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMXXXXXXMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMXXXXXXMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMMMXXXXMMMMMMMMMMMMMMM',
+  'MMMMMMMMMMMXXXXXXXXMMMMMMMMMMMMM',
+  'RRRRRRRRRRXXXXXXXXXXRRRRRRRRRRRR',
+  'RRRRRRRRRXXXXXXXXXXXXRRRRRRRRRRR',
+  'RRRRRRRRXXXXXXXXXXXXXXRRRRRRRRRR',
+  'RRRRRRRRXXXXXXXXXXXXXXRRRRRRRRRR',
+  'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
+  'XMMMMMMXXXXXXXXXXXXXXXXMMMMMMMMX',
+  'XMMMMMMXRRRRRRRRRRRRRRXMMMMMMMMX',
+  'XXXXXXXXRRRRRRRRRRRRRRXXXXXXXXXX',
+  'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+  'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+  'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+  'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+  'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+  'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+  'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+  'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+];
+
+/**
+ * Curtains, a pendant lamp, and a plant on the sill over a floor.
+ *
+ * The green is spent here, in the poster's creature, and nowhere else
+ * indoors: against a palette this warm, one small cool-green shape is the
+ * most legible thing that can happen inside a 20px opening.
+ *
+ * The lamp and the floor line matter as much as the plant. A first version
+ * was a flat warm field with a plant in the middle of it, which through a
+ * window reads as a lit blank -- a room needs a top and a bottom before
+ * anything in it can look like it is standing somewhere. */
+export const ROOM_PLANT = [
+  'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+  'RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR',
+  'RRRRMMMMMMMMMMMXXMMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMMMXXMMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMMMXXMMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMXXXXXXXXMMMMMMMMRRRR',
+  'RRRRMMMMMMMXXXXXXXXXXMMMMMMMRRRR',
+  'RRRRMMMMMMXXXXXXXXXXXXMMMMMMRRRR',
+  'RRRRMMMMMMMMMMMMMMMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMMMMMMMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMMMMMMMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMMMMMMMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMMMMMMMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMMMMMMMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMMMMMMMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMMMMMMMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMMMMMMMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMMMMMMMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMMMMMMMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMMGGGGMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMGGGGGGMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMGGGGGGGGMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMGGGGGGMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMGGGGGGGGMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMGGGGGGMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMMGGGGMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMMMGGMMMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMXXXXXXMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMXXXXXXMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMXXXXXXMMMMMMMMMRRRR',
+  'RRRRMMMMMMMMMXXXXXXMMMMMMMMMRRRR',
+  'RRRRXXXXXXXXXXXXXXXXXXXXXXXXRRRR',
+  'MMMMRRRRRRRRRRRRRRRRRRRRRRRRMMMM',
+  'MMMMRRRRRRRRRRRRRRRRRRRRRRRRMMMM',
+  'MMMMRRRRRRRRRRRRRRRRRRRRRRRRMMMM',
+  'MMMMRRRRRRRRRRRRRRRRRRRRRRRRMMMM',
+  'MMMMRRRRRRRRRRRRRRRRRRRRRRRRMMMM',
+  'MMMMRRRRRRRRRRRRRRRRRRRRRRRRMMMM',
+  'MMMMRRRRRRRRRRRRRRRRRRRRRRRRMMMM',
+  'MMMMRRRRRRRRRRRRRRRRRRRRRRRRMMMM',
+];
+
+/** An unlit room -- furniture you can just make out and nothing else.
+ *
+ *  Worth having rather than leaving the window painted: an unlit see-through
+ *  window still shows a real room, just an unoccupied one, so the dark
+ *  windows on a facade are the same kind of object as the lit ones instead of
+ *  a different tile pretending. It also means turning a light on in a flat is
+ *  a data change (swap the room, add the light) rather than an art change. */
+export const ROOM_DARK = [
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzziiiiiiiiiiiizzzzzzzzzzzz',
+  'zzzzzzzziiiiiiiiiiiizzzzzzzzzzzz',
+  'zzzzzzzziiiiiiiiiiiizzzzzzzzzzzz',
+  'zzzzzzzziiiiiiiiiiiizzzzzzzzzzzz',
+  'zzzzzzzziiiiiiiiiiiizzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzziiiiiiiizzzzzzzzzzzz',
+  'zzzzzzzzzzziiiiiiiiiizzzzzzzzzzz',
+  'zzzzzzzzzzziiiiiiiiiizzzzzzzzzzz',
+  'zzzzzzzzzziiiiiiiiiiiizzzzzzzzzz',
+  'zzzzzzzzzziiiiiiiiiiiizzzzzzzzzz',
+  'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+  'zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz',
+];
+
 export const TILES = {
   road: ROAD, roadLine: ROAD_LINE, crosswalk: CROSSWALK, pave: PAVE, paveCrack: PAVE_CRACK, paveStain: PAVE_STAIN,
   kerb: KERB, grass: GRASS, trashCan: TRASH_CAN, newsBox: NEWS_BOX, sidewalkStar: SIDEWALK_STAR,
@@ -1927,6 +2233,8 @@ export const FEATURES = {
   window: WINDOW, windowWide: WINDOW_WIDE, door: DOOR, lampPost: LAMP_POST,
   windowLit: WINDOW_LIT, windowWarm: WINDOW_WARM,
   windowStair: WINDOW_STAIR, windowTv: WINDOW_TV,
+  windowOpen: WINDOW_OPEN,
+  roomStair: ROOM_STAIR, roomLamp: ROOM_LAMP, roomPlant: ROOM_PLANT, roomDark: ROOM_DARK,
   fireEscape: FIRE_ESCAPE, acUnit: AC_UNIT,
   ticketKiosk: TICKET_KIOSK, candyCart: CANDY_CART, hydrant: HYDRANT,
   bollard: BOLLARD, planter: PLANTER, aBoard: A_BOARD,

@@ -840,9 +840,115 @@
       "rotated": false,
       "trimmed": false
     },
-    "fireEscape": {
+    "windowOpen": {
       "frame": {
         "x": 736,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 32
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "opening": {
+        "x": 2,
+        "y": 2,
+        "w": 20,
+        "h": 26
+      }
+    },
+    "roomStair": {
+      "frame": {
+        "x": 760,
+        "y": 0,
+        "w": 32,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 40
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "roomLamp": {
+      "frame": {
+        "x": 792,
+        "y": 0,
+        "w": 32,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 40
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "roomPlant": {
+      "frame": {
+        "x": 824,
+        "y": 0,
+        "w": 32,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 40
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "roomDark": {
+      "frame": {
+        "x": 856,
+        "y": 0,
+        "w": 32,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 40
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "fireEscape": {
+      "frame": {
+        "x": 888,
         "y": 0,
         "w": 16,
         "h": 64
@@ -862,7 +968,7 @@
     },
     "acUnit": {
       "frame": {
-        "x": 752,
+        "x": 904,
         "y": 0,
         "w": 14,
         "h": 10
@@ -882,47 +988,47 @@
     },
     "ticketKiosk": {
       "frame": {
-        "x": 766,
+        "x": 918,
         "y": 0,
         "w": 32,
-        "h": 44
+        "h": 50
       },
       "sourceSize": {
         "w": 32,
-        "h": 44
+        "h": 50
       },
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
         "w": 32,
-        "h": 44
+        "h": 50
       },
       "rotated": false,
       "trimmed": false
     },
     "candyCart": {
       "frame": {
-        "x": 798,
+        "x": 950,
         "y": 0,
         "w": 32,
-        "h": 34
+        "h": 37
       },
       "sourceSize": {
         "w": 32,
-        "h": 34
+        "h": 37
       },
       "spriteSourceSize": {
         "x": 0,
         "y": 0,
         "w": 32,
-        "h": 34
+        "h": 37
       },
       "rotated": false,
       "trimmed": false
     },
     "hydrant": {
       "frame": {
-        "x": 830,
+        "x": 982,
         "y": 0,
         "w": 10,
         "h": 18
@@ -942,7 +1048,7 @@
     },
     "bollard": {
       "frame": {
-        "x": 840,
+        "x": 992,
         "y": 0,
         "w": 6,
         "h": 16
@@ -962,7 +1068,7 @@
     },
     "planter": {
       "frame": {
-        "x": 846,
+        "x": 998,
         "y": 0,
         "w": 20,
         "h": 18
@@ -982,7 +1088,7 @@
     },
     "aBoard": {
       "frame": {
-        "x": 866,
+        "x": 1018,
         "y": 0,
         "w": 18,
         "h": 20
@@ -1002,7 +1108,7 @@
     },
     "boxOffice": {
       "frame": {
-        "x": 884,
+        "x": 1036,
         "y": 0,
         "w": 32,
         "h": 48
@@ -1022,7 +1128,7 @@
     },
     "posterCase": {
       "frame": {
-        "x": 916,
+        "x": 1068,
         "y": 0,
         "w": 24,
         "h": 48
@@ -1042,7 +1148,7 @@
     },
     "cinemaDoors": {
       "frame": {
-        "x": 940,
+        "x": 1092,
         "y": 0,
         "w": 96,
         "h": 48
@@ -1062,7 +1168,7 @@
     },
     "candyStand": {
       "frame": {
-        "x": 1036,
+        "x": 1188,
         "y": 0,
         "w": 32,
         "h": 48
@@ -1082,7 +1188,7 @@
     },
     "signBulb": {
       "frame": {
-        "x": 1068,
+        "x": 1220,
         "y": 0,
         "w": 8,
         "h": 8
@@ -1104,7 +1210,7 @@
   "meta": {
     "image": "tiles.png",
     "size": {
-      "w": 1076,
+      "w": 1228,
       "h": 64
     },
     "scale": 1

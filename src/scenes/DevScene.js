@@ -26,6 +26,7 @@ import { TileMapRenderer } from '../game/tilemap/renderer.js';
 import { loadCityMap } from '../game/tilemap/mapLoader.js';
 import { clockLabel } from '../game/tilemap/sun.js';
 import { bakeOccludedLight } from '../game/occludedLight.js';
+import { createDevMenu } from '../dev/menu.js';
 
 /** SYSTEMS #9: the city is a hand-editable JSON file, loaded like any other
  *  asset -- never a code change to add a building or move a streetlamp. */
@@ -65,7 +66,11 @@ export class DevScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor('#1b1b22');
     // Bad data fails loudly here, at boot, naming the offending entry --
     // never silently three files deep inside the renderer.
-    const cityMap = loadCityMap(this.cache.json.get(CITY_KEY), this);
+    // Kept, not discarded, because the dev menu edits it: a marquee's text is
+    // baked into a texture, so changing the cinema's name means patching this
+    // and building a new renderer over the top (see rebuildCity).
+    this.cityRaw = this.cache.json.get(CITY_KEY);
+    const cityMap = loadCityMap(this.cityRaw, this);
     this.map = new TileMapRenderer(this, cityMap).build();
     this.worldW = this.map.pixelWidth;
     this.worldH = this.map.pixelHeight;
@@ -95,8 +100,10 @@ export class DevScene extends Phaser.Scene {
     this.buildLightingPrototype();
     this.exposeDevHooks();
     this.bindDevHotkeys();
+    if (import.meta.env.DEV) this.devMenu = createDevMenu(this.devControls());
     this.events.once('shutdown', () => {
       this.input_.destroy();
+      this.devMenu?.destroy();
       this.map.destroy();
     });
   }
@@ -187,6 +194,9 @@ export class DevScene extends Phaser.Scene {
         // twice at the same hour must give two different numbers.
         tvIntensity: this.map.lighting?.lights.find((l) => l.kind === 'tv')?.intensity ?? 0,
         propCount: this.map.structures.filter((st) => st.kind === 'prop').length,
+        // See-through windows: how many buildings have an interior layer at
+        // all, and how many rooms are painted into them.
+        interiorCount: this.map.interiorCount,
         windowGlow: this._lightIntensity('window'),
         marqueeGlow: this._lightIntensity('marquee'),
         streetlampGlow: this._lightIntensity('streetlamp'),
@@ -202,6 +212,13 @@ export class DevScene extends Phaser.Scene {
         activeLightKeys: this.map.lighting?.active
           ? this.lights.getLights(this.cameras.main).map((v) => `${v.light.x},${v.light.y}`).sort() : [],
       }),
+      // Current screen offset of each building's interior layer against its
+      // own facade -- the parallax that makes a punched window read as a hole
+      // with a room behind it rather than a painted pane. A test can't see
+      // this in a screenshot without pixel-diffing two crops, so it's exposed
+      // as the number it actually is.
+      interiors: () => window.__dev._map().interiorOffsets(),
+      _map: () => this.map,
       probe: (x, y) => ({
         height: this.map.heightAt(x, y),
         solid: this.map.solidAt(x, y),
@@ -250,6 +267,110 @@ export class DevScene extends Phaser.Scene {
       shadowSourcesAt: (px, py) => (this.map.lighting?.shadowSources(px, py) ?? [])
         .map(({ light, strength }) => ({ x: light.groundX, y: light.groundY, strength, kind: light.kind })),
     };
+  }
+
+  /**
+   * The one building the dev menu means by "the cinema": the first with its
+   * own signboards. Found rather than indexed, so reordering city.json's
+   * buildings cannot silently point the name field at a block of flats.
+   */
+  get _cinema() {
+    return (this.cityRaw.buildings ?? []).find((b) => b.panels?.length);
+  }
+
+  /**
+   * Everything the dev menu is allowed to touch, as plain functions. A
+   * deliberate seam: the menu is DOM and knows no Phaser, this scene knows no
+   * DOM, and the list below is the entire contract between them -- which also
+   * makes it obvious what the menu can and cannot break.
+   */
+  devControls() {
+    return {
+      getHours: () => this.hours,
+      setHours: (h) => this._setHour(h),
+      getAuto: () => this.autoTime,
+      setAuto: (on) => { this.autoTime = on; },
+
+      getCinemaName: () => this._cinema?.panels[0]?.text ?? '',
+      setCinemaName: (v) => {
+        const p = this._cinema?.panels[0];
+        if (!p) return false;
+        const prev = p.text;
+        p.text = v;
+        // Reverted rather than swallowed if it does not fit: the loader
+        // measures every line against the board it has to show it on, so an
+        // over-long name is a real CityMapError, and leaving the bad value in
+        // `cityRaw` would make the *next* unrelated rebuild fail instead. The
+        // false travels back to the menu so its field reverts with us.
+        if (this.rebuildCity()) return true;
+        p.text = prev;
+        return false;
+      },
+      getNowShowing: () => this._readerLine()?.text ?? '',
+      setNowShowing: (v) => {
+        const line = this._readerLine();
+        if (!line) return false;
+        const prev = line.text;
+        line.text = v;
+        if (this.rebuildCity()) return true;
+        line.text = prev;
+        return false;
+      },
+
+      setGlowStrength: (k) => {
+        if (!this.map.glow) return;
+        this.map.glow.strength = k;
+        this.map.glow.refresh(this.hours);
+      },
+      getChaseSpeed: () => this.map.chase?.speed ?? 0,
+      setChaseSpeed: (v) => { if (this.map.chase) this.map.chase.speed = v; },
+      setParallax: (k) => { this.map.parallaxScale = k; },
+      setLayer: (name, on) => this.map.setLayerVisible(name, on),
+      setHud: (on) => window.__dev?.hud(on),
+    };
+  }
+
+  /** The reader board's title line -- the second line of the panel that has
+   *  more than one, which is what "now showing" means in this data. */
+  _readerLine() {
+    const panel = (this._cinema?.panels ?? []).find((p) => p.lines?.length > 1);
+    return panel?.lines[panel.lines.length - 1];
+  }
+
+  /**
+   * Rebuild the tile renderer from the (possibly edited) city JSON.
+   *
+   * A full teardown and rebuild rather than a surgical texture repaint,
+   * because a facade is one baked composite: the name sits in the same canvas
+   * as the bulbs around it, and the light that name registers, and the
+   * shadow the board throws. Repainting just the letters would need every one
+   * of those to be separately patchable, which is a lot of new machinery to
+   * make a dev tool slightly faster at something that already takes a few
+   * milliseconds. The player, camera and HUD are not touched -- only the map
+   * is, and `solidAt` is read through a closure over `this.map`, so collision
+   * follows the new one on its own.
+   *
+   * @returns {boolean} false if the edit failed validation, with the scene
+   *   left exactly as it was.
+   */
+  rebuildCity() {
+    let cityMap;
+    try {
+      cityMap = loadCityMap(this.cityRaw, this);
+    } catch (e) {
+      console.warn('[dev menu] rejected:', e.message);
+      return false;
+    }
+    const glow = this.map.glow?.strength ?? 1;
+    const chase = this.map.chase?.speed;
+    const parallax = this.map.parallaxScale;
+    this.map.destroy();
+    this.map = new TileMapRenderer(this, cityMap).build();
+    this.map.parallaxScale = parallax;
+    if (this.map.glow) this.map.glow.strength = glow;
+    if (this.map.chase && chase !== undefined) this.map.chase.speed = chase;
+    this.map.setHours(this.hours);
+    return true;
   }
 
   /** First live light of the given kind's current intensity, for the smoke
@@ -384,6 +505,7 @@ export class DevScene extends Phaser.Scene {
     // Wall-clock animation (the marquee chase) -- a separate clock from the
     // hour above, which only says what is switched on.
     this.map.update(time);
+    this.devMenu?.sync();
     // The player's own shadow(s) -- from the sun and from nearby point
     // lights. Runs every frame; ShadowLayer.updatePlayer throttles its own
     // redraw, this doesn't need to.
