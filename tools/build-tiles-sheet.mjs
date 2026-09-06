@@ -69,6 +69,30 @@ const RELIEF_STRENGTH = {
 };
 
 /**
+ * How far a ground tile's normal leans up the screen, and which tiles get it.
+ *
+ * Everything else in this set is a surface standing up in the world -- a
+ * wall, a door, a signboard -- and genuinely does face the camera, so a flat
+ * normal is right for it. The ground does not: it lies flat in the world and
+ * recedes up the screen, so its normal leans toward the horizon rather than
+ * at the viewer. Authoring it flat was costing the street most of its
+ * lighting, because Light.frag's diffuse term is `dot(normal, lightDir)` with
+ * lightDir.z pinned at 0.1 -- a lamp on a facade and a pavement facing the
+ * camera are close to perpendicular, so almost nothing landed. A marquee lit
+ * its own building and threw no pool on the street under it.
+ *
+ * One value for all of them rather than a per-tile number: they are all the
+ * same physical plane at the same angle, and the moment two ground tiles lean
+ * differently they stop reading as one continuous floor.
+ */
+const GROUND_LEAN = 0.8;
+const GROUND_TILT = new Set([
+  'road', 'roadLine', 'crosswalk', 'pave', 'paveCrack', 'paveStain',
+  'pavePatch', 'paveLitter', 'grass', 'sidewalkStar', 'lobbyCarpet',
+  'manhole', 'drainGrate',
+]);
+
+/**
  * The rect of a grid's genuine see-through opening, or null.
  *
  * Derived, never declared, and the rule that makes that possible is simple:
@@ -124,7 +148,7 @@ for (const [name, grid] of Object.entries({ ...TILES, ...FEATURES })) {
   frames.push({
     name, w, h,
     bmp: raster(grid, TILE_PALETTE),
-    normal: normalRaster(grid, TILE_HEIGHT, RELIEF_STRENGTH[name] ?? 0),
+    normal: normalRaster(grid, TILE_HEIGHT, RELIEF_STRENGTH[name] ?? 0, GROUND_TILT.has(name) ? GROUND_LEAN : 0),
     opening: openingOf(grid),
   });
 }

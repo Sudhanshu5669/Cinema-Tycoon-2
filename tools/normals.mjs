@@ -40,9 +40,19 @@ function heightAt(grid, heights, x, y) {
  *   tuned per tile (see build-tiles-sheet.mjs's RELIEF_STRENGTH) so a subtle
  *   ledge doesn't read as heavily as the main event even when they share the
  *   same underlying height values.
+ * @param {number} tilt a constant lean added to the whole tile's normal,
+ *   before any relief -- for surfaces that are not facing the camera at all.
+ *   A wall in this projection genuinely does face the viewer and takes 0; the
+ *   GROUND does not, it lies flat in the world and recedes up the screen
+ *   toward the horizon, so its normal leans up-screen. Authoring it flat
+ *   meant Light.frag's `dot(normal, normalize(lightDir))` -- whose lightDir.z
+ *   is hard-coded to 0.1 -- collected almost nothing on the pavement from a
+ *   lamp mounted on the facade above it, because the two were nearly
+ *   perpendicular. A marquee lit its own building and dropped nothing on the
+ *   street, which is the one thing a marquee is actually for.
  * @returns {Bitmap}
  */
-export function normalRaster(grid, heights, strength) {
+export function normalRaster(grid, heights, strength, tilt = 0) {
   const h = grid.length, w = grid[0].length;
   const b = new Bitmap(w, h);
   for (let y = 0; y < h; y++) {
@@ -50,7 +60,7 @@ export function normalRaster(grid, heights, strength) {
       const dzdx = (heightAt(grid, heights, x + 1, y) - heightAt(grid, heights, x - 1, y)) / 2;
       const dzdy = (heightAt(grid, heights, x, y + 1) - heightAt(grid, heights, x, y - 1)) / 2;
       const nx = -dzdx * strength;
-      const ny = -dzdy * strength;
+      const ny = -dzdy * strength + tilt;
       const nz = 1;
       const len = Math.hypot(nx, ny, nz);
       const r = Math.round((nx / len * 0.5 + 0.5) * 255);

@@ -60,7 +60,7 @@ const { LIGHT_PIPELINE } = Phaser.Renderer.WebGL.Pipelines;
  * enough to overlap and blend its edge away, so it alone needs a big enough
  * radius to go soft on its own.
  */
-const RADIUS = { window: 110, marquee: 190, streetlamp: 220, lobby: 150, tv: 120 };
+const RADIUS = { window: 110, marquee: 300, streetlamp: 220, lobby: 150, tv: 120 };
 
 /**
  * Opts one drawable into the lighting shader. Safe to call unconditionally --
@@ -114,7 +114,7 @@ export class LightingLayer {
     // entirely by the wider RADIUS values above, which cost nothing extra.
     const cam = scene.cameras.main;
     cam.postFX.clear();
-    cam.postFX.addVignette(0.5, 0.5, 0.82, 0.25);
+    cam.postFX.addVignette(0.5, 0.5, 0.9, 0.18);
   }
 
   /** @param {number} hours 0..24, wraps */

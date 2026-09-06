@@ -157,10 +157,25 @@ function hump(h, from, to) {
  * Per-kind light-cutout tuning. Adding a new kind of glowing thing (a
  * streetlamp, a flickering torch) is one entry here plus one light-point
  * pushed by whatever places it -- nothing else in the lighting layer changes.
+ *
+ * **These colours are pale, and that is the point.** Sampled off the
+ * reference, its street lamp reads #dbdab1 -- 19% saturation, very nearly
+ * white with a warm cast. Ours were 40-71%, which is roughly what you pick
+ * when you are trying to make the *light* carry the warmth of the scene on
+ * its own. It cannot, and it should not have to: a saturated lamp tints the
+ * material it falls on toward its own hue, so an orange lamp on grey stone
+ * gives orange stone, and the pool under it comes out the same hue as the
+ * bulb rather than reading as stone-that-is-lit.
+ *
+ * What actually produces warm-versus-cool across a frame is the SPREAD
+ * between the two illuminants -- a cool ambient and a warm key -- not the
+ * saturation of either one. With near-neutral paint (palette.mjs) even a
+ * barely-tinted lamp separates cleanly from a blue ambient, which is why
+ * these could come down this far without the street losing its warmth.
  */
 const GLOW_CURVES = {
   // Ordinary windows: on a little before dusk, off a little after dawn.
-  window: { from: DUSK - 0.5, to: DAWN + 0.5, color: 0xffb877, intensity: 1.0 },
+  window: { from: DUSK - 0.5, to: DAWN + 0.5, color: 0xffcfa0, intensity: 1.1 },
   // The cinema marquee, on its own timer -- switched on earlier than
   // residents turn their lights on, brighter once lit.
   //
@@ -173,16 +188,27 @@ const GLOW_CURVES = {
   // magenta blob. The red stays where it belongs -- the doors, the stripes,
   // the board fields, all authored art -- and the light that falls on it is
   // the colour theatre bulbs actually are.
-  marquee: { from: DUSK - 2, to: DAWN, color: 0xffb44a, intensity: 1.5 },
+  //
+  // Intensity is set against Phaser's shader, not against a feeling. Light.frag
+  // computes `diffuseFactor = dot(normal, normalize(lightDir))` with
+  // `lightDir.z` hard-coded to 0.1, so a FLAT normal -- which the pavement
+  // deliberately has, being stochastic texture with no TILE_HEIGHT entry --
+  // only ever collects `0.1 / length(lightDir)` of any light. At the ~60px
+  // from this canopy down to the pavement that is barely half, on top of the
+  // distance attenuation. A marquee therefore has to be driven harder than
+  // its brightness on the facade alone would suggest, or it lights its own
+  // building and drops nothing on the street under it -- which is exactly
+  // what a marquee is for.
+  marquee: { from: DUSK - 2, to: DAWN, color: 0xffd3a4, intensity: 1.8 },
   // The lobby behind the entrance doors: the warmest, palest source on the
   // street and the only one that is a doorway rather than a lamp. Its own
   // kind so it can be a gentle wide wash (see lighting.js's RADIUS) instead
   // of borrowing a point source's falloff, which is what turned the entrance
   // into a hotspot before.
-  lobby: { from: DUSK - 2, to: DAWN + 0.5, color: 0xffca7d, intensity: 1.2 },
+  lobby: { from: DUSK - 2, to: DAWN + 0.5, color: 0xffd6a4, intensity: 1.2 },
   // Streetlamps: on a photocell, not a resident's hand -- a sharper, earlier
   // on/off than windows and the palest colour of the lamp kinds.
-  streetlamp: { from: DUSK - 1, to: DAWN + 0.25, color: 0xffd89a, intensity: 1.2 },
+  streetlamp: { from: DUSK - 1, to: DAWN + 0.25, color: 0xffdfb2, intensity: 0.95 },
   // A television through a window. The only cold light source on the street,
   // and the only one that flickers (see `flickers` below) -- both facts are
   // the point of it. Every other lit window on this street is tungsten, so a
