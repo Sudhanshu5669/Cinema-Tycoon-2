@@ -71,7 +71,12 @@ const PLAQUE_BG_COLOR = '#201c26';
  *  those doors, and the light it spills across the threshold is what makes an
  *  entrance read as open. */
 const ALCOVE_COLOR = '#1b1218';
-const ALCOVE_GLOW_COLOR = '#ffca7d';  // palette '@'
+// Light escaping around the door frame -- a reveal, not a lamp. This was
+// '@' (#ffca7d), the lobby glow itself, which is the colour of the light
+// SOURCE rather than of a 4px strip of jamb catching a little of it, and at
+// full height down both sides of the bank it put two of the brightest
+// columns in the frame either side of the entrance.
+const ALCOVE_GLOW_COLOR = '#6d4630';
 const ALCOVE_MARGIN = 4;
 
 /**
@@ -148,7 +153,7 @@ const LIT_FACADE = {
   // authored with cold `i`/`I` glass, so both are unlit windows and neither
   // should be putting light on the street.
   windowLit: 'window', windowWarm: 'window', windowStair: 'window',
-  boxOffice: 'window', candyStand: 'window', posterCase: 'window',
+  boxOffice: 'fixture', candyStand: 'fixture', posterCase: 'fixture',
   cinemaDoors: 'lobby',
   // Not 'window': a television is cold and it moves, and both of those are
   // properties of the light rather than of the glass -- see sun.js's `tv`.

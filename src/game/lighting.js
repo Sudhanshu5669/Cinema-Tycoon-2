@@ -60,7 +60,7 @@ const { LIGHT_PIPELINE } = Phaser.Renderer.WebGL.Pipelines;
  * enough to overlap and blend its edge away, so it alone needs a big enough
  * radius to go soft on its own.
  */
-const RADIUS = { window: 110, marquee: 300, streetlamp: 220, lobby: 150, tv: 120 };
+const RADIUS = { window: 110, marquee: 300, streetlamp: 220, lobby: 150, tv: 120, fixture: 110 };
 
 /**
  * Opts one drawable into the lighting shader. Safe to call unconditionally --

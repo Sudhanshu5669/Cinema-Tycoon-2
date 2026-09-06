@@ -199,16 +199,26 @@ const GLOW_CURVES = {
   // its brightness on the facade alone would suggest, or it lights its own
   // building and drops nothing on the street under it -- which is exactly
   // what a marquee is for.
-  marquee: { from: DUSK - 2, to: DAWN, color: 0xffd3a4, intensity: 1.8 },
+  marquee: { from: DUSK - 2, to: DAWN, color: 0xffd3a4, intensity: 0.7 },
   // The lobby behind the entrance doors: the warmest, palest source on the
   // street and the only one that is a doorway rather than a lamp. Its own
   // kind so it can be a gentle wide wash (see lighting.js's RADIUS) instead
   // of borrowing a point source's falloff, which is what turned the entrance
   // into a hotspot before.
-  lobby: { from: DUSK - 2, to: DAWN + 0.5, color: 0xffd6a4, intensity: 1.2 },
+  lobby: { from: DUSK - 2, to: DAWN + 0.5, color: 0xffd6a4, intensity: 0.35 },
+  // Small backlit fixtures -- a poster case, a ticket kiosk, a candy stall.
+  // These used to register a full `window`, which is a lit room seen through
+  // a pane and a physically much bigger emitter than a 2-tile lightbox. Six
+  // of them cluster around a cinema entrance, and because Light2D simply sums
+  // every light that reaches a fragment, six window-sized washes overlapping
+  // under the marquee drove the doorway to a 4.7x multiplier -- the brightest
+  // thing in the frame, on the one surface the reference keeps in shadow.
+  // Smaller and dimmer, so a fixture reads as a tight pool at its own glass
+  // rather than as another floodlight aimed at the street.
+  fixture: { from: DUSK - 1, to: DAWN + 0.5, color: 0xffd6a4, intensity: 1.25 },
   // Streetlamps: on a photocell, not a resident's hand -- a sharper, earlier
   // on/off than windows and the palest colour of the lamp kinds.
-  streetlamp: { from: DUSK - 1, to: DAWN + 0.25, color: 0xffdfb2, intensity: 0.95 },
+  streetlamp: { from: DUSK - 1, to: DAWN + 0.25, color: 0xffdfb2, intensity: 1.15 },
   // A television through a window. The only cold light source on the street,
   // and the only one that flickers (see `flickers` below) -- both facts are
   // the point of it. Every other lit window on this street is tungsten, so a

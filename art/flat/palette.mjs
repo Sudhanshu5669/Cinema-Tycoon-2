@@ -199,6 +199,25 @@ export const TILE_PALETTE = {
   '@': '#ffca7d', // interior glow behind the doors
   '&': '#7a2420', // carpet
   '$': '#5c1a18', // carpet, in shadow
+
+  // --- the entrance doors --------------------------------------------------
+  // A theatre door is a solid panelled leaf, not a pane. These used to be
+  // drawn in `M`/`R` -- the cinema door's *glass* tones, near-white amber --
+  // which made the whole four-leaf bank the brightest object in the frame by
+  // a wide margin and gave the entrance no depth at all: a wall of light
+  // where the reference has maroon joinery standing inside a dark recess.
+  // Deep and desaturated on purpose, and darker than a maroon door "should"
+  // be, because the canopy's shade is baked into the paint. It has to be: the
+  // doors sit between the marquee above them and the pavement in front, so in
+  // this projection there is no position or radius that can light the street
+  // while leaving the doorway in shadow -- the two are the same direction from
+  // the lamp. Occlusion would answer it properly (occludedLight.js is the
+  // prototype) and until that is wired the honest substitute is the one a
+  // painter would reach for anyway: paint the shaded thing shaded. These land
+  // at L~75 under the marquee, which is where the reference's doors measure.
+  '#': '#3c1e22', // door leaf
+  '~': '#2a1418', // leaf panel, rebated -- and the bottom rail's own shadow
+  '^': '#55292c', // top rail, the one edge the marquee above actually reaches
 };
 
 /**
@@ -237,6 +256,11 @@ export const TILE_HEIGHT = {
   x: 1, X: -1, I: -2, i: -2, M: -2, R: -2,
   // Doors: the recess line grooves in, the handle is a real knob.
   D: -1, k: 2,
+  // Entrance doors: the leaf is the wall plane, its panels are rebated behind
+  // it and the top rail stands proud -- the same proud-frame/recessed-field
+  // language the window reveal already uses. Without these three the new
+  // leaves bake flat and the bank lights like a painted board.
+  '#': 0, '~': -1, '^': 1,
   // Plinth: the stone course steps out from the wall face above it.
   t: 1, T: 1, u: 1, U: 1,
   // Kerb: a raised top edge, then a real drop to road level.
