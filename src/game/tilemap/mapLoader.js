@@ -9,7 +9,7 @@
 //
 //   { w, h,
 //     ground|flat|object|overhead: { default?, bands?, vbands?, stripes?, cells? },
-//     platforms: [...], buildings: [...], streetlamps: [...] }
+//     platforms: [...], buildings: [...], streetlamps: [...], props: [...] }
 //
 // A building may also name `cornice`/`plinth` tiles alongside `face`/`base`,
 // which is how a background building is pushed back: swapping all four for
@@ -41,6 +41,14 @@ import { TILES_KEY } from './atlas.js';
 import { signLines, signFieldWidth, signLineWidth } from './sign.js';
 
 const LAYER_ROLES = ['ground', 'flat', 'object', 'overhead'];
+
+/** Light kinds a prop may declare. Mirrors sun.js's GLOW_CURVES keys by hand,
+ *  the same way sign.js mirrors the signage palette: this module is pure by
+ *  design (its "validation needs no browser" property depends on it), and
+ *  sun.js is renderer-side. A kind missing here is a loud error rather than a
+ *  silent fall back to `window`, because "my kiosk glows the wrong colour" is
+ *  exactly the kind of typo that otherwise gets shipped. */
+const LIGHT_KINDS = ['window', 'marquee', 'streetlamp', 'lobby', 'tv'];
 
 export class CityMapError extends Error {
   constructor(errs) {
@@ -216,6 +224,25 @@ export function loadCityMap(raw, scene) {
     if (!inBounds(p.x, p.y)) errs.push(`streetlamps[${i}]: (${p.x},${p.y}) out of bounds`);
   });
 
+  // Freestanding props (see renderer.js's _buildProp). `x, y` is the tile the
+  // prop stands ON, so a footprint grows north from that row -- which is why
+  // the bounds check below tests `y - d + 1` rather than `y + d`.
+  (raw.props ?? []).forEach((p, i) => {
+    const label = `props[${i}]`;
+    if (!inBounds(p.x, p.y)) { errs.push(`${label}: (${p.x},${p.y}) out of bounds`); return; }
+    if (!validTile(p.tile)) errs.push(`${label}: unknown tile "${p.tile}"`);
+    if (p.w !== undefined && !posInt(p.w)) errs.push(`${label}.w must be a positive integer, got ${p.w}`);
+    if (p.d !== undefined && !posInt(p.d)) errs.push(`${label}.d must be a positive integer, got ${p.d}`);
+    const d = p.d ?? 1;
+    if (p.y - d + 1 < 0) errs.push(`${label}: a ${d}-tile-deep footprint standing on row ${p.y} runs off the top of the map`);
+    if (p.w !== undefined && p.x + p.w > w) {
+      errs.push(`${label}: footprint (${p.x} ${p.w} wide) runs outside the ${w}-tile-wide map`);
+    }
+    if (p.light !== undefined && !LIGHT_KINDS.includes(p.light)) {
+      errs.push(`${label}.light: unknown light kind "${p.light}" -- one of ${LIGHT_KINDS.join(', ')}`);
+    }
+  });
+
   if (errs.length) throw new CityMapError(errs);
 
   return {
@@ -223,5 +250,6 @@ export function loadCityMap(raw, scene) {
     platforms: raw.platforms ?? [],
     buildings: raw.buildings ?? [],
     streetlamps: raw.streetlamps ?? [],
+    props: raw.props ?? [],
   };
 }

@@ -31,7 +31,7 @@
 // Light objects and keeping them in sync with the hour.
 
 import Phaser from 'phaser';
-import { ambientFor, glowFor } from './tilemap/sun.js';
+import { ambientFor, glowFor, flickers, flickerAt } from './tilemap/sun.js';
 import { Light } from './light.js';
 
 const { LIGHT_PIPELINE } = Phaser.Renderer.WebGL.Pipelines;
@@ -60,7 +60,7 @@ const { LIGHT_PIPELINE } = Phaser.Renderer.WebGL.Pipelines;
  * enough to overlap and blend its edge away, so it alone needs a big enough
  * radius to go soft on its own.
  */
-const RADIUS = { window: 110, marquee: 190, streetlamp: 220, lobby: 150 };
+const RADIUS = { window: 110, marquee: 190, streetlamp: 220, lobby: 150, tv: 120 };
 
 /**
  * Opts one drawable into the lighting shader. Safe to call unconditionally --
@@ -133,6 +133,33 @@ export class LightingLayer {
       light.setColor(color).setIntensity(intensity);
       this._phaserLights[i].setColor(color).setIntensity(intensity);
     });
+    // Re-derived here because setHours has just overwritten every intensity
+    // with its steady value -- see `_flickering`.
+    this._flickering = this.lights
+      .map((light, i) => ({ light, phaser: this._phaserLights[i], base: light.intensity, phase: (light.x * 0.013 + light.y * 0.029) % 10 }))
+      .filter((e) => flickers(e.light.kind) && e.base > 0);
+  }
+
+  /**
+   * Per-frame brightness for the lights that have any -- only the flickering
+   * ones, which on this street is a couple of televisions. Everything else
+   * stays a pure function of the hour and is not touched here, which is what
+   * keeps setHours' bucket optimisation worth having.
+   *
+   * The `Light` object is updated alongside its live Phaser light, not just
+   * the Phaser one, because `shadowSources` reads `illuminationAt` off the
+   * former -- letting them drift would mean a shadow cast by a brightness the
+   * screen is not currently showing.
+   *
+   * @param {number} timeMs
+   */
+  update(timeMs) {
+    if (!this.active) return;
+    for (const e of this._flickering ?? []) {
+      const v = e.base * flickerAt(timeMs, e.phase);
+      e.light.setIntensity(v);
+      e.phaser.setIntensity(v);
+    }
   }
 
   /**

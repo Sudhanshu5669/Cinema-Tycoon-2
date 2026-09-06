@@ -36,6 +36,8 @@ import {
 } from './sign.js';
 import { ShadowLayer } from './shadows.js';
 import { LightingLayer, wireLight } from '../lighting.js';
+import { GlowLayer } from '../glow.js';
+import { BulbChase } from './chase.js';
 
 /** Small plaque label on a booth/stand -- TICKET, CANDY. Not a per-cinema
  *  identity like the marquee name; universal fixture signage, so it's fixed
@@ -46,6 +48,18 @@ import { LightingLayer, wireLight } from '../lighting.js';
 const FACADE_LABELS = {
   boxOffice: { text: 'TICKET', y: 2 },
   candyStand: { text: 'CANDY', y: 8 },
+  // Freestanding props (see _buildProp) look these up by tile name too: a
+  // kiosk on the pavement wants a plate for the same reason a booth in a
+  // wall does, and a second table for it would be a second table to keep in
+  // agreement with this one. A prop may override the text in data
+  // (`label`) -- unlike a fixed facade fixture, the same kiosk art is
+  // reasonably a ticket window on one street and a newsstand on the next.
+  //
+  // The candy cart deliberately has no entry: its art leaves no dark board
+  // clear for one, so a plate lands straight on the striped hood (tried, and
+  // it looked exactly like that), and at 32px across two lit popcorn boxes
+  // say "candy" more legibly than five letters at scale 1 ever will.
+  ticketKiosk: { text: 'TICKET', y: 8 },
 };
 const LABEL_SCALE = 1;
 const PLAQUE_BG_COLOR = '#201c26';
@@ -60,17 +74,39 @@ const ALCOVE_COLOR = '#1b1218';
 const ALCOVE_GLOW_COLOR = '#ffca7d';  // palette '@'
 const ALCOVE_MARGIN = 4;
 
-/** Facade tiles whose own art is lit from inside, and the kind of light each
- *  one therefore registers. The kiosks and the poster case are on this list
- *  because their art *is* lit: a glowing booth that throws no light on the
- *  pavement in front of it reads as a sticker, not as a lamp. The door bank
- *  gets its own `lobby` kind -- a doorway is a wide, warm, comparatively
- *  gentle wash, not a point source, and giving it a window's curve is what
- *  previously produced a blown-out blob at the entrance. */
+/**
+ * Facade tiles whose own art is lit from inside, and the kind of light each
+ * one therefore registers. The kiosks and the poster case are on this list
+ * because their art *is* lit: a glowing booth that throws no light on the
+ * pavement in front of it reads as a sticker, not as a lamp. The door bank
+ * gets its own `lobby` kind -- a doorway is a wide, warm, comparatively
+ * gentle wash, not a point source, and giving it a window's curve is what
+ * previously produced a blown-out blob at the entrance.
+ *
+ * **This table used to be exactly inverted for windows**, and the bug is
+ * worth recording because it looked completely right: plain `window` was on
+ * the list and `windowLit`/`windowWarm` were not. But plain WINDOW's glass is
+ * `i`/`I`, the cold dark pane -- that tile is an *unlit* window, and it was
+ * the one throwing light onto the street, while the tiles whose art is
+ * literally a warm room with someone in it threw none. The visible symptom
+ * was a night street where every window glowed equally, which is why nobody
+ * noticed: uniform light reads as "the lighting works". A real street is
+ * mostly dark windows with a few lit ones, and getting that contrast back is
+ * worth more than any amount of extra glow.
+ *
+ * So the rule is now simply: a tile emits light if, and only if, its own
+ * authored art has warm interior in it.
+ */
 const LIT_FACADE = {
-  window: 'window', windowWide: 'window',
+  // `window` and `windowWide` are absent for exactly that reason -- both are
+  // authored with cold `i`/`I` glass, so both are unlit windows and neither
+  // should be putting light on the street.
+  windowLit: 'window', windowWarm: 'window', windowStair: 'window',
   boxOffice: 'window', candyStand: 'window', posterCase: 'window',
   cinemaDoors: 'lobby',
+  // Not 'window': a television is cold and it moves, and both of those are
+  // properties of the light rather than of the glass -- see sun.js's `tv`.
+  windowTv: 'tv',
 };
 
 export class TileMapRenderer {
@@ -110,6 +146,15 @@ export class TileMapRenderer {
     this._lights = [];
     /** @type {LightingLayer | null} set by build(). */
     this.lighting = null;
+    /** World-space bulb centres, one perimeter-ordered ring per signboard --
+     *  filled as panels are built, consumed by the chase. */
+    this._bulbRings = [];
+    /** @type {BulbChase | null} set by build(). */
+    this.chase = null;
+    /** @type {GlowLayer | null} set by build(). The emission half of the
+     *  lighting: LightingLayer shades surfaces, this puts light in the air.
+     *  Built from the exact same `_lights` list, never a second one. */
+    this.glow = null;
     /** Current hour driving the cast shadows and the lighting layer. */
     this.hours = 12;
   }
@@ -164,6 +209,7 @@ export class TileMapRenderer {
     for (const p of this.map.platforms ?? []) this._buildPlatform(p);
     for (const b of this.map.buildings ?? []) this._buildBuilding(b);
     for (const s of this.map.streetlamps ?? []) this._buildStreetlamp(s);
+    for (const pr of this.map.props ?? []) this._buildProp(pr);
     this._buildLoose();
     this.shadows = new ShadowLayer(
       this.scene, this._casters, this._spriteCasters, this._surfaces, this._wallFaces,
@@ -172,6 +218,10 @@ export class TileMapRenderer {
     this.shadows.setHours(this.hours);
     this.lighting = new LightingLayer(this.scene, this._lights);
     this.lighting.setHours(this.hours);
+    this.glow = new GlowLayer(this.scene, this._lights);
+    this.glow.setHours(this.hours);
+    this.chase = new BulbChase(this.scene, this._bulbRings);
+    this.chase.setHours(this.hours);
     return this;
   }
 
@@ -180,6 +230,8 @@ export class TileMapRenderer {
     this.hours = hours;
     this.shadows?.setHours(hours);
     this.lighting?.setHours(hours);
+    this.glow?.setHours(hours);
+    this.chase?.setHours(hours);
   }
 
   /**
@@ -193,6 +245,19 @@ export class TileMapRenderer {
   updatePlayer(px, py, frameName, heightPx) {
     const sources = this.lighting?.shadowSources(px, py) ?? [];
     this.shadows?.updatePlayer(px, py, frameName, heightPx, this.hours, sources);
+  }
+
+  /**
+   * Per-frame animation. Separate from setHours because these two clocks are
+   * genuinely different: the hour decides what is *switched on*, and only
+   * changes work when it crosses a bucket; this is wall-clock motion in
+   * already-lit things, and has to run every frame to be motion at all.
+   * @param {number} timeMs the scene clock (Phaser passes it to update())
+   */
+  update(timeMs) {
+    this.chase?.update(timeMs);
+    this.lighting?.update(timeMs);
+    this.glow?.update(timeMs);
   }
 
   _place(key, x, y, depth) {
@@ -352,14 +417,7 @@ export class TileMapRenderer {
         // leaves clear for it (FACADE_LABELS carries that per-tile offset),
         // it can't be hidden by anything placed above this facade canvas.
         const label = FACADE_LABELS[d.tile];
-        if (label) {
-          const tw = measureWidth(label.text, LABEL_SCALE);
-          const th = CHAR_H * LABEL_SCALE;
-          const plaqueH = th + 4;
-          const plaqueY = localY + label.y;
-          g.rect(PLAQUE_BG_COLOR, localX, plaqueY, size.w, plaqueH);
-          g.text(label.text, localX + (size.w - tw) / 2, plaqueY + 2, LABEL_SCALE, SIGN_GOLD);
-        }
+        if (label) this._paintPlaque(g, label, localX, localY, size.w);
       }
     });
     this._place(faceKey, b.x * TILE, faceTop, frontY);
@@ -405,9 +463,14 @@ export class TileMapRenderer {
     // across a street.
     for (const p of b.panels ?? []) {
       const pw = p.fw * TILE, ph = (p.h ?? 1) * STEP;
-      const panelKey = bake(this.scene, pw, ph, (g) => this._paintSign(g, pw, ph, p));
+      let bulbs = [];
+      const panelKey = bake(this.scene, pw, ph, (g) => { bulbs = this._paintSign(g, pw, ph, p); });
       const pTop = frontY - (p.up ?? storeys) * TILE;
       this._place(panelKey, (b.x + p.fx) * TILE, pTop, DEPTH_OVERHEAD);
+      // The same bulbs, in the same order, as world positions -- one ring per
+      // board for the running chase (chase.js).
+      const px0 = (b.x + p.fx) * TILE;
+      this._bulbRings.push(bulbs.map((v) => ({ x: px0 + v.x, y: pTop + v.y })));
       this._lights.push({
         x: (b.x + p.fx) * TILE + pw / 2,
         y: pTop + ph / 2,
@@ -469,6 +532,24 @@ export class TileMapRenderer {
   }
 
   /**
+   * A small dark plate with gold lettering, on the board a booth/kiosk tile
+   * leaves clear for it. Shared by facade fixtures and freestanding props --
+   * `label.y` is that per-tile offset (see FACADE_LABELS), `x0, y0` the
+   * top-left of the tile's own art within whatever bake is being painted.
+   *
+   * @param {object} g the bake painter (see atlas.js)
+   * @param {{text: string, y: number}} label
+   * @param {number} x0 @param {number} y0 @param {number} w the tile's width
+   */
+  _paintPlaque(g, label, x0, y0, w) {
+    const tw = measureWidth(label.text, LABEL_SCALE);
+    const plaqueH = CHAR_H * LABEL_SCALE + 4;
+    const plaqueY = y0 + label.y;
+    g.rect(PLAQUE_BG_COLOR, x0, plaqueY, w, plaqueH);
+    g.text(label.text, x0 + (w - tw) / 2, plaqueY + 2, LABEL_SCALE, SIGN_GOLD);
+  }
+
+  /**
    * Paint one signboard into a bake: a dark rebate, a frame of bulbs stepped
    * around its whole perimeter, a gold pinstripe, the field, then the text.
    *
@@ -478,33 +559,45 @@ export class TileMapRenderer {
    * The block is centred vertically in the field and each line centred
    * horizontally, so nothing has to be positioned by hand in the data.
    *
+   * Returns the centre of every bulb it drew, in panel-local px and in
+   * perimeter order (clockwise from the top-left corner) -- what the running
+   * chase (chase.js) parks its travelling highlight on. Perimeter order is
+   * the whole reason this is a return value rather than something the caller
+   * re-derives: the *set* of positions is obvious from the board's size, but
+   * the order they go round in is not, and a chase run over them in any other
+   * order jumps about instead of travelling.
+   *
    * @param {object} g the bake painter (see atlas.js)
    * @param {number} w @param {number} h panel size in px
    * @param {object} p the panel's own `city.json` entry
+   * @returns {{x: number, y: number}[]}
    */
   _paintSign(g, w, h, p) {
     g.rect(SIGN_BACK_COLOR, 0, 0, w, h);
     g.rect(p.border ?? SIGN_GOLD, BULB - 1, BULB - 1, w - (BULB - 1) * 2, h - (BULB - 1) * 2);
     g.rect(p.bg ?? SIGN_FIELD_COLOR, BULB, BULB, w - BULB * 2, h - BULB * 2);
 
-    // Bulbs around all four edges. The corners are covered by the horizontal
-    // runs, so the vertical ones start and stop one bulb in.
-    for (let x = 0; x + BULB <= w; x += BULB) {
-      g.tile('signBulb', x, 0);
-      g.tile('signBulb', x, h - BULB);
-    }
-    for (let y = BULB; y + BULB <= h - BULB; y += BULB) {
-      g.tile('signBulb', 0, y);
-      g.tile('signBulb', w - BULB, y);
-    }
+    // Bulbs around all four edges, collected clockwise: top row left to
+    // right, down the right side, bottom row right to left, up the left side.
+    // The corners belong to the horizontal runs, so the vertical ones start
+    // and stop one bulb in -- which is also what stops a corner bulb being
+    // visited twice by the chase and pulsing at double rate.
+    const bulbs = [];
+    const at = (x, y) => { g.tile('signBulb', x, y); bulbs.push({ x: x + BULB / 2, y: y + BULB / 2 }); };
+    const lastX = Math.floor((w - BULB) / BULB) * BULB;
+    for (let x = 0; x + BULB <= w; x += BULB) at(x, 0);
+    for (let y = BULB; y + BULB <= h - BULB; y += BULB) at(lastX, y);
+    for (let x = lastX; x >= 0; x -= BULB) at(x, h - BULB);
+    for (let y = h - BULB * 2; y >= BULB; y -= BULB) at(0, y);
 
     const lines = signLines(p);
-    if (!lines.length) return;
+    if (!lines.length) return bulbs;
     let ty = Math.round((h - signBlockHeight(lines)) / 2);
     for (const l of lines) {
       g.text(l.text, Math.round((w - signLineWidth(l)) / 2), ty, l.scale, l.color, l.font);
       ty += (signBlockHeight([l])) + SIGN_LINE_GAP;
     }
+    return bulbs;
   }
 
   /**
@@ -554,6 +647,95 @@ export class TileMapRenderer {
     });
   }
 
+  /**
+   * A freestanding prop -- a ticket kiosk, a candy cart, a hydrant, a planter.
+   *
+   * The difference between this and a `facade` entry is the whole reason it
+   * exists, and it is not a drawing difference: a facade feature is baked
+   * *into* a building's oblique face, so it is part of a wall. It can never
+   * be walked behind, never occlude anyone, never cast a shadow of its own,
+   * and never stand anywhere but flat against a building. The reference's
+   * ticket booth is none of those things -- it is a box out on the footpath.
+   * So a prop is its own y-sorted image standing on the ground, with a real
+   * footprint behind it, and everything else follows from that: it gets a
+   * depth from its contact row (so the player passes in front of it walking
+   * south and behind it walking north), a silhouette shadow like the
+   * streetlamp's, optional collision, and optionally its own light.
+   *
+   * Deliberately built on the machinery already here rather than a new one:
+   * `_spriteCasters` is the streetlamp's own shadow path (alpha silhouette,
+   * not a dragged footprint box, which is the difference between a hydrant
+   * and a shipping container), and `_lights` is the same list every window
+   * and lamp already pushes into, so a lit kiosk shades and glows through
+   * SYSTEMS #8 with nothing new wired up.
+   *
+   * @param {object} p `{ x, y, tile, w?, d?, solid?, light? }` -- `x, y` the
+   *   tile the prop stands on (its ground-contact row), `w`/`d` its footprint
+   *   in tiles for collision and sorting, both defaulting to the art's own
+   *   width in whole tiles and one row deep.
+   */
+  _buildProp(p) {
+    const size = frameSize(this.scene, p.tile);
+    const { w: wTiles } = this._propFootprint(p);
+    const baseY = footY(p.y);
+    const cx = (p.x + wTiles / 2) * TILE;
+
+    // Origin (0.5, 1): bottom-centre, the same anchor a sprite caster's
+    // `x, y` means, so the image and its shadow cannot disagree about where
+    // the thing touches the ground.
+    // A plain atlas image unless the prop carries a plate, in which case it
+    // has to become a bake -- there is nowhere else to paint data-driven text.
+    // Same painter, same normal-map carry-through as a building face, so a
+    // labelled prop is lit identically to an unlabelled one.
+    const label = p.label === undefined ? FACADE_LABELS[p.tile] : { text: p.label, y: FACADE_LABELS[p.tile]?.y ?? 2 };
+    let img;
+    if (label) {
+      const key = bake(this.scene, size.w, size.h, (g) => {
+        g.tile(p.tile, 0, 0);
+        this._paintPlaque(g, label, 0, 0, size.w);
+      });
+      img = this.scene.add.image(cx, baseY, key).setOrigin(0.5, 1);
+    } else {
+      img = this.scene.add.image(cx, baseY, TILES_KEY, p.tile).setOrigin(0.5, 1);
+    }
+    img.setDepth(baseY);
+    wireLight(img);
+    this.objects.push(img);
+
+    this._spriteCasters.push({
+      x: cx, y: baseY, textureKey: TILES_KEY, frameName: p.tile, heightPx: size.h,
+    });
+
+    // A lit prop is a light. Anchored at the middle of its own glass rather
+    // than its centroid -- a kiosk's light comes out of the window, which is
+    // in its upper half, not out of its plinth.
+    if (p.light) {
+      this._lights.push({
+        x: cx, y: baseY - size.h * 0.55,
+        gx: cx, gy: baseY,
+        kind: p.light,
+      });
+    }
+
+    this.structures.push({
+      kind: 'prop', tile: p.tile, worldRect: worldRect(this._propFootprint(p)), depth: baseY,
+    });
+  }
+
+  /**
+   * A prop's footprint in tiles, as a rect in the same grid space a building's
+   * is. One helper because the drawing pass and the collision bake both need
+   * it and must not disagree: the default width is the art's own, rounded to
+   * whole tiles, so an author only writes `w` down when a prop should block
+   * (or sort) across something other than the space it visibly occupies.
+   * `y` is the contact row, so the rect grows *north* from it.
+   */
+  _propFootprint(p) {
+    const d = p.d ?? 1;
+    const w = p.w ?? Math.max(1, Math.round(frameSize(this.scene, p.tile).w / TILE));
+    return { x: p.x, y: p.y - d + 1, w, h: d };
+  }
+
   /** 'object' and 'overhead' layers: one image per cell. */
   _buildLoose() {
     for (const layer of this.map.layers ?? []) {
@@ -585,6 +767,13 @@ export class TileMapRenderer {
   _bakeSolid() {
     const g = grid(this.w, this.h, false);
     for (const b of this.map.buildings ?? []) stamp(g, b, true);
+    // A prop marked solid blocks the same way a building does -- a kiosk you
+    // can walk through is worse than no kiosk. Its footprint is `w` x `d`
+    // tiles ending on its own contact row, so `y` means the same thing here
+    // as it does when the prop is drawn: the row it stands on.
+    for (const p of this.map.props ?? []) {
+      if (p.solid) stamp(g, this._propFootprint(p), true);
+    }
     return g;
   }
 
@@ -593,6 +782,10 @@ export class TileMapRenderer {
     this.shadows = null;
     this.lighting?.destroy();
     this.lighting = null;
+    this.glow?.destroy();
+    this.glow = null;
+    this.chase?.destroy();
+    this.chase = null;
     for (const o of this.objects) o.destroy();
     this.objects.length = 0;
   }

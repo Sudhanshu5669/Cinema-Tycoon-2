@@ -164,7 +164,45 @@ const GLOW_CURVES = {
   // Streetlamps: on a photocell, not a resident's hand -- a sharper, earlier
   // on/off than windows and the palest colour of the lamp kinds.
   streetlamp: { from: DUSK - 1, to: DAWN + 0.25, color: 0xffd89a, intensity: 1.2 },
+  // A television through a window. The only cold light source on the street,
+  // and the only one that flickers (see `flickers` below) -- both facts are
+  // the point of it. Every other lit window on this street is tungsten, so a
+  // single blue-white one in a row of amber ones reads instantly as a
+  // different kind of evening happening behind that particular pane. Off
+  // earlier than the rest come on, because someone sitting down in front of
+  // the television does it before the street lights up, and off well before
+  // dawn because they fall asleep.
+  tv: { from: DUSK - 1.5, to: DAWN - 1.5, color: 0x8fb4ff, intensity: 0.85 },
 };
+
+/**
+ * Light kinds whose brightness is not a pure function of the hour -- i.e. the
+ * ones something has to drive per frame. Exported rather than a string
+ * comparison at each call site so "which lights move" is one fact in one
+ * place; both the shading layer (lighting.js) and the emission layer
+ * (glow.js) ask this the same question and must agree, or a window's glow
+ * would flicker while the wall it lights held perfectly still.
+ * @param {string} kind
+ */
+export function flickers(kind) { return kind === 'tv'; }
+
+/**
+ * Brightness multiplier for a flickering light at a moment in time, ~0.5..1.
+ *
+ * Three sine waves at deliberately incommensurate frequencies, so the sum
+ * never repeats on any period an eye can catch -- a single sine reads as a
+ * pulse and a random number per frame reads as broken hardware, while this
+ * reads as a picture changing. `phase` de-syncs one light from another, so a
+ * street with two televisions in it does not have them showing the same
+ * programme.
+ *
+ * @param {number} timeMs @param {number} phase any per-light constant
+ */
+export function flickerAt(timeMs, phase) {
+  const t = timeMs / 1000 + phase;
+  const w = 0.6 * Math.sin(t * 11.3) + 0.3 * Math.sin(t * 19.7) + 0.1 * Math.sin(t * 31.1);
+  return 0.76 + 0.24 * w;
+}
 
 /**
  * @param {number} hours 0..24, wraps

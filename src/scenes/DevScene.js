@@ -166,6 +166,27 @@ export class DevScene extends Phaser.Scene {
         // separate code path, see TileMapRenderer#bakedNormalMapped.
         bakedNormalMapped: this.map.bakedNormalMapped,
         ambientColor: this.map.lighting?.ambientColor ?? 0xffffff,
+        // The emission layer (glow.js). `visible` is the real assertion: the
+        // whole layer hides itself in daylight rather than drawing at alpha
+        // 0, which is what makes it free for two thirds of the day, and a
+        // regression there would be invisible in a screenshot.
+        glow: {
+          total: this.map.glow?.glows.length ?? 0,
+          visible: this.map.glow?.glows.filter((g) => g.halo.visible).length ?? 0,
+          // How many lights sit low enough to pool on the pavement. Upper
+          // storey windows must not -- see glow.js's POOL_FADE.
+          pooled: this.map.glow?.glows.filter((g) => g.pool).length ?? 0,
+        },
+        // The marquee bulb chase (chase.js). Alphas of one board's ring, so
+        // the test can assert both that they differ from each other (a wave
+        // is present) and that they change over time (it travels).
+        chaseAlphas: this.map.chase?.rings[0]?.images.map((i) => Math.round(i.alpha * 1000) / 1000) ?? [],
+        chaseVisible: this.map.chase?.rings[0]?.images[0]?.visible ?? false,
+        // Live intensity of the one flickering light kind -- unlike every
+        // other kind this is not a pure function of the hour, so sampling it
+        // twice at the same hour must give two different numbers.
+        tvIntensity: this.map.lighting?.lights.find((l) => l.kind === 'tv')?.intensity ?? 0,
+        propCount: this.map.structures.filter((st) => st.kind === 'prop').length,
         windowGlow: this._lightIntensity('window'),
         marqueeGlow: this._lightIntensity('marquee'),
         streetlampGlow: this._lightIntensity('streetlamp'),
@@ -340,10 +361,10 @@ export class DevScene extends Phaser.Scene {
   }
 
   /**
-   * @param {number} _time
+   * @param {number} time scene clock, milliseconds
    * @param {number} delta milliseconds
    */
-  update(_time, delta) {
+  update(time, delta) {
     const dt = delta / 1000;
     this.input_.update();
     this.player.update(dt, this.input_);
@@ -360,6 +381,9 @@ export class DevScene extends Phaser.Scene {
     if (this.autoTime) this.hours = (this.hours + dt * (24 / DAY_SECONDS)) % 24;
     // Cheap when the hour has not moved into a new bake bucket.
     this.map.setHours(this.hours);
+    // Wall-clock animation (the marquee chase) -- a separate clock from the
+    // hour above, which only says what is switched on.
+    this.map.update(time);
     // The player's own shadow(s) -- from the sun and from nearby point
     // lights. Runs every frame; ShadowLayer.updatePlayer throttles its own
     // redraw, this doesn't need to.

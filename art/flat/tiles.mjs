@@ -1074,46 +1074,66 @@ export const BOX_OFFICE = [
  * sun-bleached paper (`j`/`J`) standing in for a curled corner -- the
  * cheap-cinema detail, not a pristine display case.
  */
+/**
+ * 24 x 48 -- a poster case, with an actual poster in it.
+ *
+ * This used to be a red field with a vague gold oval on it, which from across
+ * a street reads as "a lit rectangle" and nothing more. A poster case is one
+ * of only three things on this frontage that tells you what kind of cinema
+ * this is (the marquee and the reader board are the others), and the way it
+ * does that is by having a *picture* on it, so this one has a rocket, a
+ * creature and a title band.
+ *
+ * The field is `I`, the cool sky-glass tone, and that is the deliberate
+ * choice here: every other lit thing on this facade is tungsten, so a cold
+ * poster reads as a printed sheet behind glass rather than as another lamp.
+ * It was the darker reader-board `K` first, which was the correct *hue* and
+ * the wrong *value* -- at night, flanked by a blown-out doorway, a case that
+ * dark stops reading as an illuminated case and starts reading as a hole in
+ * the wall. A poster case has lamps inside it; the paper has to sit above
+ * the brick around it, not below. Green is spent on the creature and nowhere else on
+ * the street -- with the palette this warm, one small green shape is the most
+ * legible thing that can happen inside a frame this size.
+ */
 export const POSTER_CASE = [
   'xxxxxxxxxxxxxxxxxxxxxxxx',
   'llllllllllllllllllllllll',
   'LLLLLLLLLLLLLLLLLLLLLLLL',
   'xXXXXXXXXXXXXXXXXXXXXXXx',
-  'xXXXXXXXXXXXXXXXXXXXXXXx',
-  'xX%%%%%%%%%%%%%%%%%%%%Xx',
-  'xX%%%%%%%%*%%%%%%%%%%%Xx',
-  'xX%%*%%%%%%%%%%%%%%%*%Xx',
-  'xX%%%%%%%%%%%%%%%%%%%%Xx',
-  'xX%%%%%%%%%%%VVVVVV%%%Xx',
-  'xX%%%%%%*%%VVV++++VVV%Xx',
-  'xX%%%%%%%%%V++++++++V%Xx',
-  'xX%%%%%%%%VV++++++++VVXx',
-  'xX%%%%%%%%V++++++++++VXx',
-  'xX%%%%%%%%V++++++++++VXx',
-  'xX%%%%%%%%V++++++++++VXx',
-  'xX%%%%%%%%V++++++++++VXx',
-  'xX%%%*%%%%VV++++++++VVXx',
-  'xX%%%%%%%%%V++++++++V%Xx',
-  'xX%%%%%%%%%VVV++++VVV%Xx',
-  'xX%%%%**%%%%%VVVVVV%%%Xx',
-  'xX%%%*****%%%%%%%%%%%%Xx',
-  'xX%%**@@@***%%%%%%%%%%Xx',
-  'xX%%%*****%%%%%%%%%%%%Xx',
-  'xX%%%%**%%%%%%%%%%%%%%Xx',
-  'xX%%%%%%%%%%%%%%%%%%%%Xx',
-  'xX%%%%%%%%%%%%%%%%%%%%Xx',
-  'xX%%%%%%%%%%%%%%%%%%%%Xx',
-  'xX%%%%%%%%%%%%%%%%%%%%Xx',
-  'xX%%%%%%%%%%%%%%%%%%%%Xx',
-  'xX%%%%%%%%%%%%%%%%%%%%Xx',
+  'xXIIIIIIIIIIIIIIIIIIIIXx',
+  'xXIIII*IIIIIIIIIII*IIIXx',
+  'xXIIIIIIIII*IIIIIIIIIIXx',
+  'xXIIIIIIIII+IIIII*IIIIXx',
+  'xXII*IIIIII+IIIIIIIIIIXx',
+  'xXIIIIIIIII+IIIIIII*IIXx',
+  'xXIIIIIIII+++IIIIIIIIIXx',
+  'xXIIIIIIII+++IIII*IIIIXx',
+  'xXIIIIIII++s++IIIIIIIIXx',
+  'xXII*IIII++s++IIIIIIIIXx',
+  'xXIIIIIII++s++IIIII*IIXx',
+  'xXIIIIII+++++++IIIIIIIXx',
+  'xXIIIIIV+++++++VIIIIIIXx',
+  'xXIIIIVV+++++++VVIII*IXx',
+  'xXIIIVVV+++++++VVVIIIIXx',
+  'xXIIIIII+++++++IIIIIIIXx',
+  'xXIIIIIII*+++*IIIIIIIIXx',
+  'xXIIII*III*+*IIIIIIIIIXx',
+  'xXIIIIIIIII*IIII*IIIIIXx',
+  'xXIIIIIIIIIIIIIIIIIIIIXx',
+  'xXIIgggggIIIIIIIIIIIIIXx',
+  'xXIIgGgGgIIIIIIIII*IIIXx',
+  'xXIgggggggIIIIIIIIIIIIXx',
+  'xXIgGgggGgIIIII*IIIIIIXx',
+  'xXIgggggggIIIIIIIIIIIIXx',
+  'xXIIgggggIIIIIIIIIIIIIXx',
+  'xXIIGgGgGIIIIIIIIIIIIIXx',
+  'xXIIIIIIIIIIIIIIIIIIIIXx',
   'xXVVVVVVVVVVVVVVVVVVVVXx',
   'xX%%%%%%%%%%%%%%%%%%%%Xx',
-  'xX%%++++++++++++++++%%Xx',
-  'xX%%++++++++++++++++%%Xx',
-  'xX%%++++++++++++++++%%Xx',
-  'xX%%++++++++++++++++%%Xx',
+  'xX%%++++%%++++%%++++%%Xx',
+  'xX%%++++%%++++%%++++%%Xx',
   'xX%%%%%%%%%%%%%%%%%%%%Xx',
-  'xX%%%%%%%%%%%%%%%%%%%%Xx',
+  'xXVVVVVVVVVVVVVVVVVVVVXx',
   'xXXXXXXXXXXXXXXXXXXXXXXx',
   'xjjjjjjjjjjsjjjjjjjjjjjx',
   'xJJJJJJJJJJJJJJJJJJJJJJx',
@@ -1123,6 +1143,7 @@ export const POSTER_CASE = [
   'LLLLLLLLLLLLLLLLLLLLLLLL',
   'xdddddddddddddddddddddDx',
   'TTTTTTTTTTTTTTTTTTTTTTTT',
+  'UUUUUUUUUUUUUUUUUUUUUUUU',
 ];
 
 /**
@@ -1386,10 +1407,513 @@ export const SIGN_BULB = [
 ];
 
 /** Draw order is the map's business, not the tile's — these are just names. */
+// --- street surface clutter --------------------------------------------------
+//
+// Ground-layer tiles, so they *replace* a slab rather than sit on it as an
+// object: a manhole is not a thing standing on the pavement, it is what that
+// square of pavement is. That also keeps them free -- they bake into the one
+// ground image with everything else and cost nothing at runtime, where the
+// same marks placed as objects would each be a separate y-sorted image.
+//
+// Density is the point of this whole group. A street with four objects on it
+// reads as a diagram of a street however well each building is drawn, and the
+// reference's pavement is covered: drains, patched slabs, blown litter, an
+// iron cover. None of these is interesting on its own and none is meant to be
+// -- they exist so the eye has somewhere to rest between the lit things.
+
+export const MANHOLE = [
+  'pppppppppppppppp',
+  'ppppqqqqqqqqpppp',
+  'ppqqZZZZZZZZqqpp',
+  'pqZZQZZZZQZZZZqp',
+  'pqZZZZQZZZZQZZqp',
+  'qZZQZZZZQZZZZZZq',
+  'qZZZZZZZZZZQZZZq',
+  'qZZZZQZZZZZZZZZq',
+  'qZZZZZZZQZZZZZZq',
+  'qZZQZZZZZZZZQZZq',
+  'qZZZZZZQZZZZZZZq',
+  'pqZZZZZZZZQZZZqp',
+  'pqZZQZZZZZZZZZqp',
+  'ppqqZZZZZZZZqqpp',
+  'ppppqqqqqqqqpppp',
+  'pppppppppppppppp',
+];
+
+/** A storm drain. Meant for the row of kerb tiles specifically -- the dark
+ *  slots are road colour, not a new one, because what you are looking into
+ *  through a grating is the same darkness the road already is. */
+export const DRAIN_GRATE = [
+  'cccccccccccccccc',
+  'CCCCCCCCCCCCCCCC',
+  'qZZZZZZZZZZZZZZq',
+  'qZaaaaaaaaaaaaZq',
+  'qZZZZZZZZZZZZZZq',
+  'qZaaaaaaaaaaaaZq',
+  'qZZZZZZZZZZZZZZq',
+  'qZaaaaaaaaaaaaZq',
+  'qZZZZZZZZZZZZZZq',
+  'qZaaaaaaaaaaaaZq',
+  'qZZZZZZZZZZZZZZq',
+  'qZaaaaaaaaaaaaZq',
+  'qZZZZZZZZZZZZZZq',
+  'qqqqqqqqqqqqqqqq',
+  'aaaaaaaaaaaaaaaa',
+  'aaaaaaaaaaaaaaaa',
+];
+
+/** One slab lifted and relaid in newer stone. The plinth tones are reused on
+ *  purpose rather than a new pair: a patch is the same stone as the kerb and
+ *  the building bases, which is exactly why it reads as a repair. */
+export const PAVE_PATCH = [
+  'pPpppqppppppqppp',
+  'PppppppqppPppppp',
+  'ppqTTTTTTTTTqppp',
+  'pppTtttttttTpqpp',
+  'pqpTtttttttTpppp',
+  'pppTtttttttTppqp',
+  'ppqTtttttttTpppp',
+  'pppTtttttttTpppp',
+  'pppTtttttttTpqpp',
+  'pqpTtttttttTpppp',
+  'pppTTTTTTTTTqppp',
+  'ppppppqppppppppP',
+  'pqppppppppqppppp',
+  'ppppPpppppppppqp',
+  'pppppppqpppppppp',
+  'qppppppppppPpppp',
+];
+
+/** Blown paper. Poster stock (`j`/`J`), so the litter outside a cinema is
+ *  last week's bill for last week's film -- one palette doing two jobs
+ *  because they really are the same material. */
+export const PAVE_LITTER = [
+  'ppppppqpppppPppp',
+  'pPppppppppqppppp',
+  'ppppjjjppppppppp',
+  'pppjJjjpppppqppp',
+  'ppppjjppppjJppqp',
+  'pqppppppppjjjppp',
+  'pppppppppppJppPp',
+  'ppqppppppppppppp',
+  'ppppppPppqpppppp',
+  'pppppppppppppqpp',
+  'ppjjppppppppppPp',
+  'pjJjjppqpppppppp',
+  'ppjjppppppjjpppp',
+  'pqppppppppjJjppq',
+  'ppppPppppppjjppp',
+  'pppppqpppppppppp',
+];
+
+// --- freestanding props ------------------------------------------------------
+//
+// Things that STAND ON the pavement rather than being painted onto a wall.
+// That difference is the whole reason this group exists and is not more
+// facade features: a facade feature is part of a building's baked oblique
+// face, so it can never be walked behind, never occlude the player, and never
+// throw a shadow of its own. The reference's ticket booth is none of those
+// things -- it is a kiosk out on the footpath with its own footprint, its own
+// roof, and its own shadow raking off it. See renderer.js's `_buildProp` and
+// the `props` list in city.json.
+//
+// Bottom-anchored: a prop's last row is where it meets the ground, which is
+// what its depth and its shadow are both derived from. So they may be any
+// height; only their footprint has to agree with the tile grid.
+
+/**
+ * 32 x 44 -- the cinema's ticket booth, out on the pavement.
+ *
+ * Built like a small building rather than like a sign, because that is what
+ * it is: a lipped roof cap catching the light at the top, a dark fascia for
+ * its TICKET plate, a big warm window with a seller behind it, a panelled
+ * body, and a plinth where it meets the stone. The window is the point -- an
+ * unlit booth is a shed, and the seller's silhouette is what says the cinema
+ * is open tonight.
+ */
+export const TICKET_KIOSK = [
+  '..llllllllllllllllllllllllllll..',
+  '.llllllllllllllllllllllllllllll.',
+  'llllllllllllllllllllllllllllllll',
+  'LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL',
+  '.ffffffffffffffffffffffffffffff.',
+  '.ffffffFfffffffffffffffFffffffff',
+  '.LLLLLLLLLLLLLLLLLLLLLLLLLLLLLL.',
+  '.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%.',
+  '.%============================%.',
+  '.%============================%.',
+  '.%============================%.',
+  '.%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%.',
+  '.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.',
+  '.xXXXXXXXXXXXXXXXXXXXXXXXXXXXXx.',
+  '.xXMMMMMMMMMMMXMMMMMMMMMMMMMMXx.',
+  '.xXMMMMMMMMMMMXMMMMMMMMMMMMMMXx.',
+  '.xXMMMMMMMMMMMXMMMMMMMMMMMMMMXx.',
+  '.xXMMMMMMMMMMMXMMMMXXXXXXMMMMXx.',
+  '.xXMMMMMMMMMMMXMMMXXXXXXXXMMMXx.',
+  '.xXMMMMMMMMMMMXMMMXXXXXXXXMMMXx.',
+  '.xXMMMMMMMMMMMXMMMMXXXXXXMMMMXx.',
+  '.xXMMMMMMMMMMMXMMMMMXXXXMMMMMXx.',
+  '.xXMMMMMMMMMMMXMMMXXXXXXXXMMMXx.',
+  '.xXMMMMMMMMMMMXMMXXXXXXXXXXMMXx.',
+  '.xXMMMMMMMMMMMXMMXXXXXXXXXXMMXx.',
+  '.xXMMMMMMMMMMMXMXXXXXXXXXXXXMXx.',
+  '.xXRRRRRRRRRRRXMXXXXXXXXXXXXMXx.',
+  '.xXXXXXXXXXXXXXXXXXXXXXXXXXXXXx.',
+  '.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.',
+  '.wwwwwwwwwwwwwwwwwwwwwwwwwwwwww.',
+  '.wWWWWWWWWWWWWWWWWWWWWWWWWWWWWw.',
+  '.wWwwwwwwwwwwwWwwwwwwwwwwwwwwWw.',
+  '.wWwwwwwwwwwwwWwwwwwwwwwwwwwwWw.',
+  '.wWwwwwwwwwwwwWwwwwwwwwwwwwwwWw.',
+  '.wWwwwwwwwwwwwWwwwwwwwwwwwwwwWw.',
+  '.wWwwwwwwwwwwwWwwwwwwwwwwwwwwWw.',
+  '.wWWWWWWWWWWWWWWWWWWWWWWWWWWWWw.',
+  '.wwwwwwwwwwwwwwwwwwwwwwwwwwwwww.',
+  '.tttttttttttttttttttttttttttttt.',
+  '.tTTTTTTTTTTTTTTTTTTTTTTTTTTTTt.',
+  '.tTttttttttttttttttttttttttttTt.',
+  '.tTttttttttttttttttttttttttttTt.',
+  '.TTTTTTTTTTTTTTTTTTTTTTTTTTTTTT.',
+  '.UUUUUUUUUUUUUUUUUUUUUUUUUUUUUU.',
+];
+
+/**
+ * 32 x 34 -- the candy stand, wheeled out onto the footpath beside the doors.
+ *
+ * A scalloped striped hood over a warm glass case, on legs. The stripes reuse
+ * the awning's red and cream exactly, so the cart reads as belonging to the
+ * cinema behind it rather than as a generic barrow that happens to be parked
+ * there -- the same containment rule the marquee red already follows.
+ */
+export const CANDY_CART = [
+  '....vvvvvvvvvvvvvvvvvvvvvvvv....',
+  '...vvssvvssvvssvvssvvssvvssvv...',
+  '..vvssvvssvvssvvssvvssvvssvvvv..',
+  '..VssvvssvvssvvssvvssvvssvvssV..',
+  '..VvssvvssvvssvvssvvssvvssvvsV..',
+  '..VVssvvssvvssvvssvvssvvssvvVV..',
+  '..VvVvVvVvVvVvVvVvVvVvVvVvVvVV..',
+  '...VV.VV.VV.VV.VV.VV.VV.VV.VV...',
+  '..xxxxxxxxxxxxxxxxxxxxxxxxxxxx..',
+  '..xXXXXXXXXXXXXXXXXXXXXXXXXXXx..',
+  '..xXMMMMMMMMMMMMXMMMMMMMMMMMXx..',
+  '..xXMMMMMMMMMMMMXMMMMMMMMMMMXx..',
+  '..xXMMMsssssMMMMXMMMMMMMMMMMXx..',
+  '..xXMMssvssvsMMMXMMMMsssssMMXx..',
+  '..xXMMsvssvssMMMXMMMsvssvsMMXx..',
+  '..xXMMssvssvsMMMXMMMssvssvsMXx..',
+  '..xXMMsvssvssMMMXMMMsvssvssMXx..',
+  '..xXMMssvssvsMMMXMMMssvssvsMXx..',
+  '..xXMMsvssvssMMMXMMMsvssvssMXx..',
+  '..xXMMSSSSSSSMMMXMMMSSSSSSSMXx..',
+  '..xXMMMMMMMMMMMMXMMMMMMMMMMMXx..',
+  '..xXRRRRRRRRRRRRXRRRRRRRRRRRXx..',
+  '..xXXXXXXXXXXXXXXXXXXXXXXXXXXx..',
+  '..xxxxxxxxxxxxxxxxxxxxxxxxxxxx..',
+  '..tttttttttttttttttttttttttttt..',
+  '..tTTTTTTTTTTTTTTTTTTTTTTTTTTt..',
+  '..TTTTTTTTTTTTTTTTTTTTTTTTTTTT..',
+  '...HH....................HH.....',
+  '...HH....................HH.....',
+  '...HH....................HH.....',
+  '...HH....................HH.....',
+  '...HH....................HH.....',
+  '..EEEE..................EEEE....',
+  '..EEEE..................EEEE....',
+];
+
+/** A fire hydrant. The one place on the street the awning red is spent
+ *  outside the cinema, and it earns it: a hydrant is genuinely that colour,
+ *  and a single small saturated mark on an otherwise stone pavement is how
+ *  the eye finds scale down at ground level. */
+export const HYDRANT = [
+  '....vv....',
+  '...VvvV...',
+  '...vvvv...',
+  '..VvvvvV..',
+  '..vvvvvv..',
+  '.QvvvvvvQ.',
+  '.QvvvvvvQ.',
+  '..vvvvvv..',
+  '.vvvvvvvv.',
+  '.vvVVVVvv.',
+  '.vvvvvvvv.',
+  '.vvvvvvvv.',
+  '.VvvvvvvV.',
+  '.VvvvvvvV.',
+  '..VvvvvV..',
+  '..VVVVVV..',
+  '.VVVVVVVV.',
+  '..EEEEEE..',
+];
+
+/** A kerbside bollard. Deliberately the streetlamp's own metal, not a new
+ *  one: on a real street these are the same municipal ironwork, and reusing
+ *  the palette is what makes them look like they were installed by the same
+ *  council rather than drawn by a different hand. */
+export const BOLLARD = [
+  '.QQQQ.',
+  '.QhhQ.',
+  '.HhhH.',
+  '.HhhH.',
+  '.HhhH.',
+  '.HhhH.',
+  '.HhhH.',
+  '.HhhH.',
+  '.HhhH.',
+  '.HhhH.',
+  '.HhhH.',
+  '.HhhH.',
+  '.HhhH.',
+  '.HHHH.',
+  '.EEEE.',
+  '..EE..',
+];
+
+/** A stone tub with a shrub in it. The only green above ground level on the
+ *  street, and the reason it is here: an unbroken run of stone and brick has
+ *  nothing organic in it at all, which is what makes a drawn city read as
+ *  architecture rather than as somewhere people live. */
+export const PLANTER = [
+  '.......gGg..........',
+  '.....gGgggGg........',
+  '...gGgggggggGg......',
+  '..gGggGgggggggG.....',
+  '..gGgggggggggGg.....',
+  '...gGgggGgggGg......',
+  '.....ggGgggGg.......',
+  '.......gGgGg........',
+  '........ggg.........',
+  '..tttttttttttttt....',
+  '..tTTTTTTTTTTTTt....',
+  '..tTttttttttttTt....',
+  '..tTttttttttttTt....',
+  '..tTttttttttttTt....',
+  '..tTttttttttttTt....',
+  '..tTTTTTTTTTTTTt....',
+  '..TTTTTTTTTTTTTT....',
+  '...UUUUUUUUUUUU.....',
+];
+
+/** A chalked A-board on the footpath. The gold marks are lettering read from
+ *  across a street -- at this size actual glyphs would be mush, and a shape
+ *  that reads as "writing" is more honest than four illegible letters. */
+export const A_BOARD = [
+  '..................',
+  '...EEEEEEEEEEEE...',
+  '..E============E..',
+  '..E=++++++++++=E..',
+  '..E============E..',
+  '..E=+++++++++==E..',
+  '..E============E..',
+  '..E=++++++++++=E..',
+  '..E============E..',
+  '..E=++++++===+=E..',
+  '..E============E..',
+  '..EEEEEEEEEEEEEE..',
+  '..EE..........EE..',
+  '.EE............EE.',
+  '.EE............EE.',
+  'EE..............EE',
+  'EE..............EE',
+  'E................E',
+  'E................E',
+  'EE..............EE',
+];
+
+// --- facade features ---------------------------------------------------------
+
+/**
+ * 16 x 64 -- four storeys of fire escape, bolted to a facade.
+ *
+ * One 16-row storey module repeated four times, which is exactly how a real
+ * one is built and also why it can be authored once and read as four. Its
+ * value to the scene is less the ironwork than the shadow: it is the first
+ * thing on this street with holes in it, so the cast-shadow layer gets a
+ * silhouette with structure instead of another solid box.
+ */
+export const FIRE_ESCAPE = [
+  '.QZZZZZZZZZZZZQ.',
+  '.Q............Q.',
+  '.Q.Q.Q.Q.Q.Q..Q.',
+  '.QZZZZZZZZZZZZQ.',
+  '.ZQZQZQZQZQZQZQ.',
+  '..Z..........Z..',
+  '.....QQQQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....Q..Q.......',
+  '.QZZZZZZZZZZZZQ.',
+  '.Q............Q.',
+  '.Q.Q.Q.Q.Q.Q..Q.',
+  '.QZZZZZZZZZZZZQ.',
+  '.ZQZQZQZQZQZQZQ.',
+  '..Z..........Z..',
+  '.....QQQQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....Q..Q.......',
+  '.QZZZZZZZZZZZZQ.',
+  '.Q............Q.',
+  '.Q.Q.Q.Q.Q.Q..Q.',
+  '.QZZZZZZZZZZZZQ.',
+  '.ZQZQZQZQZQZQZQ.',
+  '..Z..........Z..',
+  '.....QQQQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....Q..Q.......',
+  '.QZZZZZZZZZZZZQ.',
+  '.Q............Q.',
+  '.Q.Q.Q.Q.Q.Q..Q.',
+  '.QZZZZZZZZZZZZQ.',
+  '.ZQZQZQZQZQZQZQ.',
+  '..Z..........Z..',
+  '.....QQQQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....Q..Q.......',
+  '.....QHHQ.......',
+  '.....QQQQ.......',
+];
+
+/** A window air-conditioning unit. Small, dull, and worth having: it is the
+ *  cheapest possible mark that says a building is *occupied and maintained*
+ *  rather than drawn, and a facade with three of them at different windows
+ *  stops reading as a repeating pattern. */
+export const AC_UNIT = [
+  '..QQQQQQQQQQ..',
+  '.QQQQQQQQQQQQ.',
+  '.QZZZZZZZZZZQ.',
+  '.QZaZaZaZaZZQ.',
+  '.QZZZZZZZZZZQ.',
+  '.QZaZaZaZaZZQ.',
+  '.QZZZZZZZZZZQ.',
+  '.QZZZZZZZZZZQ.',
+  '.QQQQQQQQQQQQ.',
+  '..ZZZZZZZZZZ..',
+];
+
+/**
+ * 24 x 32 -- WINDOW's frame with a staircase behind the glass.
+ *
+ * The single most valuable window in the set, and the one the reference leans
+ * on hardest: a lit rectangle says "a light is on", a lit rectangle with a
+ * flight of stairs climbing across it says "there is a building behind this
+ * wall". That is the entire difference between a facade and a place, and it
+ * costs one tile. The treads step up left-to-right across both sashes so the
+ * run reads as continuous through the transom rather than as two unrelated
+ * halves.
+ */
+export const WINDOW_STAIR = [
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.xRRRRRRRRRRXRRRRRRRRRx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMXXx.',
+  '.xMMMMMMMMMMXMMMMMXXXXx.',
+  '.xMMMMMMMMMMXMMMMXXXXRx.',
+  '.xMMMMMMMMMMXMMMXXXXRRx.',
+  '.xMMMMMMMMMMXMMXXXXRRRx.',
+  '.xMMMMMMMMMMXMXXXXRRRRx.',
+  '.xMMMMMMMMXXXXXXXRRRRRx.',
+  '.xMMMMMMMXXXXXXRRRRRRRx.',
+  '.xMMMMMMXXXXXRRRRRRRRRx.',
+  '.xMMMMMXXXXXRRRRRRRRRRx.',
+  '.xXXXXXXXXXXXXXXXXXXXXx.',
+  '.xMMMXXXXXXMXMMMMMMMMMx.',
+  '.xMMXXXXXXMMXMMMMMMMMMx.',
+  '.xMXXXXXMMMMXMMMMMMMMMx.',
+  '.xXXXXXMMMMMXMMMMMMMMMx.',
+  '.xXXXXMMMMMMXMMMMMMMMMx.',
+  '.xXXXMMMMMMMXMMMMMMMMMx.',
+  '.xXXMMMMMMMMXMMMMMMMMMx.',
+  '.xXMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xMMMMMMMMMMXMMMMMMMMMx.',
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.XXXXXXXXXXXXXXXXXXXXXX.',
+  'llllllllllllllllllllllll',
+  '.LLLLLLLLLLLLLLLLLLLLLL.',
+];
+
+/**
+ * 24 x 32 -- a television on in an otherwise dark room.
+ *
+ * The one window in the set whose glass is COLD (`K`, the reader-board blue)
+ * while the room around it is dark. Everything else lit on this street is
+ * some shade of tungsten, so a single blue-white flickering rectangle in a
+ * row of amber ones is instantly legible as a different kind of light from a
+ * different kind of evening -- and it is the one the flicker (glow.js's
+ * per-light `flicker` flag) is worth spending on, because a television is the
+ * only light source on the street that genuinely does not hold still.
+ */
+export const WINDOW_TV = [
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.xXXXXXXXXXXXXXXXXXXXXx.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xXXXXXXXXXXXXXXXXXXXXx.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiKKKKKKKKKKKKiiiiix.',
+  '.xiiKKKKKKKKKKKKKKiiiix.',
+  '.xiiKKIIIIIIIIIIKKiiiix.',
+  '.xiiKKIIIIIIIIIIKKiiiix.',
+  '.xiiKKIIIIIIIIIIKKiiiix.',
+  '.xiiKKIIIIIIIIIIKKiiiix.',
+  '.xiiKKKKKKKKKKKKKKiiiix.',
+  '.xiiiKKKKKKKKKKKKiiiiix.',
+  '.xiiiiXXiiiiiiXXiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xiiiiiiiiiiXiiiiiiiiix.',
+  '.xxxxxxxxxxxxxxxxxxxxxx.',
+  '.XXXXXXXXXXXXXXXXXXXXXX.',
+  'llllllllllllllllllllllll',
+  '.LLLLLLLLLLLLLLLLLLLLLL.',
+];
+
 export const TILES = {
   road: ROAD, roadLine: ROAD_LINE, crosswalk: CROSSWALK, pave: PAVE, paveCrack: PAVE_CRACK, paveStain: PAVE_STAIN,
   kerb: KERB, grass: GRASS, trashCan: TRASH_CAN, newsBox: NEWS_BOX, sidewalkStar: SIDEWALK_STAR,
   lobbyCarpet: LOBBY_CARPET,
+  manhole: MANHOLE, drainGrate: DRAIN_GRATE, pavePatch: PAVE_PATCH, paveLitter: PAVE_LITTER,
   wall: WALL, wallEdge: WALL_EDGE, brick: BRICK, brickEdge: BRICK_EDGE,
   wallDark: WALL_DARK, brickDark: BRICK_DARK,
   corniceDark: CORNICE_DARK, plinthDark: PLINTH_DARK,
@@ -1402,6 +1926,10 @@ export const TILES = {
 export const FEATURES = {
   window: WINDOW, windowWide: WINDOW_WIDE, door: DOOR, lampPost: LAMP_POST,
   windowLit: WINDOW_LIT, windowWarm: WINDOW_WARM,
+  windowStair: WINDOW_STAIR, windowTv: WINDOW_TV,
+  fireEscape: FIRE_ESCAPE, acUnit: AC_UNIT,
+  ticketKiosk: TICKET_KIOSK, candyCart: CANDY_CART, hydrant: HYDRANT,
+  bollard: BOLLARD, planter: PLANTER, aBoard: A_BOARD,
   boxOffice: BOX_OFFICE, posterCase: POSTER_CASE,
   cinemaDoors: CINEMA_DOORS, candyStand: CANDY_STAND,
   signBulb: SIGN_BULB,

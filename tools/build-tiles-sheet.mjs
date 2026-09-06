@@ -45,7 +45,15 @@ const RELIEF_STRENGTH = {
   plinth: 0.5, plinthEdge: 0.5,
   kerb: 0.7,
   window: 0.8, windowWide: 0.8, windowLit: 0.8, windowWarm: 0.8,
+  windowStair: 0.8, windowTv: 0.8,
   door: 0.6,
+  // Street furniture and the freestanding props. All of it is small, hard
+  // ironwork or panelled joinery -- the kind of shallow, sharp relief this
+  // pipeline is good at -- so it all takes the same middling strength rather
+  // than each getting a number argued over separately.
+  manhole: 0.7, drainGrate: 0.7, pavePatch: 0.4, paveLitter: 0.3,
+  hydrant: 0.7, bollard: 0.7, planter: 0.5, aBoard: 0.5,
+  ticketKiosk: 0.7, candyCart: 0.6, fireEscape: 0.8, acUnit: 0.7,
   marquee: 0.6, signTower: 0.6, signCap: 0.6,
   boxOffice: 0.7, posterCase: 0.6,
   cinemaDoors: 0.6, candyStand: 0.6,

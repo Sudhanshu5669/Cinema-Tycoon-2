@@ -491,6 +491,77 @@ await page.screenshot({ path: path.join(OUT, 'city-lights-west.png') });
 await cityLightsAt(1800, 400);
 await page.screenshot({ path: path.join(OUT, 'city-lights-east.png') });
 
+// --- emission: additive glow, the bulb chase, the flickering television -----
+// The half of lighting Light2D cannot do (src/game/glow.js) plus the two
+// animated things built on it. All three are invisible to every assertion
+// above, because none of them changes how a *surface* is shaded -- they add
+// light on top of the frame, so the only way to check them is to ask the
+// layers themselves what they are currently drawing.
+const tilesAt = async (h) => {
+  await page.evaluate((hh) => window.__dev.setTime(hh), h);
+  await page.waitForTimeout(160);
+  return page.evaluate(() => window.__dev.tiles());
+};
+const glowNoon = await tilesAt(12);
+const glowNight = await tilesAt(22);
+check('every light also has an emission sprite', glowNight.glow.total === glowNight.totalLights,
+  `${glowNight.glow.total} glows for ${glowNight.totalLights} lights`);
+check('the glow layer is fully hidden in daylight, not drawn at alpha 0',
+  glowNoon.glow.visible === 0, `${glowNoon.glow.visible} visible at noon`);
+check('the glow layer is lit at night', glowNight.glow.visible > 0,
+  `${glowNight.glow.visible} of ${glowNight.glow.total} visible at 22:00`);
+// Elevation, not kind, decides which lights pool on the pavement -- so some
+// do and some (upper-storey windows) must not. Both halves matter: all of
+// them pooling would mean the rule never fires, none would mean it always does.
+check('only lights near the ground pool on the pavement',
+  glowNight.glow.pooled > 0 && glowNight.glow.pooled < glowNight.glow.total,
+  `${glowNight.glow.pooled} of ${glowNight.glow.total} pool`);
+
+check('marquee bulbs are dark in daylight', glowNoon.chaseVisible === false);
+check('marquee bulbs are lit at night', glowNight.chaseVisible === true,
+  `${glowNight.chaseAlphas.length} bulbs on the first board`);
+// A chase is a *wave*: the bulbs must differ from each other at one instant,
+// and the pattern must move between two instants. Either one alone passes
+// for something that is not a chase -- a static gradient, or every bulb
+// pulsing in unison.
+check('the chase is a wave along the ring, not every bulb in unison',
+  new Set(glowNight.chaseAlphas).size > 2,
+  `${new Set(glowNight.chaseAlphas).size} distinct alphas`);
+await page.waitForTimeout(140);
+const chaseLater = await page.evaluate(() => window.__dev.tiles());
+check('the chase travels over time',
+  chaseLater.chaseAlphas.some((a, i) => a !== glowNight.chaseAlphas[i]));
+
+// The television is the one light whose brightness is not a pure function of
+// the hour, so two samples at the same hour have to disagree.
+check('the television flickers -- same hour, different brightness',
+  glowNight.tvIntensity > 0 && chaseLater.tvIntensity !== glowNight.tvIntensity,
+  `${glowNight.tvIntensity.toFixed(3)} -> ${chaseLater.tvIntensity.toFixed(3)}`);
+await page.evaluate(() => window.__dev.setTime(22));
+await page.waitForTimeout(200);
+await page.screenshot({ path: path.join(OUT, 'city-glow-night.png') });
+
+// --- freestanding props ----------------------------------------------------
+// SYSTEMS #6 follow-up. A prop differs from a facade feature by standing on
+// the ground with a footprint of its own, so the things worth checking are
+// exactly the ones a painted-on facade tile could never do: block a walk, and
+// sort against the player by its own contact row.
+const props = await page.evaluate(() => window.__dev.tiles());
+check('the map builds freestanding props', props.propCount > 0, `${props.propCount} props`);
+// The candy cart stands on tiles 55-56 of row 21 -- world x 880..912, ground
+// row y 336..352 -- and is marked solid.
+const cartProbe = await page.evaluate(() => window.__dev.probe(896, 344));
+check('a prop marked solid blocks like a building does', cartProbe.solid === true);
+const openProbe = await page.evaluate(() => window.__dev.probe(896, 376));
+check('the pavement one row south of it is still walkable', openProbe.solid === false);
+await page.evaluate(() => window.__dev.warp(896, 380));
+await hold(page, 'ArrowUp', 700);
+const blocked = await state(page);
+check('walking into a prop stops the player short of it', blocked.y > 352,
+  `stopped at y ${blocked.y.toFixed(1)}, prop footprint ends at 352`);
+check('the player never enters the prop\'s footprint',
+  (await page.evaluate((y) => window.__dev.probe(896, y), blocked.y)).solid === false);
+
 await page.evaluate(() => window.__dev.setTime(15));
 await page.waitForTimeout(150);
 await page.evaluate(() => window.__dev.warp(430, 330));
