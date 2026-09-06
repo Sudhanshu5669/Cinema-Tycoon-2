@@ -90,8 +90,9 @@ const ALCOVE_MARGIN = 4;
  * from Phaser's `scrollFactor`: a scroll factor is applied to *absolute*
  * scroll, so at the far end of a 1920px map it would displace a room by
  * thirty pixels and swing it clean out of its own window. The cap is sized
- * against the margin the ROOM_* art carries beyond its opening (6px each
- * side), so the room can never run out of itself.
+ * against the margin the ROOM_* art carries beyond its opening -- 32x40 art
+ * behind a 20x26 hole leaves 6px each side and 7px top and bottom -- so the
+ * room can never run out of itself on either axis.
  */
 const PARALLAX = 0.02;
 const PARALLAX_MAX = 4;
@@ -321,14 +322,25 @@ export class TileMapRenderer {
    * that is further LEFT, so to put that part in the opening the room image
    * has to move right, *with* the camera. Get it backwards and the effect is
    * just as strong and reads as the room being in front of the wall.
+   *
+   * **Both axes.** This slid on x alone at first, which quietly threw away
+   * most of the effect: the player of a top-down 3/4 game spends as much of
+   * their time walking toward and away from a facade as along it, and an
+   * interior that holds perfectly still while you approach the window is the
+   * one moment that gives away a painted backdrop. Vertical takes the same
+   * rate, the same cap and the same sign as horizontal -- a room is recessed
+   * behind its opening in every direction, not only sideways, so there is no
+   * reason for the two to be tuned apart.
    */
   _updateParallax() {
     if (!this._interiors.length) return;
     const cam = this.scene.cameras.main;
-    const camCentre = cam.scrollX + cam.width / 2;
+    const camCentreX = cam.scrollX + cam.width / 2;
+    const camCentreY = cam.scrollY + cam.height / 2;
+    const clamp = (v) => Math.max(-PARALLAX_MAX, Math.min(PARALLAX_MAX, v));
     for (const it of this._interiors) {
-      const off = (camCentre - it.centreX) * PARALLAX * this.parallaxScale;
-      it.img.x = it.baseX + Math.max(-PARALLAX_MAX, Math.min(PARALLAX_MAX, off));
+      it.img.x = it.baseX + clamp((camCentreX - it.centreX) * PARALLAX * this.parallaxScale);
+      it.img.y = it.baseY + clamp((camCentreY - it.centreY) * PARALLAX * this.parallaxScale);
     }
   }
 
@@ -484,6 +496,7 @@ export class TileMapRenderer {
       const img = this._place(interiorKey, b.x * TILE, faceTop, frontY - DEPTH_INTERIOR_BEHIND);
       this._interiors.push({
         img, baseX: b.x * TILE, centreX: (b.x + b.w / 2) * TILE,
+        baseY: faceTop, centreY: faceTop + faceH / 2,
       });
     }
 
