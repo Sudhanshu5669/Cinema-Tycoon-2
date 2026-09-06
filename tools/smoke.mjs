@@ -255,6 +255,20 @@ const lightAt = async (h) => {
 };
 const [litNoon, litNight] = [await lightAt(12), await lightAt(23)];
 check('the Light2D pipeline is actually active, not silently degraded', litNoon.lightingActive === true);
+
+// Phaser culls to render.maxLights by sorting on distance from the camera
+// centre and slicing (LightsManager.getLights), so a map carrying more lights
+// than the cap does not dim gracefully -- it drops the far ones, and which
+// ones it drops changes as the camera moves. That reads in-game as lights
+// switching on when the player walks up to them. lighting.js's MERGE_DIST
+// collapses same-kind neighbours to keep the shaded count under the cap; this
+// is the guard that a growing city has not quietly outrun it again.
+// The cap applies to lights ON SCREEN, not to the map's total, so the real
+// guard is per camera position further down ("no light is culled by camera
+// distance"). All this one asserts is that merging is happening at all.
+check('same-kind neighbours are merged before the shader sees them',
+  litNight.lightCounts.shaded < litNight.lightCounts.derived,
+  `${litNight.lightCounts.derived} derived -> ${litNight.lightCounts.shaded} shaded`);
 // tools/normals.mjs derives the tile atlas's normal map from the same ASCII
 // grids the diffuse art reads, and atlas.js's bake() re-attaches it to every
 // baked composite (a building's face, its roof, the ground, a platform) via
@@ -465,27 +479,51 @@ const badTileErr = await page.evaluate(() => {
 check('an unknown tile name fails loudly against the live atlas',
   badTileErr && /not-a-real-tile/.test(badTileErr), badTileErr?.split('\n')[1]);
 
-// The live city itself: SYSTEMS #8's shader is deliberately given more total
-// light sources (every window, the marquee, every streetlamp) than fit in one
-// screen at once, to actually show its limit rather than assert it never gets
-// hit. maxLights caps the shader's per-frame cost, not how large a city can
-// be: LightsManager culls to the nearest `maxLights` lights to the *camera*
-// every frame, so which lights are lit is a function of where you're
-// standing, not a global count.
+// The live city and the shader cap.
+//
+// This used to assert the OPPOSITE of what it asserts now, and the reversal
+// was deliberate. LightsManager culls to `maxLights` by sorting on distance
+// from the camera centre and slicing, and that was treated here as the
+// design: "which lights are lit is a function of where you're standing, not
+// a global count". In play it reads as a bug -- a light that is plainly
+// visible switches ON as you walk up to it and off again as you leave, and
+// never the same ones, because the cull re-ranks every frame.
+//
+// So the rule is now that the cull must never bite: lighting.js's MERGE_DIST
+// collapses same-kind neighbours until the on-screen count fits under the cap
+// with room to spare. These checks guard the headroom rather than the limit,
+// because the failure they are protecting against is silent -- Phaser drops
+// lights without complaining, and a city that grows past the cap looks like
+// an art problem rather than a budget one.
 const cityLightsAt = async (x, y) => {
   await page.evaluate(([wx, wy]) => window.__dev.warp(wx, wy), [x, y]);
   await page.waitForTimeout(150);
   return page.evaluate(() => window.__dev.tiles());
 };
 const [westEnd, eastEnd] = [await cityLightsAt(80, 400), await cityLightsAt(1800, 400)];
-check('the city defines far more lights than fit on one screen',
-  westEnd.totalLights > 40, `totalLights ${westEnd.totalLights}`);
-check('the shader still only lights the nearest maxLights of them',
-  westEnd.activeLightKeys.length <= 16 && eastEnd.activeLightKeys.length <= 16,
-  `west ${westEnd.activeLightKeys.length} east ${eastEnd.activeLightKeys.length}`);
-check('which lights are active is a function of the camera, not a fixed list',
-  westEnd.activeLightKeys.every((k) => !eastEnd.activeLightKeys.includes(k)),
-  `${westEnd.activeLightKeys.length} lit at the west end share none of the ${eastEnd.activeLightKeys.length} lit 1720px away at the east end`);
+check('the city defines far more lights than the shader is handed',
+  westEnd.lightCounts.derived > 40 && westEnd.lightCounts.shaded < westEnd.lightCounts.derived,
+  `${westEnd.lightCounts.derived} derived -> ${westEnd.lightCounts.shaded} shaded`);
+// The cull never bites: strictly under the cap, at both ends of the street.
+// Equal to the cap would already be suspect -- that is the point at which
+// Phaser starts dropping the far ones.
+for (const [where, at] of [['west', westEnd], ['east', eastEnd]]) {
+  check(`no light is culled by camera distance at the ${where} end`,
+    at.activeLightKeys.length < at.maxLights,
+    `${at.activeLightKeys.length} lit, cap ${at.maxLights}`);
+}
+// The symptom itself, directly: walk a little way along the street and every
+// light that was lit and is still on screen must still be lit. Under the old
+// ranked cull this is exactly what failed -- approaching one light demoted
+// another out of the list.
+const nudged = await cityLightsAt(240, 400);
+const stillOnScreen = westEnd.activeLightKeys.filter((k) => {
+  const [lx] = k.split(',').map(Number);
+  return Math.abs(lx - 240) < 300;
+});
+check('lights stay lit as the player walks toward them',
+  stillOnScreen.every((k) => nudged.activeLightKeys.includes(k)),
+  `${stillOnScreen.filter((k) => !nudged.activeLightKeys.includes(k)).length} of ${stillOnScreen.length} went out`);
 await cityLightsAt(80, 400);
 await page.screenshot({ path: path.join(OUT, 'city-lights-west.png') });
 await cityLightsAt(1800, 400);
@@ -504,8 +542,12 @@ const tilesAt = async (h) => {
 };
 const glowNoon = await tilesAt(12);
 const glowNight = await tilesAt(22);
-check('every light also has an emission sprite', glowNight.glow.total === glowNight.totalLights,
-  `${glowNight.glow.total} glows for ${glowNight.totalLights} lights`);
+// One glow per DERIVED light, not per shaded one: glow.js is uncapped and
+// cheap, so emission stays per-window even where the shader sees one merged
+// light for the whole facade. The two layers disagreeing is the design.
+check('every derived light also has an emission sprite',
+  glowNight.glow.total === glowNight.lightCounts.derived,
+  `${glowNight.glow.total} glows for ${glowNight.lightCounts.derived} derived lights`);
 check('the glow layer is fully hidden in daylight, not drawn at alpha 0',
   glowNoon.glow.visible === 0, `${glowNoon.glow.visible} visible at noon`);
 check('the glow layer is lit at night', glowNight.glow.visible > 0,

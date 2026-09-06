@@ -102,10 +102,17 @@ import { shadowFor } from './sun.js';
  *
  * These images are composited straight over the lit scene -- deliberately not
  * on the Light2D pipeline -- so this colour is literal, not a material to be
- * shaded. It is dark enough to still read as shadow at the alphas sun.js
- * hands out, and blue enough to be doing a job at them.
+ * shaded.
+ *
+ * It has to work across a wide alpha range, and that is what sets how far the
+ * blue can go. A sun shadow at midday runs about 0.32; a point-light shadow
+ * off a close streetlamp reaches PLIGHT_MAX_ALPHA, 0.65. A blue picked to
+ * read clearly at 0.32 turns into an actual blue puddle at 0.65 -- which is
+ * exactly what the player's own shadow became on lit pavement. Tuned at the
+ * top of the range instead: cool enough to read as sky-fill in daylight,
+ * still a shadow rather than a colour when a lamp is standing over it.
  */
-const SHADOW_COLOR = '#101c47';
+const SHADOW_COLOR = '#12172b';
 
 const PLAYER_SHADOW_REACH = 130;
 /** Point-light player shadows: length range (px) from a light's edge (dim,

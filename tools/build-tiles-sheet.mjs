@@ -98,7 +98,7 @@ const RELIEF_STRENGTH = {
  * ground light the shader's flat normal would deny it; the lamps decide how
  * much there is to collect. Set the second first.
  */
-const GROUND_LEAN = 0.3;
+const GROUND_LEAN = 0.2;
 const GROUND_TILT = new Set([
   'road', 'roadLine', 'crosswalk', 'pave', 'paveCrack', 'paveStain',
   'pavePatch', 'paveLitter', 'grass', 'sidewalkStar', 'lobbyCarpet',

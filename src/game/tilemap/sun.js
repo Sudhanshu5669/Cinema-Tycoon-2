@@ -206,7 +206,7 @@ function hump(h, from, to) {
  */
 const GLOW_CURVES = {
   // Ordinary windows: on a little before dusk, off a little after dawn.
-  window: { from: DUSK - 0.5, to: DAWN + 0.5, color: 0xffcfa0, intensity: 1.2 },
+  window: { from: DUSK - 0.5, to: DAWN + 0.5, color: 0xffcfa0, intensity: 2.5 },
   // The cinema marquee, on its own timer -- switched on earlier than
   // residents turn their lights on, brighter once lit.
   //
@@ -230,7 +230,7 @@ const GLOW_CURVES = {
   // its brightness on the facade alone would suggest, or it lights its own
   // building and drops nothing on the street under it -- which is exactly
   // what a marquee is for.
-  marquee: { from: DUSK - 2, to: DAWN, color: 0xffd3a4, intensity: 0.6 },
+  marquee: { from: DUSK - 2, to: DAWN, color: 0xffd3a4, intensity: 0.5 },
   // The lobby behind the entrance doors: the warmest, palest source on the
   // street and the only one that is a doorway rather than a lamp. Its own
   // kind so it can be a gentle wide wash (see lighting.js's RADIUS) instead
@@ -246,10 +246,10 @@ const GLOW_CURVES = {
   // thing in the frame, on the one surface the reference keeps in shadow.
   // Smaller and dimmer, so a fixture reads as a tight pool at its own glass
   // rather than as another floodlight aimed at the street.
-  fixture: { from: DUSK - 1, to: DAWN + 0.5, color: 0xffd6a4, intensity: 0.95 },
+  fixture: { from: DUSK - 1, to: DAWN + 0.5, color: 0xffd6a4, intensity: 0.5 },
   // Streetlamps: on a photocell, not a resident's hand -- a sharper, earlier
   // on/off than windows and the palest colour of the lamp kinds.
-  streetlamp: { from: DUSK - 1, to: DAWN + 0.25, color: 0xffdfb2, intensity: 0.85 },
+  streetlamp: { from: DUSK - 1, to: DAWN + 0.25, color: 0xffdfb2, intensity: 0.7 },
   // A television through a window. The only cold light source on the street,
   // and the only one that flickers (see `flickers` below) -- both facts are
   // the point of it. Every other lit window on this street is tungsten, so a

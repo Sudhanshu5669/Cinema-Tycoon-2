@@ -166,6 +166,10 @@ export class DevScene extends Phaser.Scene {
         // degrade, not a broken hour model) rather than reading window/
         // marquee intensity of 0 for the wrong reason.
         lightingActive: this.map.lighting?.active ?? false,
+        // Derived vs. what the shader actually sees. The second number has to
+        // stay under render.maxLights or Phaser culls by camera distance and
+        // lights visibly switch on as the player walks up to them.
+        lightCounts: this.map.lighting?.lightCounts ?? { derived: 0, shaded: 0 },
         // The tile atlas's normal map (tools/normals.mjs) actually bound,
         // not silently missing -- see TileMapRenderer#normalMapped.
         normalMapped: this.map.normalMapped,
@@ -211,6 +215,9 @@ export class DevScene extends Phaser.Scene {
         // { light, distance } wrappers, not the Light itself.
         activeLightKeys: this.map.lighting?.active
           ? this.lights.getLights(this.cameras.main).map((v) => `${v.light.x},${v.light.y}`).sort() : [],
+        // The shader's hard cap. Exposed so a test can assert the *headroom*
+        // rather than a number copied from main.js that would silently rot.
+        maxLights: this.lights.maxLights,
       }),
       // Current screen offset of each building's interior layer against its
       // own facade -- the parallax that makes a punched window read as a hole
