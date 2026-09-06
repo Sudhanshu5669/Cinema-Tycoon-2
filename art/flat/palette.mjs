@@ -43,15 +43,29 @@ export const PALETTE = {
  * hair on a person and has no business meaning anything on a pavement, and the
  * two sets would otherwise fight over sixteen usable letters.
  *
- * **Warm register, wide value range.** The city runs warm -- tan plaster, red
- * brick, warm stone paving -- against a near-black road and a cool window
- * glass that is the one deliberate cold family left. The point is contrast:
- * an earlier muted, uniformly cool version of this table put the whole street
- * within a few values of itself, so nothing could ever be the brightest thing
- * on screen and a lit cinema facade read as grey-mauve wash rather than as
- * light. Value spread is what makes a night street work, and it is spent
- * deliberately: the road is the floor, the marquee's bulb core (`*`) is the
- * ceiling, and everything else is placed between them on purpose.
+ * **Neutral materials, coloured light.** Two illuminants light this city: a
+ * cool ambient (sun.js's NIGHT) standing in for sky and moon, and warm point
+ * lights at the lamps, windows and marquee. So the *paint* here is close to
+ * neutral and the colour arrives from the lighting pass -- masonry sits at
+ * 2-8% saturation, brick keeps ~24% because brick genuinely is the warm one,
+ * and that is the whole spread.
+ *
+ * This matters mechanically, not just aesthetically: ambient light
+ * MULTIPLIES. A material with no blue in it cannot be cooled by a blue
+ * ambient -- `#7d5344` times a cool ambient is still orange, only darker --
+ * so a warm-painted street can only ever have warm shadows, and a night
+ * scene with warm shadows has no hue contrast anywhere for its lamps to sit
+ * against. Keeping the paint neutral is what buys a cool shadow and a warm
+ * pool of lamplight in the same frame.
+ *
+ * Saturation is therefore a budget, and it is spent almost entirely on
+ * things that EMIT: the awning red (`v`), the marquee gold (`+`), the bulb
+ * core (`*`), the lobby glow (`@`). Those stay fully saturated on purpose --
+ * they are the only objects allowed to be colourful, which is exactly what
+ * makes them read as the light sources in a neutral street.
+ *
+ * Value spread is still spent deliberately: the road is the floor, the bulb
+ * core (`*`) is the ceiling, and everything else is placed between them.
  *
  * The one place tones go three deep is where a surface turns a corner in the
  * 3/4 view (roof -> lip -> shadow -> wall), because that turn is the only
@@ -68,49 +82,54 @@ export const TILE_PALETTE = {
   // (sun.js multiplies every one of these by ~0.11 after dark, which takes
   // this straight down to near-black on its own), and baking the darkness
   // into the material instead just breaks every other hour of the day.
-  a: '#3a3742', // asphalt
-  A: '#454150', // asphalt, lighter fleck — worn patches, not noise
-  z: '#302d38', // asphalt, darker fleck
-  m: '#a89678', // lane marking, worn. Never white; white reads as neon
+  a: '#393742', // asphalt
+  A: '#44414f', // asphalt, lighter fleck — worn patches, not noise
+  z: '#2f2d37', // asphalt, darker fleck
+  m: '#9f978d', // lane marking, worn. Never white; white reads as neon
                  // here -- but the road around it is now near-black, and at
                  // the ambient a night runs at, the old value left a
                  // crosswalk you could not actually see was there.
 
   // Kerb: the small vertical face where the pavement drops to the road, and
   // the first thing that sells the 3/4 view at ground level.
-  c: '#7d7263', // kerb top, catching the light
-  C: '#4a4238', // kerb face, turned away from it
+  c: '#767272', // kerb top, catching the light
+  C: '#464241', // kerb face, turned away from it
 
   // Pavement — warm stone, and a full step lighter than the road, so the
   // footpath reads as a separate surface and not just less-dark asphalt.
-  p: '#6e675c', // slab
-  P: '#7b7368', // slab, lighter
-  q: '#5c564d', // slab seam
+  p: '#696769', // slab
+  P: '#757376', // slab, lighter
+  q: '#575658', // slab seam
 
   // Planting.
-  g: '#4f6247', // grass
-  G: '#3d4d38', // grass, shaded
+  g: '#51614e', // grass
+  G: '#3f4c3d', // grass, shaded
 
   // Plaster wall — the default building face. Warm tan.
-  w: '#8a7d6d',
-  W: '#6f6456', // the shaded side of a building (see WALL_EDGE)
-  n: '#564c41', // the band of shadow a roof overhang throws on the wall
+  w: '#837e7c',
+  W: '#696462', // the shaded side of a building (see WALL_EDGE)
+  n: '#514d4b', // the band of shadow a roof overhang throws on the wall
 
-  // Brick. Warm red-brown and a wider light/dark spread than the plaster,
-  // so a brick building reads as the warmer, older one on the street.
-  b: '#7d5344',
-  B: '#5e3c31', // mortar course
-  r: '#8f6250', // the odd lighter brick
-  y: '#5c3b30', // brick on the shaded return (see BRICK_EDGE)
-  Y: '#452a22', // its mortar
+  // Brick. Still the warmest masonry in the set and still a wider light/dark
+  // spread than the plaster, so a brick building reads as the older one on
+  // the street -- but at 16% saturation, not the 46% it carried when the
+  // paint was doing the lighting's job. A warm lamp raises this to roughly
+  // the high thirties on screen, which is where the reference's brick
+  // actually measures; painting it there to begin with meant it stayed there
+  // in shadow too, and a brick wall the sun never reaches is not orange.
+  b: '#685758',
+  B: '#4d3f40', // mortar course
+  r: '#786667', // the odd lighter brick
+  y: '#4c3e3f', // brick on the shaded return (see BRICK_EDGE)
+  Y: '#382d2d', // its mortar
 
   // Roof and its lip. The roof faces up, so it is the lightest thing here.
-  f: '#8f8474',
-  F: '#7f7566', // roof, weathered patch
-  l: '#a89b87', // the lip of the parapet, brightest edge in the scene
-  L: '#4a4136', // the hard shadow immediately under it
-  o: '#8d8271', // lip, on the shaded return
-  N: '#3e362d', // the shadow band, on the shaded return
+  f: '#888484',
+  F: '#797575', // roof, weathered patch
+  l: '#a09b9b', // the lip of the parapet, brightest edge in the scene
+  L: '#454140', // the hard shadow immediately under it
+  o: '#868281', // lip, on the shaded return
+  N: '#3a3635', // the shadow band, on the shaded return
 
   // Windows. The one cool family left in the set, on purpose: glass reflects
   // the sky, and against warm brick that contrast is what makes a window
@@ -121,8 +140,8 @@ export const TILE_PALETTE = {
   X: '#40372e', // frame, shaded
 
   // Doors.
-  d: '#6b4a33',
-  D: '#4f3624',
+  d: '#5f4c43',
+  D: '#463830',
   k: '#c9a04e', // handle — one pixel of brass
 
   // Awning. Deliberately the same red as the character's accent: it is the
@@ -134,29 +153,29 @@ export const TILE_PALETTE = {
 
   // Plinth: the course of stone where a wall meets the pavement. Without it
   // buildings look like they were pasted onto the ground.
-  t: '#574c40',
-  T: '#453b31',
-  u: '#463d33', // plinth, on the shaded return
-  U: '#372f27',
+  t: '#514d4b',
+  T: '#403c3a',
+  u: '#413d3c', // plinth, on the shaded return
+  U: '#332f2e',
 
   // Streetlamp. Warm cream glass, not the windows' cold blue -- it's the
   // shader's job to actually light it at night, this is just what the glass
   // looks like unlit, in daylight.
-  h: '#544a3f', // pole, lit side
-  H: '#3c342c', // pole, shaded side
+  h: '#504a46', // pole, lit side
+  H: '#393431', // pole, shaded side
   e: '#ffdfa0', // bulb glass
-  E: '#332c25', // cap and bracket, dark metal
+  E: '#312c29', // cap and bracket, dark metal
 
   // Poster paper -- sun-bleached.
-  j: '#a3937a',
-  J: '#7d7060', // fold shadow / the case's own cast shadow on the sheet
+  j: '#9b948c',
+  J: '#77716d', // fold shadow / the case's own cast shadow on the sheet
 
   // Street clutter (bin, vending box): muted city-grime metal, no new accent.
-  Z: '#474b42',
-  Q: '#5f665a', // lit rim/lid
+  Z: '#474b47',
+  Q: '#5f6561', // lit rim/lid
 
   // Terrazzo: the dark inset a sidewalk star sits in.
-  O: '#3d3730',
+  O: '#3b3735',
 
   // The cinema door's own glass -- warm amber, not the ordinary window's
   // cold blue-grey (`I`/`i`): per user reference, the entrance glows with

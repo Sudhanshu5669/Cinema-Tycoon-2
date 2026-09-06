@@ -80,13 +80,32 @@ function lerpRGB([r1, g1, b1], [r2, g2, b2], t) {
 // Anchor tones. NIGHT and DAY are reused at every occurrence rather than each
 // getting its own shade -- one dark/cool tone, one bright/near-neutral tone,
 // and the transitions between them are what actually reads as day/night.
-const NIGHT = [0.11, 0.12, 0.19];   // dark and cool -- geometry still legible,
-                                     // but genuinely dark. An earlier, lighter
-                                     // night lifted the whole street to within
-                                     // a few values of the lit shopfronts, so
-                                     // nothing could read as *the* light source;
-                                     // a warm glow only looks like a glow when
-                                     // there is real darkness for it to sit in.
+const NIGHT = [0.26, 0.28, 0.44];   // dark and cool, but not crushed.
+                                     //
+                                     // The cool bias is load-bearing, not a
+                                     // mood: this is the only thing putting
+                                     // blue into an unlit surface, and it can
+                                     // only do that because the materials it
+                                     // multiplies are near-neutral now (see
+                                     // palette.mjs). Against the old warm
+                                     // paint the same numbers produced warm
+                                     // shadows, because multiplying cannot
+                                     // add a channel the material lacks.
+                                     //
+                                     // The *level* is set against measurement,
+                                     // not taste: asphalt (`a`, L=56) times
+                                     // this lands at L~16, and brick at L~25,
+                                     // which is where the reference frame's
+                                     // genuinely-unlit surfaces sit. A third
+                                     // of this was the previous value, and it
+                                     // took the road to L=8 -- black enough
+                                     // that its own texture disappeared and
+                                     // the street had no floor, only a void.
+                                     // Darkness that swallows detail is not
+                                     // contrast, it is missing information;
+                                     // what makes a lamp read as a lamp is
+                                     // the ratio between lit and unlit, and
+                                     // the reference holds that at under 2x.
 const DAY = [1.02, 1.00, 0.92];     // bright, faintly warm -- "as authored"
 const EVENING = [0.62, 0.44, 0.36]; // warm dusk. Warmer than the night that
                                      // follows it, so the hour before the
