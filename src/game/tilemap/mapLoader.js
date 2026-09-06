@@ -147,7 +147,7 @@ export function loadCityMap(raw, scene) {
    */
   const checkSignText = (label, panel, bandTiles) => {
     const lines = signLines(panel);
-    const avail = signFieldWidth(bandTiles);
+    const avail = signFieldWidth(bandTiles, panel.splay ?? 0);
     lines.forEach((line, i) => {
       const where = lines.length > 1 ? `${label}.lines[${i}]` : label;
       if (typeof line.text !== 'string' || !line.text.length) {

@@ -33,6 +33,7 @@ import { measureWidth, CHAR_H } from './font.js';
 import {
   BULB, SIGN_LINE_GAP, SIGN_GOLD, SIGN_FIELD_COLOR, SIGN_BACK_COLOR,
   signLines, signBlockHeight, signLineWidth,
+  SIGN_SPLAY_TAPER, SIGN_SPLAY_BAND, SIGN_SPLAY_LIGHT, SIGN_SPLAY_DARK, SIGN_SPLAY_EDGE,
 } from './sign.js';
 import { ShadowLayer } from './shadows.js';
 import { LightingLayer, wireLight } from '../lighting.js';
@@ -781,9 +782,19 @@ export class TileMapRenderer {
    * @returns {{x: number, y: number}[]}
    */
   _paintSign(g, w, h, p) {
-    g.rect(SIGN_BACK_COLOR, 0, 0, w, h);
-    g.rect(p.border ?? SIGN_GOLD, BULB - 1, BULB - 1, w - (BULB - 1) * 2, h - (BULB - 1) * 2);
-    g.rect(p.bg ?? SIGN_FIELD_COLOR, BULB, BULB, w - BULB * 2, h - BULB * 2);
+    // Angled end returns, drawn first so the board's own frame closes over
+    // their inner edge -- see sign.js's SIGN_SPLAY_*. Everything below is
+    // then laid out inside what is left, which is why `x0`/`bw` replace 0/w
+    // rather than the board simply being drawn narrower and centred: the
+    // bulb ring, the frame and the text all have to agree on the same
+    // rectangle or the chase walks a ring the board does not have.
+    const splay = p.splay ?? 0;
+    if (splay) this._paintSplay(g, w, h, splay);
+    const x0 = splay, bw = w - splay * 2;
+
+    g.rect(SIGN_BACK_COLOR, x0, 0, bw, h);
+    g.rect(p.border ?? SIGN_GOLD, x0 + BULB - 1, BULB - 1, bw - (BULB - 1) * 2, h - (BULB - 1) * 2);
+    g.rect(p.bg ?? SIGN_FIELD_COLOR, x0 + BULB, BULB, bw - BULB * 2, h - BULB * 2);
 
     // Bulbs around all four edges, collected clockwise: top row left to
     // right, down the right side, bottom row right to left, up the left side.
@@ -792,20 +803,52 @@ export class TileMapRenderer {
     // visited twice by the chase and pulsing at double rate.
     const bulbs = [];
     const at = (x, y) => { g.tile('signBulb', x, y); bulbs.push({ x: x + BULB / 2, y: y + BULB / 2 }); };
-    const lastX = Math.floor((w - BULB) / BULB) * BULB;
-    for (let x = 0; x + BULB <= w; x += BULB) at(x, 0);
+    const lastX = x0 + Math.floor((bw - BULB) / BULB) * BULB;
+    for (let x = x0; x + BULB <= x0 + bw; x += BULB) at(x, 0);
     for (let y = BULB; y + BULB <= h - BULB; y += BULB) at(lastX, y);
-    for (let x = lastX; x >= 0; x -= BULB) at(x, h - BULB);
-    for (let y = h - BULB * 2; y >= BULB; y -= BULB) at(0, y);
+    for (let x = lastX; x >= x0; x -= BULB) at(x, h - BULB);
+    for (let y = h - BULB * 2; y >= BULB; y -= BULB) at(x0, y);
 
     const lines = signLines(p);
     if (!lines.length) return bulbs;
     let ty = Math.round((h - signBlockHeight(lines)) / 2);
     for (const l of lines) {
-      g.text(l.text, Math.round((w - signLineWidth(l)) / 2), ty, l.scale, l.color, l.font);
+      g.text(l.text, x0 + Math.round((bw - signLineWidth(l)) / 2), ty, l.scale, l.color, l.font);
       ty += (signBlockHeight([l])) + SIGN_LINE_GAP;
     }
     return bulbs;
+  }
+
+  /**
+   * One marquee end return, both ends, drawn as stacked horizontal mouldings
+   * that taper toward the outer edge.
+   *
+   * The taper is the whole trick. A return drawn at full board height reads
+   * as more board; shrinking it as it goes outward is what puts the far end
+   * further away, and the resulting trapezoid silhouette is what says
+   * "projecting box" before a single letter on the front face is legible.
+   */
+  _paintSplay(g, w, h, splay) {
+    const taper = Math.round(h * SIGN_SPLAY_TAPER);
+    for (let i = 0; i < splay; i++) {
+      // 1 at the outermost column, 0 where the return meets the board.
+      const t = (splay - i) / splay;
+      const dy = Math.round(taper * t);
+      const y0 = dy, y1 = h - dy;
+      for (const x of [i, w - 1 - i]) {
+        for (let y = y0; y < y1; y++) {
+          // Banded off absolute y, NOT off this column's own top edge: the
+          // mouldings are horizontal courses running the length of the
+          // marquee, so they have to line up across every column of the
+          // return. Phasing them from `y0` instead makes the bands follow
+          // the taper and the return reads as a chevron.
+          g.rect(y % (SIGN_SPLAY_BAND * 2) < SIGN_SPLAY_BAND
+            ? SIGN_SPLAY_LIGHT : SIGN_SPLAY_DARK, x, y, 1, 1);
+        }
+        g.rect(SIGN_SPLAY_EDGE, x, y0, 1, 1);
+        g.rect(SIGN_SPLAY_EDGE, x, y1 - 1, 1, 1);
+      }
+    }
   }
 
   /**

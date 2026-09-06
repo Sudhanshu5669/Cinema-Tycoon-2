@@ -39,6 +39,28 @@ export const SIGN_BACK_COLOR = '#3a0d12';
 export const SIGN_TEXT_MARGIN = 4;
 
 /**
+ * A marquee's angled end returns -- the part that makes it a projecting box
+ * rather than a board glued flat to the wall.
+ *
+ * A real marquee juts out over the pavement, so from the street you see its
+ * front face *and* the two short sides running back to the building. Those
+ * returns are what the reference reads as a marquee at a glance, before any
+ * of the lettering is legible: the silhouette is a trapezoid, not a rectangle.
+ * A panel opts in with `splay` (px taken off each end for the return), and
+ * the return tapers toward its outer edge -- the further from the viewer, the
+ * shallower it reads.
+ *
+ * Banded rather than flat, because a marquee's soffit and fascia are stacked
+ * horizontal mouldings and the banding is what tells you the return is a
+ * surface turning away rather than a flat block of colour beside the board.
+ */
+export const SIGN_SPLAY_TAPER = 0.16;   // of board height, lost at the outer edge
+export const SIGN_SPLAY_BAND = 3;       // moulding pitch, px
+export const SIGN_SPLAY_LIGHT = '#c9b795';
+export const SIGN_SPLAY_DARK = '#6a2320';
+export const SIGN_SPLAY_EDGE = '#f2c451';
+
+/**
  * A panel's text as a normalised list of lines. `lines` is the general form
  * (each entry may carry its own `scale`, `color` and `font`, so one board can
  * set a small label over a big title the way a real reader board does);
@@ -57,9 +79,12 @@ export function signLines(p) {
 }
 
 /** Pixel width actually available to text on a board `fw` tiles wide, once
- *  its bulb frame and end margins are taken out. */
-export function signFieldWidth(fw) {
-  return fw * TILE - BULB * 2 - SIGN_TEXT_MARGIN * 2;
+ *  its bulb frame, end margins and any angled returns are taken out. The
+ *  splay has to be in here and not only in the renderer: this is the number
+ *  mapLoader validates a name against before anything is drawn, and a board
+ *  that splays has genuinely less room for its text. */
+export function signFieldWidth(fw, splay = 0) {
+  return fw * TILE - splay * 2 - BULB * 2 - SIGN_TEXT_MARGIN * 2;
 }
 
 /** Pixel height a normalised line list occupies as a block. */

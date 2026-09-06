@@ -864,15 +864,16 @@
    },
    "panels": [
     {
-     "fx": 6,
-     "fw": 12,
+     "fx": 4,
+     "fw": 16,
      "h": 2,
      "up": 6,
-     "text": "PIXEL CINEMA"
+     "text": "PIXEL CINEMA",
+     "splay": 22
     },
     {
-     "fx": 5,
-     "fw": 15,
+     "fx": 3,
+     "fw": 18,
      "h": 3,
      "up": 9,
      "bg": "#1d2740",
