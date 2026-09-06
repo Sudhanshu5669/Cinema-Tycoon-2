@@ -106,7 +106,38 @@ const NIGHT = [0.26, 0.28, 0.44];   // dark and cool, but not crushed.
                                      // what makes a lamp read as a lamp is
                                      // the ratio between lit and unlit, and
                                      // the reference holds that at under 2x.
-const DAY = [1.02, 1.00, 0.92];     // bright, faintly warm -- "as authored"
+const DAY = [1.00, 0.95, 0.82];     // sunlight, and warm like sunlight is.
+                                     //
+                                     // This was [1.02, 1.00, 0.92] -- near
+                                     // white, i.e. "show the paint as
+                                     // authored". That was right while the
+                                     // paint carried the warmth itself, and
+                                     // wrong the moment it stopped: neutral
+                                     // materials under a neutral ambient give
+                                     // a grey street, which is exactly what
+                                     // noon became once the palette was
+                                     // desaturated. The warmth has to come
+                                     // from somewhere, and at midday the
+                                     // somewhere is the sun.
+                                     //
+                                     // Warmth here has to be spent as LESS
+                                     // green and blue, never as more red:
+                                     // packRGB clamps each channel at 255, so
+                                     // anything over 1.0 is silently thrown
+                                     // away. A first attempt at this used
+                                     // [1.12, 1.02, 0.86], which clipped to
+                                     // (255, 255, 219) -- the red and green
+                                     // it was asking for never arrived and
+                                     // all it actually did was pull the blue
+                                     // down a little.
+                                     //
+                                     // It only works paired with a cool
+                                     // shadow (shadows.js's SHADOW_COLOR).
+                                     // Warm ambient alone just tints
+                                     // everything equally and reads as a
+                                     // filter over the frame; what reads as
+                                     // sunlight is warm light against the
+                                     // blue sky-fill in its own shadows.
 const EVENING = [0.62, 0.44, 0.36]; // warm dusk. Warmer than the night that
                                      // follows it, so the hour before the
                                      // lights come on reads as the sun going

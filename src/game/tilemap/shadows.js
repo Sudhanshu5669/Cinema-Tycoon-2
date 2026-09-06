@@ -85,6 +85,28 @@ import { shadowFor } from './sun.js';
  *  the longest shadow either the sun or a point light throws below (a sun
  *  shadow tops out around 2.6x the caster's height -- SPRITE_H is 48 -- and
  *  point-light shadows are capped well under that, see PLIGHT_MAX_LEN). */
+/**
+ * What a shadow is actually made of.
+ *
+ * Pure black was the wrong answer for the same reason a warm-painted street
+ * was: a shadow is not an absence of light, it is a surface lit by whatever
+ * light still reaches it. Outdoors in the day that is the sky, which is blue,
+ * so a shadow on sunlit paving goes COOL while the paving around it stays
+ * warm -- and that warm/cool split across a single flat surface is most of
+ * what makes daylight read as daylight rather than as grey. Black can only
+ * ever darken; it cannot do that.
+ *
+ * The same holds at night, where a shadow thrown by a warm lamp is filled by
+ * the cool ambient (sun.js's NIGHT) and by the other lamps on the street, so
+ * it wants the same treatment.
+ *
+ * These images are composited straight over the lit scene -- deliberately not
+ * on the Light2D pipeline -- so this colour is literal, not a material to be
+ * shaded. It is dark enough to still read as shadow at the alphas sun.js
+ * hands out, and blue enough to be doing a job at them.
+ */
+const SHADOW_COLOR = '#101c47';
+
 const PLAYER_SHADOW_REACH = 130;
 /** Point-light player shadows: length range (px) from a light's edge (dim,
  *  short) to standing right on top of it (bright, long) -- see updatePlayer. */
@@ -209,7 +231,7 @@ export class ShadowLayer {
 
     const ctx = this.canvas.getContext();
     ctx.clearRect(0, 0, this.w, this.h);
-    ctx.fillStyle = '#000000';
+    ctx.fillStyle = SHADOW_COLOR;
     for (const hull of hulls) if (hull) paintPolygon(ctx, hull);
     for (const sc of this.spriteCasters) {
       const s = shadowFor(hours, sc.heightPx);
@@ -224,7 +246,7 @@ export class ShadowLayer {
       const { footprint, screen, casterIndex } = layer.surface;
       const sctx = layer.canvas.getContext();
       sctx.clearRect(0, 0, screen.w, screen.h);
-      sctx.fillStyle = '#000000';
+      sctx.fillStyle = SHADOW_COLOR;
 
       const scaleY = screen.h / footprint.h;
       let hit = false;
@@ -269,7 +291,7 @@ export class ShadowLayer {
     // 'source-in' keeps new pixels only where the existing (destination)
     // alpha is already opaque, so this fill takes exactly the sprite's shape.
     octx.globalCompositeOperation = 'source-in';
-    octx.fillStyle = '#000000';
+    octx.fillStyle = SHADOW_COLOR;
     octx.fillRect(0, 0, w, h);
 
     s = { canvas: off, w, h };
