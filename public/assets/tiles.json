@@ -1245,12 +1245,52 @@
       },
       "rotated": false,
       "trimmed": false
+    },
+    "posterShip": {
+      "frame": {
+        "x": 1388,
+        "y": 0,
+        "w": 32,
+        "h": 17
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 17
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 17
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "posterKaiju": {
+      "frame": {
+        "x": 1420,
+        "y": 0,
+        "w": 26,
+        "h": 21
+      },
+      "sourceSize": {
+        "w": 26,
+        "h": 21
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 26,
+        "h": 21
+      },
+      "rotated": false,
+      "trimmed": false
     }
   },
   "meta": {
     "image": "tiles.png",
     "size": {
-      "w": 1388,
+      "w": 1446,
       "h": 64
     },
     "scale": 1

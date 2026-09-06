@@ -32,7 +32,7 @@ import { preloadTiles, tilesReady, bake, frameSize, frameOpening, TILES_KEY } fr
 import { measureWidth, CHAR_H } from './font.js';
 import {
   BULB, SIGN_LINE_GAP, SIGN_GOLD, SIGN_FIELD_COLOR, SIGN_BACK_COLOR,
-  signLines, signBlockHeight, signLineWidth,
+  signLines, signBlockHeight, signLineWidth, signArtPad, SIGN_TEXT_MARGIN,
   SIGN_SPLAY_TAPER, SIGN_SPLAY_BAND, SIGN_SPLAY_LIGHT, SIGN_SPLAY_DARK, SIGN_SPLAY_EDGE,
 } from './sign.js';
 import { ShadowLayer } from './shadows.js';
@@ -809,11 +809,28 @@ export class TileMapRenderer {
     for (let x = lastX; x >= x0; x -= BULB) at(x, h - BULB);
     for (let y = h - BULB * 2; y >= BULB; y -= BULB) at(x0, y);
 
+    // Poster art, inside the bulb frame at either end and vertically centred.
+    // Measured with the same helper the loader validates against, so a board
+    // that fits its name at load time still fits it once drawn.
+    const pad = signArtPad(p, (t) => frameSize(this.scene, t));
+    for (const a of p.art ?? []) {
+      const sz = frameSize(this.scene, a.tile);
+      if (!sz) continue;
+      const ax = a.at === 'right'
+        ? x0 + bw - BULB - SIGN_TEXT_MARGIN - sz.w
+        : x0 + BULB + SIGN_TEXT_MARGIN;
+      g.tile(a.tile, ax, Math.round((h - sz.h) / 2));
+    }
+
     const lines = signLines(p);
     if (!lines.length) return bulbs;
+    // Text centres in what the art leaves, not in the board -- otherwise a
+    // spaceship at one end shoves the title visibly off-centre the other way.
+    const tx0 = x0 + BULB + pad.left;
+    const tw = bw - BULB * 2 - pad.left - pad.right;
     let ty = Math.round((h - signBlockHeight(lines)) / 2);
     for (const l of lines) {
-      g.text(l.text, x0 + Math.round((bw - signLineWidth(l)) / 2), ty, l.scale, l.color, l.font);
+      g.text(l.text, tx0 + Math.round((tw - signLineWidth(l)) / 2), ty, l.scale, l.color, l.font);
       ty += (signBlockHeight([l])) + SIGN_LINE_GAP;
     }
     return bulbs;

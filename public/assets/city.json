@@ -872,8 +872,8 @@
      "splay": 22
     },
     {
-     "fx": 3,
-     "fw": 18,
+     "fx": 2,
+     "fw": 20,
      "h": 3,
      "up": 9,
      "bg": "#1d2740",
@@ -886,6 +886,16 @@
        "text": "8-BIT BLOCKBUSTER",
        "scale": 2,
        "color": "#fff2d2"
+      }
+     ],
+     "art": [
+      {
+       "tile": "posterShip",
+       "at": "left"
+      },
+      {
+       "tile": "posterKaiju",
+       "at": "right"
       }
      ]
     }

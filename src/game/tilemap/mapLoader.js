@@ -37,8 +37,8 @@
 // stopping at the first one -- a hand-edited file is likely to have more
 // than one mistake at a time and deserves to hear about all of them.
 
-import { TILES_KEY } from './atlas.js';
-import { signLines, signFieldWidth, signLineWidth } from './sign.js';
+import { TILES_KEY, frameSize } from './atlas.js';
+import { signLines, signFieldWidth, signLineWidth, signArtPad } from './sign.js';
 
 const LAYER_ROLES = ['ground', 'flat', 'object', 'overhead'];
 
@@ -147,7 +147,10 @@ export function loadCityMap(raw, scene) {
    */
   const checkSignText = (label, panel, bandTiles) => {
     const lines = signLines(panel);
-    const avail = signFieldWidth(bandTiles, panel.splay ?? 0);
+    // Without a scene there are no frames to measure, so a board validates as
+    // though it carried no art -- see signArtPad.
+    const sizeOf = scene ? (t) => frameSize(scene, t) : () => null;
+    const avail = signFieldWidth(bandTiles, panel.splay ?? 0, signArtPad(panel, sizeOf));
     lines.forEach((line, i) => {
       const where = lines.length > 1 ? `${label}.lines[${i}]` : label;
       if (typeof line.text !== 'string' || !line.text.length) {

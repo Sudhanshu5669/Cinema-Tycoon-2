@@ -2300,6 +2300,61 @@ export const ROOM_DARK = [
 ];
 
 
+/**
+ * Reader-board poster art -- what is actually showing, drawn on the board
+ * rather than only named on it.
+ *
+ * These are the one place in the tile set allowed a cartoon register. Every
+ * other tile is a building material and answers to the street's neutral
+ * palette; a poster is a picture of something else entirely, printed and hung
+ * up, and the reference leans on exactly that contrast -- a green monster and
+ * a chrome spaceship against a board of otherwise flat masonry. Kept simple
+ * on purpose: at the size a 3-tile board leaves them, a silhouette and two
+ * colours read and detail does not.
+ */
+export const POSTER_SHIP = [
+  '................................',
+  '..............5555..............',
+  '.............555555.............',
+  '............55555555............',
+  '...........555555555............',
+  '.......7...4444444444444........',
+  '.....777..44444444444444444.....',
+  '...77777.4444444444444444444....',
+  '..777*777444446644444444444444..',
+  '...77777.4444444444444444444....',
+  '.....777..44444444444444444.....',
+  '.......7...4444444444444........',
+  '...........555555555............',
+  '............55555555............',
+  '.............555555.............',
+  '..............5555..............',
+  '................................',
+];
+export const POSTER_KAIJU = [
+  '..........................',
+  '..1....................1..',
+  '..11..................11..',
+  '..111................111..',
+  '...11111111111111111111...',
+  '..111111111111111111111...',
+  '.11111111111111111111111..',
+  '.11111111111111111111111..',
+  '.1111**11111111**1111111..',
+  '.1111*2*1111111*2*1111111.',
+  '.1111**11111111**1111111..',
+  '.111111111111111111111111.',
+  '..2222222222222222222222..',
+  '..999999999999999999999...',
+  '..9*99*99*99*99*99*99*9...',
+  '..999999999999999999999...',
+  '..9*99*99*99*99*99*99*9...',
+  '..999999999999999999999...',
+  '...22222222222222222222...',
+  '....222222222222222222....',
+  '..........................',
+];
+
 export const TILES = {
   road: ROAD, roadLine: ROAD_LINE, crosswalk: CROSSWALK, pave: PAVE, paveCrack: PAVE_CRACK, paveStain: PAVE_STAIN,
   kerb: KERB, grass: GRASS, trashCan: TRASH_CAN, newsBox: NEWS_BOX, sidewalkStar: SIDEWALK_STAR,
@@ -2327,4 +2382,5 @@ export const FEATURES = {
   boxOffice: BOX_OFFICE, posterCase: POSTER_CASE,
   cinemaDoors: CINEMA_DOORS, candyStand: CANDY_STAND,
   signBulb: SIGN_BULB,
+  posterShip: POSTER_SHIP, posterKaiju: POSTER_KAIJU,
 };

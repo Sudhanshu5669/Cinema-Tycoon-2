@@ -78,13 +78,39 @@ export function signLines(p) {
   }));
 }
 
+/**
+ * How much width a board's poster art takes off each end of its text field.
+ *
+ * `sizeOf` is passed in rather than looked up here, so this file keeps its one
+ * real property: it does the sign arithmetic and never reaches Phaser. The
+ * renderer hands it the live atlas; the loader hands it the same atlas when it
+ * has a scene, and a stub returning null when it does not, in which case a
+ * board simply validates as though it carried no art -- the structural tests
+ * run without a browser and have no frames to measure.
+ *
+ * @param {{art?: {tile: string, at?: 'left'|'right'}[]}} panel
+ * @param {(tile: string) => {w: number, h: number} | null | undefined} sizeOf
+ */
+export function signArtPad(panel, sizeOf) {
+  let left = 0, right = 0;
+  for (const a of panel.art ?? []) {
+    const w = sizeOf(a.tile)?.w;
+    if (!w) continue;
+    if (a.at === 'right') right = Math.max(right, w + SIGN_TEXT_MARGIN);
+    else left = Math.max(left, w + SIGN_TEXT_MARGIN);
+  }
+  return { left, right };
+}
+
 /** Pixel width actually available to text on a board `fw` tiles wide, once
- *  its bulb frame, end margins and any angled returns are taken out. The
- *  splay has to be in here and not only in the renderer: this is the number
- *  mapLoader validates a name against before anything is drawn, and a board
- *  that splays has genuinely less room for its text. */
-export function signFieldWidth(fw, splay = 0) {
-  return fw * TILE - splay * 2 - BULB * 2 - SIGN_TEXT_MARGIN * 2;
+ *  its bulb frame, end margins, angled returns and poster art are taken out.
+ *  All of it has to be in here and not only in the renderer: this is the
+ *  number mapLoader validates a name against before anything is drawn, and a
+ *  board that splays, or that carries a spaceship at one end, has genuinely
+ *  less room for its text. */
+export function signFieldWidth(fw, splay = 0, artPad = { left: 0, right: 0 }) {
+  return fw * TILE - splay * 2 - BULB * 2 - SIGN_TEXT_MARGIN * 2
+    - artPad.left - artPad.right;
 }
 
 /** Pixel height a normalised line list occupies as a block. */

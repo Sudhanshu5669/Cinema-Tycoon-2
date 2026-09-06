@@ -201,6 +201,27 @@ export const TILE_PALETTE = {
   '%': '#3a0d12', // sign board back / the frame's own dark rebate
   'K': '#1d2740', // reader-board screen, cool and dark against all that gold
 
+  // --- reader-board poster art --------------------------------------------
+  // Digits, because every letter in this palette is spoken for and a poster
+  // needs colours nothing else on the street has: a monster is green and a
+  // spaceship is cold grey, and neither belongs in a set built for masonry.
+  // Scoped exactly as tightly as the signage tones above -- these appear on
+  // the reader board and nowhere else, which is why they are allowed to be
+  // this saturated while the buildings around them are not.
+  '1': '#6fae4e', // creature, lit
+  '2': '#3d6b34', // creature, shaded muzzle and its pupils
+  '9': '#31160f', // the inside of an open mouth
+  '4': '#7b8598', // ship hull
+  '5': '#4a5368', // ship hull, shaded -- and its fins, which turn away
+  '6': '#3f8fb0', // canopy glass
+  '7': '#ff9a3c', // thruster flame
+
+  // These sit a long way below where a chrome hull "should" be. The reader
+  // board is a lit surface like any other, so its art takes the marquee's
+  // light on top of whatever it is painted -- authored near-white, the ship
+  // clipped to a flat white blob and its fins merged into its hull, because
+  // two tones both above the clip point are the same tone.
+
   // Lobby light spilling out of the entrance, and the runner it falls on.
   '@': '#ffca7d', // interior glow behind the doors
   '&': '#7a2420', // carpet
