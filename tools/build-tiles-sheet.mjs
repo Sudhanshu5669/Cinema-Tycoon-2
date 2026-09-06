@@ -87,8 +87,18 @@ const RELIEF_STRENGTH = {
  * One value for all of them rather than a per-tile number: they are all the
  * same physical plane at the same angle, and the moment two ground tiles lean
  * differently they stop reading as one continuous floor.
+ *
+ * **Kept modest, and that is a correction.** This went in at 0.8 at the same
+ * time the night lights were being driven up, and the two were solving the
+ * same problem twice: the pavement in front of the cinema ended up averaging
+ * L=143 with an eighth of it clipped past 200, a white blaze with none of its
+ * own tile grid left. The lean and the lamp intensity are not independent
+ * knobs -- both scale what the ground collects -- so tuning one while the
+ * other was already too high just double-counted. The lean is what earns the
+ * ground light the shader's flat normal would deny it; the lamps decide how
+ * much there is to collect. Set the second first.
  */
-const GROUND_LEAN = 0.8;
+const GROUND_LEAN = 0.3;
 const GROUND_TILT = new Set([
   'road', 'roadLine', 'crosswalk', 'pave', 'paveCrack', 'paveStain',
   'pavePatch', 'paveLitter', 'grass', 'sidewalkStar', 'lobbyCarpet',
