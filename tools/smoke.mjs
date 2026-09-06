@@ -359,7 +359,16 @@ check('the player casts a shadow away from a nearby streetlamp',
 // gotten backwards, so this is the regression check for that specifically.
 await page.evaluate(() => window.__dev.warp(170, 370));
 await page.waitForTimeout(200);
-const lampFromNorth = (await page.evaluate(() => window.__dev.shadowSourcesAt(170, 370)))[0];
+// The strongest source here is NOT the southern lamp -- there is one 2px off
+// the player's own row, and taking [0] silently picked that instead, which
+// made this check assert something about a level light while claiming to
+// assert something about a southern one. Pick by the property the check is
+// actually about.
+const southSources = (await page.evaluate(() => window.__dev.shadowSourcesAt(170, 370)))
+  .filter((s) => s.y > 370 + 40);
+check('there is a streetlamp genuinely south of the player to test against',
+  southSources.length > 0, `${southSources.length} sources south of the player`);
+const lampFromNorth = southSources[0];
 const northDir = { x: 170 - lampFromNorth.x, y: 370 - lampFromNorth.y };
 const [awayNorth, towardNorth] = await Promise.all([
   maxShadowAlong(northDir.x, northDir.y), maxShadowAlong(-northDir.x, -northDir.y),

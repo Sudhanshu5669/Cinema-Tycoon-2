@@ -65,18 +65,41 @@ export class Light {
   /**
    * How strongly this light illuminates world point (px, py): 0..(peak
    * `intensity`), continuous, reaching exactly 0 at `radius` and never
-   * beyond it. The same falloff shape Phaser's own Light2D shader uses
+   * beyond it. Note the upper bound is `intensity`, NOT 1 -- anything that
+   * wants a normalised 0..1 wants `attenuationAt` below. The same falloff shape Phaser's own Light2D shader uses
    * (`1 - d²/r²`, see node_modules/phaser/src/renderer/webgl/shaders/src/
    * Light.frag) -- deliberately, so a shadow this light casts always tracks
    * what the eye actually sees glowing, not a second, separately-invented
    * curve that could disagree with it.
    */
   illuminationAt(px, py) {
+    return this.attenuationAt(px, py) * this.intensity;
+  }
+
+  /**
+   * The same falloff WITHOUT `intensity`: 0 at the radius, exactly 1 at the
+   * light's own centre, always.
+   *
+   * This exists because the two questions are genuinely different and were
+   * being answered with one number. "Which light dominates here, and how much
+   * does it contribute" scales with how bright the bulb is -- that is
+   * `illuminationAt`. "Where is this light relative to the caster" does not:
+   * a shadow's LENGTH and DIRECTION are set by geometry, and turning a lamp
+   * up does not stretch the shadow it throws, it darkens it.
+   *
+   * Conflating them was a real bug. `shadows.js` sized the player's shadow as
+   * `MIN + (MAX - MIN) * strength`, correct only while every intensity was
+   * <= 1; the moment a window light went to 2.5 the same expression produced
+   * a 154px shadow against a 70px maximum and an alpha of 1.33, so the
+   * player trailed an opaque streak long enough to be clipped square by the
+   * edge of its own 130px canvas.
+   */
+  attenuationAt(px, py) {
     if (this.intensity <= 0) return 0;
     const d2 = (px - this.x) ** 2 + (py - this.y) ** 2;
     const r2 = this.radius * this.radius;
     if (d2 >= r2) return 0;
-    return (1 - d2 / r2) * this.intensity;
+    return 1 - d2 / r2;
   }
 
   /**

@@ -121,12 +121,56 @@ const PLIGHT_MIN_LEN = 14;
 const PLIGHT_MAX_LEN = 70;
 /** Point-light player shadows: darkness range, same 0 (a light barely
  *  reaching at all) to 1 (standing right on it) strength driving both. */
+/**
+ * Floor on how much of a point-light shadow's direction is vertical, as a
+ * fraction of its unit direction. Sign is preserved -- a light south of the
+ * player still throws the shadow north.
+ *
+ * Without it a light level with the player produces a shadow with no area at
+ * all. The projection maps the sprite's x-axis to (1, 0) and its y-axis to
+ * (-dx/H, -dy/H); as dy goes to zero those two become parallel and the quad
+ * collapses, so a 16x48 figure is drawn as a 1px-tall horizontal needle
+ * seventy pixels long. `_paintSpriteShadow` already nudges dy off exact zero
+ * to keep the matrix invertible, but invertible is not the same as
+ * non-degenerate -- it stops the draw vanishing and leaves the needle.
+ *
+ * A light exactly level with the player is not an edge case, it is most of a
+ * walk down a street of streetlamps: the player crosses that line at every
+ * single lamp.
+ *
+ * The value is bounded from both sides. Too small and the needle survives;
+ * too large and it becomes the southward bias this file already tried and
+ * reverted once -- the smoke suite has a check aimed squarely at that
+ * ("away from a streetlamp that is south of the player"), and it fails at
+ * 0.18, because a lamp level with the player leaves the shadow direction
+ * almost entirely horizontal and any tilt is measurable against it. 0.12
+ * gives the quad real area without moving the shadow visibly off the line
+ * the light actually puts it on.
+ */
+const PLIGHT_MIN_VERTICAL = 0.28;
+
 const PLIGHT_MIN_ALPHA = 0.2;
 const PLIGHT_MAX_ALPHA = 0.65;
 /** Horizontal slack (px) when testing whether the player's shadow could reach
  *  a wall's width -- generous enough to cover the sprite's own width and the
  *  shear's sideways drift without needing the exact silhouette bounds. */
 const WALL_HIT_MARGIN = 24;
+
+/**
+ * Push a shadow direction far enough off horizontal that its projection still
+ * has area -- see PLIGHT_MIN_VERTICAL. Keeps the vector unit length, so the
+ * caller's `len` stays the shadow's actual length, and keeps the sign, so a
+ * light below the player still throws the shadow upward. A direction with no
+ * vertical component at all leans south, toward the camera, the way the sun's
+ * own always does.
+ * @param {{x: number, y: number}} dir unit vector
+ */
+function tiltOffLevel({ x, y }) {
+  if (Math.abs(y) >= PLIGHT_MIN_VERTICAL) return { x, y };
+  const ny = PLIGHT_MIN_VERTICAL * (y < 0 ? -1 : 1);
+  const nx = Math.sign(x) * Math.sqrt(Math.max(0, 1 - ny * ny));
+  return { x: nx, y: ny };
+}
 
 export class ShadowLayer {
   /**
@@ -403,10 +447,18 @@ export class ShadowLayer {
     // physically honest thing to do is ask each light in turn which way its
     // own shadow falls and how strong it is, then let them overlap exactly
     // like real light would.
-    for (const { light, strength } of lightSources) {
-      const dir = light.directionFrom(px, py);
-      const len = PLIGHT_MIN_LEN + (PLIGHT_MAX_LEN - PLIGHT_MIN_LEN) * strength;
-      const alpha = PLIGHT_MIN_ALPHA + (PLIGHT_MAX_ALPHA - PLIGHT_MIN_ALPHA) * strength;
+    for (const { light } of lightSources) {
+      // `attenuationAt`, not the `strength` the source list is ranked by.
+      // Strength is illumination and runs 0..intensity; these two curves both
+      // need a normalised 0..1, and once a window light's intensity went to
+      // 2.5 the length expression below returned 154px against a 70px maximum
+      // and the alpha returned 1.33. Geometry does not scale with wattage:
+      // turning a lamp up darkens the shadow it throws, it does not stretch
+      // it.
+      const t = light.attenuationAt(px, py);
+      const dir = tiltOffLevel(light.directionFrom(px, py));
+      const len = PLIGHT_MIN_LEN + (PLIGHT_MAX_LEN - PLIGHT_MIN_LEN) * t;
+      const alpha = PLIGHT_MIN_ALPHA + (PLIGHT_MAX_ALPHA - PLIGHT_MIN_ALPHA) * t;
       cast({ dx: dir.x * len, dy: dir.y * len }, alpha);
     }
 
