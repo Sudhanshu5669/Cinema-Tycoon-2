@@ -1154,6 +1154,33 @@
      "fx": 11,
      "fy": 1
     }
+   ],
+   "roof": [
+    {
+     "tile": "roofVent",
+     "rx": 4,
+     "ry": 2
+    },
+    {
+     "tile": "roofHatch",
+     "rx": 9,
+     "ry": 2
+    },
+    {
+     "tile": "acUnit",
+     "rx": 15,
+     "ry": 1
+    },
+    {
+     "tile": "roofDuct",
+     "rx": 18,
+     "ry": 2
+    },
+    {
+     "tile": "roofVent",
+     "rx": 1,
+     "ry": 1
+    }
    ]
   },
   {
@@ -1234,6 +1261,28 @@
      "tile": "roomFlat",
      "fx": 6,
      "fy": 7
+    }
+   ],
+   "roof": [
+    {
+     "tile": "roofTank",
+     "rx": 6,
+     "ry": 2
+    },
+    {
+     "tile": "roofVent",
+     "rx": 12,
+     "ry": 1
+    },
+    {
+     "tile": "acUnit",
+     "rx": 2,
+     "ry": 2
+    },
+    {
+     "tile": "roofHatch",
+     "rx": 13,
+     "ry": 2
     }
    ]
   },
@@ -1375,6 +1424,33 @@
      "fx": 0,
      "fy": 5
     }
+   ],
+   "roof": [
+    {
+     "tile": "roofDuct",
+     "rx": 3,
+     "ry": 1
+    },
+    {
+     "tile": "roofTank",
+     "rx": 15,
+     "ry": 2
+    },
+    {
+     "tile": "roofVent",
+     "rx": 20,
+     "ry": 1
+    },
+    {
+     "tile": "acUnit",
+     "rx": 8,
+     "ry": 2
+    },
+    {
+     "tile": "roofHatch",
+     "rx": 11,
+     "ry": 1
+    }
    ]
   },
   {
@@ -1448,6 +1524,28 @@
      "tile": "roomFlat",
      "fx": 1,
      "fy": 3
+    }
+   ],
+   "roof": [
+    {
+     "tile": "acUnit",
+     "rx": 5,
+     "ry": 2
+    },
+    {
+     "tile": "roofHatch",
+     "rx": 12,
+     "ry": 1
+    },
+    {
+     "tile": "roofVent",
+     "rx": 16,
+     "ry": 2
+    },
+    {
+     "tile": "roofDuct",
+     "rx": 1,
+     "ry": 2
     }
    ]
   },
@@ -1548,6 +1646,33 @@
      "fx": 7,
      "fy": 4
     }
+   ],
+   "roof": [
+    {
+     "tile": "roofTank",
+     "rx": 4,
+     "ry": 3
+    },
+    {
+     "tile": "roofVent",
+     "rx": 14,
+     "ry": 2
+    },
+    {
+     "tile": "roofDuct",
+     "rx": 18,
+     "ry": 1
+    },
+    {
+     "tile": "acUnit",
+     "rx": 10,
+     "ry": 3
+    },
+    {
+     "tile": "roofHatch",
+     "rx": 20,
+     "ry": 2
+    }
    ]
   },
   {
@@ -1575,6 +1700,38 @@
      "tile": "windowWarm",
      "fx": 7,
      "fy": 3
+    }
+   ],
+   "roof": [
+    {
+     "tile": "roofTank",
+     "rx": 2,
+     "ry": 3
+    },
+    {
+     "tile": "roofVent",
+     "rx": 6,
+     "ry": 2
+    },
+    {
+     "tile": "roofHatch",
+     "rx": 4,
+     "ry": 5
+    },
+    {
+     "tile": "acUnit",
+     "rx": 7,
+     "ry": 6
+    },
+    {
+     "tile": "roofDuct",
+     "rx": 1,
+     "ry": 7
+    },
+    {
+     "tile": "roofVent",
+     "rx": 8,
+     "ry": 8
     }
    ]
   },
@@ -1604,6 +1761,38 @@
      "fx": 8,
      "fy": 3,
      "room": "roomLamp"
+    }
+   ],
+   "roof": [
+    {
+     "tile": "roofDuct",
+     "rx": 2,
+     "ry": 2
+    },
+    {
+     "tile": "roofVent",
+     "rx": 8,
+     "ry": 4
+    },
+    {
+     "tile": "roofHatch",
+     "rx": 5,
+     "ry": 6
+    },
+    {
+     "tile": "acUnit",
+     "rx": 9,
+     "ry": 7
+    },
+    {
+     "tile": "roofTank",
+     "rx": 9,
+     "ry": 1
+    },
+    {
+     "tile": "roofVent",
+     "rx": 1,
+     "ry": 5
     }
    ]
   },
@@ -1639,6 +1828,43 @@
      "fy": 3,
      "room": "roomPlant"
     }
+   ],
+   "roof": [
+    {
+     "tile": "roofTank",
+     "rx": 3,
+     "ry": 4
+    },
+    {
+     "tile": "roofHatch",
+     "rx": 9,
+     "ry": 2
+    },
+    {
+     "tile": "roofVent",
+     "rx": 11,
+     "ry": 6
+    },
+    {
+     "tile": "acUnit",
+     "rx": 1,
+     "ry": 7
+    },
+    {
+     "tile": "roofDuct",
+     "rx": 5,
+     "ry": 1
+    },
+    {
+     "tile": "roofVent",
+     "rx": 7,
+     "ry": 8
+    },
+    {
+     "tile": "roofHatch",
+     "rx": 12,
+     "ry": 4
+    }
    ]
   },
   {
@@ -1668,6 +1894,43 @@
      "tile": "window",
      "fx": 8,
      "fy": 3
+    }
+   ],
+   "roof": [
+    {
+     "tile": "roofDuct",
+     "rx": 4,
+     "ry": 3
+    },
+    {
+     "tile": "acUnit",
+     "rx": 1,
+     "ry": 5
+    },
+    {
+     "tile": "acUnit",
+     "rx": 3,
+     "ry": 6
+    },
+    {
+     "tile": "roofVent",
+     "rx": 9,
+     "ry": 2
+    },
+    {
+     "tile": "roofTank",
+     "rx": 7,
+     "ry": 7
+    },
+    {
+     "tile": "roofHatch",
+     "rx": 9,
+     "ry": 5
+    },
+    {
+     "tile": "roofVent",
+     "rx": 1,
+     "ry": 1
     }
    ]
   },
@@ -1702,6 +1965,43 @@
      "fx": 10,
      "fy": 3
     }
+   ],
+   "roof": [
+    {
+     "tile": "roofTank",
+     "rx": 9,
+     "ry": 3
+    },
+    {
+     "tile": "roofVent",
+     "rx": 2,
+     "ry": 2
+    },
+    {
+     "tile": "roofHatch",
+     "rx": 4,
+     "ry": 6
+    },
+    {
+     "tile": "roofDuct",
+     "rx": 11,
+     "ry": 7
+    },
+    {
+     "tile": "acUnit",
+     "rx": 6,
+     "ry": 4
+    },
+    {
+     "tile": "roofVent",
+     "rx": 12,
+     "ry": 1
+    },
+    {
+     "tile": "roofDuct",
+     "rx": 1,
+     "ry": 8
+    }
    ]
   },
   {
@@ -1732,6 +2032,38 @@
      "fx": 7,
      "fy": 3
     }
+   ],
+   "roof": [
+    {
+     "tile": "roofHatch",
+     "rx": 2,
+     "ry": 3
+    },
+    {
+     "tile": "roofVent",
+     "rx": 6,
+     "ry": 5
+    },
+    {
+     "tile": "acUnit",
+     "rx": 7,
+     "ry": 2
+    },
+    {
+     "tile": "roofTank",
+     "rx": 4,
+     "ry": 7
+    },
+    {
+     "tile": "roofDuct",
+     "rx": 1,
+     "ry": 1
+    },
+    {
+     "tile": "roofVent",
+     "rx": 8,
+     "ry": 6
+    }
    ]
   },
   {
@@ -1760,6 +2092,43 @@
      "tile": "window",
      "fx": 8,
      "fy": 3
+    }
+   ],
+   "roof": [
+    {
+     "tile": "roofTank",
+     "rx": 7,
+     "ry": 5
+    },
+    {
+     "tile": "roofDuct",
+     "rx": 1,
+     "ry": 2
+    },
+    {
+     "tile": "roofVent",
+     "rx": 5,
+     "ry": 7
+    },
+    {
+     "tile": "roofHatch",
+     "rx": 9,
+     "ry": 3
+    },
+    {
+     "tile": "acUnit",
+     "rx": 3,
+     "ry": 8
+    },
+    {
+     "tile": "roofVent",
+     "rx": 10,
+     "ry": 6
+    },
+    {
+     "tile": "roofDuct",
+     "rx": 4,
+     "ry": 1
     }
    ]
   },
@@ -1793,6 +2162,43 @@
      "tile": "windowWarm",
      "fx": 10,
      "fy": 3
+    }
+   ],
+   "roof": [
+    {
+     "tile": "roofDuct",
+     "rx": 2,
+     "ry": 2
+    },
+    {
+     "tile": "roofTank",
+     "rx": 10,
+     "ry": 4
+    },
+    {
+     "tile": "acUnit",
+     "rx": 6,
+     "ry": 6
+    },
+    {
+     "tile": "roofVent",
+     "rx": 7,
+     "ry": 2
+    },
+    {
+     "tile": "roofHatch",
+     "rx": 3,
+     "ry": 5
+    },
+    {
+     "tile": "roofVent",
+     "rx": 12,
+     "ry": 7
+    },
+    {
+     "tile": "acUnit",
+     "rx": 9,
+     "ry": 1
     }
    ]
   }

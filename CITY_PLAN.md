@@ -42,6 +42,14 @@ high on a south-facing wall, which in this projection puts it high on the
 behind the building. The shop block carries 8–9 tiles of roof so that its
 windows light Parade St and not Main St.
 
+**So a roof is a facade now.** It is the elevation the street behind a block
+actually looks at, and it has to be built like one: a parapet capping its back
+edge (`roofBack`, not `cornice` flipped — the far parapet's shaded drop faces
+away and is never in view), and furniture standing on the deck (`b.roof`,
+placed in roof space the way `facade` is placed in face space). Undressed, a
+nine-tile deck is a pale slab ending on a hard line against the pavement in
+front of it, which is what the shop block looked like the moment it existed.
+
 This was the open question phase 1a had to answer, and the alternative — a
 north-facing face variant in the renderer — was not taken: it puts a shopfront
 above its own roofline and fights the depth sort, to buy a street shape the
@@ -86,6 +94,14 @@ a door, an upper floor of windows, and a material each.
 One new tile (`kerbSouth`) and one new schema primitive (`rects`, for a
 crossing that was 48 hand-written cells). Otherwise existing art.
 
+Then the roofs, once it was clear they were a facade and not scenery: a
+parapet tile (`roofBack`), four pieces of furniture (`roofTank`, `roofVent`,
+`roofHatch`, `roofDuct`, alongside the existing `acUnit`), a `roof` list on a
+building, and 76 items placed across all thirteen decks. The loader checks a
+piece's own **pixels** fit the deck, not just the cell it names — a tank is
+wider and taller than a tile, so a legal `rx` can still hang it off the edge,
+where the bake clips it and half a tank appears.
+
 ### 1b — Shopfront kit
 The main art investment, and the thing that decides whether this scales. Rather
 than eight bespoke buildings, build **parts that combine**: fascia bands, awning
@@ -107,6 +123,12 @@ from across the road.
 ### 1e — Street dressing
 Crossings, benches, bins, planters, A-boards, bollards, a bike rack. Small, and
 what stops a pavement reading as a corridor.
+
+Roofs got their first pass in 1a, because the shop block's deck is what Main St
+looks at and it could not wait. What they still want: **clustering** — plant
+rooms and tank groups rather than an even scatter — and **cast shadows.**
+Furniture is baked into the roof image, so none of it casts, while the
+buildings around it do. Short shadows at noon hide it; a low sun will not.
 
 ### 1f — Light budget pass
 Re-measure and re-tune. **Hard constraint:** on-screen shaded lights must stay

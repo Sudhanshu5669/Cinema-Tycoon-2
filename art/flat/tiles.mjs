@@ -598,6 +598,39 @@ export const ROOF = [
 
 /** Roof lip and the shadow it throws. The single most important tile here:
  *  without the shadow the roof and the wall read as one flat plane. */
+/**
+ * The far side of a roof: the parapet you look ACROSS a roof at, from the
+ * street behind the building.
+ *
+ * Not CORNICE flipped. CORNICE is the near parapet, and what it shows is the
+ * lip catching light and the shadow that lip throws down the wall below it --
+ * a wall this one does not have, because on the far side there is no wall in
+ * view, only the deck falling away toward the camera. What reads here is the
+ * coping, the dark line under its inner overhang, the parapet's own inner
+ * face, and then the deck. Without it a block's roof simply stops against the
+ * pavement behind it on a hard line, with nothing saying the roof is five
+ * storeys up -- which is exactly how the shop block read when the city grew a
+ * street behind it.
+ */
+export const ROOF_BACK = [
+  'llllllllllllllll',
+  'llllllllllllllll',
+  'LLLLLLLLLLLLLLLL',
+  'nnnnnnnnnnnnnnnn',
+  'nnnnnnnnnnnnnnnn',
+  'NNNNNNNNNNNNNNNN',
+  'fFfFffFfFfFFffFf',
+  'fffffFffFFffffff',
+  'fFFfffffffffffff',
+  'fffFffFfFfffffff',
+  'ffffffFfffffffFf',
+  'fFFfFfffFfffffff',
+  'fffFffffffFfffff',
+  'fffFffffffFfFFff',
+  'fFFFFfFffFfffFff',
+  'ffFFffffFffFfFff',
+];
+
 export const CORNICE = [
   'ffffffffffffffff',
   'ffffffffffffffff',
@@ -2344,6 +2377,76 @@ export const ROOM_DARK = [
  * on purpose: at the size a 3-tile board leaves them, a silhouette and two
  * colours read and detail does not.
  */
+/**
+ * Roof furniture. A city block seen from the street behind it is mostly roof,
+ * and an unbroken deck reads as a slab rather than as the top of a building
+ * -- these are what break it up. All four are the same grimy city metal the
+ * bins and the AC unit are (`Z`/`Q`), seen from the same 3/4 angle as
+ * everything else: a lit top surface, a side turned toward the camera, and
+ * `N` down the right where the light from the left does not reach.
+ *
+ * They sit on the roof deck, not on the ground -- see the renderer's `roof`
+ * list, which places them in roof space the way `facade` places a window in
+ * face space.
+ */
+export const ROOF_TANK = [
+  '.....QQQQQQQQQQ.....',
+  '...QQQQQQQQQQQQQQ...',
+  '..QQQQQQQQQQQQQQQQ..',
+  '..QQZZZZZZZZZZZZNN..',
+  '..QQZZZZZZZZZZZZNN..',
+  '..QQZZZZZZZZZZZZNN..',
+  '..QQQQQQQQQQQQQQQQ..',
+  '..QQZZZZZZZZZZZZNN..',
+  '..QQZZZZZZZZZZZZNN..',
+  '..QQZZZZZZZZZZZZNN..',
+  '..QQZZZZZZZZZZZZNN..',
+  '..QQQQQQQQQQQQQQQQ..',
+  '..QQZZZZZZZZZZZZNN..',
+  '..QQZZZZZZZZZZZZNN..',
+  '..QQZZZZZZZZZZZZNN..',
+  '..NNNNNNNNNNNNNNNN..',
+  '...ZZ..........ZZ...',
+  '...ZZ..........ZZ...',
+  '...ZZ..........ZZ...',
+  '..ZZZZ........ZZZZ..',
+];
+
+export const ROOF_VENT = [
+  '...QQQQQQ...',
+  '..QQQQQQQQ..',
+  '.QQQQQQQQQQ.',
+  '.ZZZZZZZZNN.',
+  '....QZZN....',
+  '....QZZN....',
+  '....QZZN....',
+  '....QZZN....',
+  '...QQZZNN...',
+  '...NNNNNN...',
+];
+
+export const ROOF_HATCH = [
+  '..QQQQQQQQQQQQ..',
+  '.QQQQQQQQQQQQQQ.',
+  '.QQQQQQQQQQQQQQ.',
+  '.QZZZZZZZZZZZZN.',
+  '.QZZZZZZZZZZZZN.',
+  '.QZZZZZZZZZZZZN.',
+  '.NNNNNNNNNNNNNN.',
+  '................',
+];
+
+export const ROOF_DUCT = [
+  '........................',
+  '..QQQQQQQQQQQQQQQQQQQQ..',
+  '..ZZQZZQZZQZZQZZQZZQZZ..',
+  '..ZZQZZQZZQZZQZZQZZQZZ..',
+  '..ZZQZZQZZQZZQZZQZZQZZ..',
+  '..NNQNNQNNQNNQNNQNNQNN..',
+  '........................',
+  '........................',
+];
+
 export const POSTER_SHIP = [
   '................................',
   '..............5555..............',
@@ -2395,7 +2498,7 @@ export const TILES = {
   wall: WALL, wallEdge: WALL_EDGE, brick: BRICK, brickEdge: BRICK_EDGE,
   wallDark: WALL_DARK, brickDark: BRICK_DARK,
   corniceDark: CORNICE_DARK, plinthDark: PLINTH_DARK,
-  roof: ROOF, cornice: CORNICE, corniceEdge: CORNICE_EDGE,
+  roof: ROOF, roofBack: ROOF_BACK, cornice: CORNICE, corniceEdge: CORNICE_EDGE,
   plinth: PLINTH, plinthEdge: PLINTH_EDGE, beltCourse: BELT_COURSE,
   awning: AWNING, marquee: MARQUEE, signTower: SIGN_TOWER, signCap: SIGN_CAP,
 };
@@ -2414,5 +2517,6 @@ export const FEATURES = {
   boxOffice: BOX_OFFICE, posterCase: POSTER_CASE,
   cinemaDoors: CINEMA_DOORS, candyStand: CANDY_STAND,
   signBulb: SIGN_BULB,
+  roofTank: ROOF_TANK, roofVent: ROOF_VENT, roofHatch: ROOF_HATCH, roofDuct: ROOF_DUCT,
   posterShip: POSTER_SHIP, posterKaiju: POSTER_KAIJU,
 };

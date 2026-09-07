@@ -481,10 +481,29 @@ export class TileMapRenderer {
     // the wall dominates the way it does in a real 3/4 street rather than the
     // roof spreading into a flat slab. Depth is the front wall line: the player
     // is behind the whole building unless their feet are south of it.
+    //
+    // The deck is capped at its back edge by a parapet (`roofBack`), and
+    // dressed with whatever `b.roof` puts on it. Both exist because a roof is
+    // not scenery here any more: a block's roof is what the street BEHIND it
+    // looks at, and an undressed deck ending on a hard line against that
+    // street's pavement reads as a pale slab rather than as the top of a
+    // building five storeys up.
     const roofH = Math.min(b.h, b.roofDepth ?? 3) * TILE;
     const roofY = faceTop - roofH;
-    const roofKey = bake(this.scene, b.w * TILE, roofH, (g) =>
-      g.fill(b.top ?? 'roof', 0, 0, b.w * TILE, roofH));
+    const roofKey = bake(this.scene, b.w * TILE, roofH, (g) => {
+      g.fill(b.top ?? 'roof', 0, 0, b.w * TILE, roofH);
+      // Only on a deck with room for one. A three-tile roof cap on a tall
+      // north-row building is a sliver seen edge-on from the street it fronts,
+      // and a parapet across the whole of it would read as a stripe.
+      if (roofH >= 2 * TILE) g.fill(b.parapet ?? 'roofBack', 0, 0, b.w * TILE, TILE);
+      // Furniture, in roof space: `rx` tiles from the left, `ry` the deck row
+      // it stands ON -- the same "the row it stands on" rule a freestanding
+      // prop's own y follows, so a tank and a bin are placed by the same idea.
+      for (const it of b.roof ?? []) {
+        const size = frameSize(this.scene, it.tile);
+        g.tile(it.tile, it.rx * TILE, (it.ry + 1) * TILE - size.h);
+      }
+    });
     this._place(roofKey, b.x * TILE, roofY, frontY);
 
     // Composed face. Every window facade entry doubles as a light source --

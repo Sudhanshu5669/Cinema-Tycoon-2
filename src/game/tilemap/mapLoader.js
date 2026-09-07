@@ -11,7 +11,9 @@
 //     ground|flat|object|overhead: { default?, bands?, vbands?, rects?, stripes?, cells? },
 //     platforms: [...], buildings: [...], streetlamps: [...], props: [...] }
 //
-// A building may also name `cornice`/`plinth` tiles alongside `face`/`base`,
+// A building may also carry a `roof` list -- furniture standing on its deck,
+// placed in roof space the way `facade` places a window in face space -- and
+// may name `cornice`/`plinth` tiles alongside `face`/`base`,
 // which is how a background building is pushed back: swapping all four for
 // their `*Edge` (shaded-return) variants darkens a whole facade in data,
 // with no new art, so the street has a foreground and a background instead
@@ -46,6 +48,10 @@ import { TILES_KEY, frameSize } from './atlas.js';
 import { signLines, signFieldWidth, signLineWidth, signArtPad } from './sign.js';
 
 const LAYER_ROLES = ['ground', 'flat', 'object', 'overhead'];
+
+/** Tile size in pixels. Mirrors core/config.js by hand for the same reason
+ *  LIGHT_KINDS mirrors sun.js: this module is pure, and stays that way. */
+const TILE_PX = 16;
 
 /** Light kinds a prop may declare. Mirrors sun.js's GLOW_CURVES keys by hand,
  *  the same way sign.js mirrors the signage palette: this module is pure by
@@ -208,6 +214,38 @@ export function loadCityMap(raw, scene) {
       // carries, so the renderer is the honest place for that, and an unused
       // `room` is inert rather than wrong.
       if (d.room !== undefined && !validTile(d.room)) errs.push(`${dlabel}.room: unknown tile "${d.room}"`);
+    });
+    // Roof furniture, placed in roof space (see renderer.js's `roof` list).
+    // `ry` is bounded by the roof's own depth rather than by `h`: a building
+    // may be deeper than the few tiles of it the roof cap actually shows, and
+    // a tank authored past that edge would bake off the bottom of the roof
+    // image and simply not appear -- silently, which is the failure this file
+    // exists to prevent.
+    const roofRows = Math.min(b.h, b.roofDepth ?? 3);
+    (b.roof ?? []).forEach((it, j) => {
+      const rlabel = `${label}.roof[${j}]`;
+      if (!validTile(it.tile)) errs.push(`${rlabel}: unknown tile "${it.tile}"`);
+      if (!(Number.isInteger(it.rx) && it.rx >= 0 && Number.isInteger(b.w) && it.rx < b.w)) {
+        errs.push(`${rlabel}: rx=${it.rx} outside the building's own width ${b.w}`);
+      }
+      if (!(Number.isInteger(it.ry) && it.ry >= 0 && it.ry < roofRows)) {
+        errs.push(`${rlabel}: ry=${it.ry} outside the ${roofRows} rows of roof this building shows`);
+        return;
+      }
+      // And the item's own pixels fit, not just the cell it is placed in. A
+      // water tank is wider and taller than one tile, so a legal `rx` can
+      // still hang it off the edge of the roof canvas -- where the bake
+      // clips it and it simply half-appears, which is the silent kind of
+      // wrong this file exists to turn into a loud one. Needs a scene: only
+      // the live atlas knows how big a frame is.
+      if (!scene || !validTile(it.tile)) return;
+      const size = frameSize(scene, it.tile);
+      if (it.rx * TILE_PX + size.w > b.w * TILE_PX) {
+        errs.push(`${rlabel}: "${it.tile}" is ${size.w}px wide at rx=${it.rx}, past the ${b.w * TILE_PX}px of roof this building has`);
+      }
+      if (size.h > (it.ry + 1) * TILE_PX) {
+        errs.push(`${rlabel}: "${it.tile}" is ${size.h}px tall standing on roof row ${it.ry}, so it runs off the back of the deck`);
+      }
     });
     if (b.awning) {
       const { fx, fw } = b.awning;

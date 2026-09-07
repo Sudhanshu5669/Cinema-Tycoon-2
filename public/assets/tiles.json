@@ -520,7 +520,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "cornice": {
+    "roofBack": {
       "frame": {
         "x": 416,
         "y": 0,
@@ -540,7 +540,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "corniceEdge": {
+    "cornice": {
       "frame": {
         "x": 432,
         "y": 0,
@@ -560,7 +560,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "plinth": {
+    "corniceEdge": {
       "frame": {
         "x": 448,
         "y": 0,
@@ -580,7 +580,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "plinthEdge": {
+    "plinth": {
       "frame": {
         "x": 464,
         "y": 0,
@@ -600,7 +600,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "beltCourse": {
+    "plinthEdge": {
       "frame": {
         "x": 480,
         "y": 0,
@@ -620,7 +620,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "awning": {
+    "beltCourse": {
       "frame": {
         "x": 496,
         "y": 0,
@@ -640,7 +640,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "marquee": {
+    "awning": {
       "frame": {
         "x": 512,
         "y": 0,
@@ -660,7 +660,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "signTower": {
+    "marquee": {
       "frame": {
         "x": 528,
         "y": 0,
@@ -680,7 +680,7 @@
       "rotated": false,
       "trimmed": false
     },
-    "signCap": {
+    "signTower": {
       "frame": {
         "x": 544,
         "y": 0,
@@ -700,9 +700,29 @@
       "rotated": false,
       "trimmed": false
     },
-    "window": {
+    "signCap": {
       "frame": {
         "x": 560,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 16
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "window": {
+      "frame": {
+        "x": 576,
         "y": 0,
         "w": 24,
         "h": 32
@@ -722,7 +742,7 @@
     },
     "windowWide": {
       "frame": {
-        "x": 584,
+        "x": 600,
         "y": 0,
         "w": 32,
         "h": 32
@@ -742,7 +762,7 @@
     },
     "door": {
       "frame": {
-        "x": 616,
+        "x": 632,
         "y": 0,
         "w": 24,
         "h": 48
@@ -762,7 +782,7 @@
     },
     "lampPost": {
       "frame": {
-        "x": 640,
+        "x": 656,
         "y": 0,
         "w": 16,
         "h": 48
@@ -782,7 +802,7 @@
     },
     "windowLit": {
       "frame": {
-        "x": 656,
+        "x": 672,
         "y": 0,
         "w": 24,
         "h": 32
@@ -802,7 +822,7 @@
     },
     "windowWarm": {
       "frame": {
-        "x": 680,
+        "x": 696,
         "y": 0,
         "w": 24,
         "h": 32
@@ -822,7 +842,7 @@
     },
     "windowStair": {
       "frame": {
-        "x": 704,
+        "x": 720,
         "y": 0,
         "w": 24,
         "h": 32
@@ -842,7 +862,7 @@
     },
     "windowTv": {
       "frame": {
-        "x": 728,
+        "x": 744,
         "y": 0,
         "w": 24,
         "h": 32
@@ -862,7 +882,7 @@
     },
     "windowOpen": {
       "frame": {
-        "x": 752,
+        "x": 768,
         "y": 0,
         "w": 24,
         "h": 32
@@ -888,7 +908,7 @@
     },
     "roomHall": {
       "frame": {
-        "x": 776,
+        "x": 792,
         "y": 0,
         "w": 80,
         "h": 40
@@ -908,7 +928,7 @@
     },
     "roomFlat": {
       "frame": {
-        "x": 856,
+        "x": 872,
         "y": 0,
         "w": 80,
         "h": 40
@@ -928,7 +948,7 @@
     },
     "roomStair": {
       "frame": {
-        "x": 936,
+        "x": 952,
         "y": 0,
         "w": 32,
         "h": 40
@@ -948,7 +968,7 @@
     },
     "roomLamp": {
       "frame": {
-        "x": 968,
+        "x": 984,
         "y": 0,
         "w": 32,
         "h": 40
@@ -968,7 +988,7 @@
     },
     "roomPlant": {
       "frame": {
-        "x": 1000,
+        "x": 1016,
         "y": 0,
         "w": 32,
         "h": 40
@@ -988,7 +1008,7 @@
     },
     "roomDark": {
       "frame": {
-        "x": 1032,
+        "x": 1048,
         "y": 0,
         "w": 32,
         "h": 40
@@ -1008,7 +1028,7 @@
     },
     "fireEscape": {
       "frame": {
-        "x": 1064,
+        "x": 1080,
         "y": 0,
         "w": 16,
         "h": 64
@@ -1028,7 +1048,7 @@
     },
     "acUnit": {
       "frame": {
-        "x": 1080,
+        "x": 1096,
         "y": 0,
         "w": 14,
         "h": 10
@@ -1048,7 +1068,7 @@
     },
     "ticketKiosk": {
       "frame": {
-        "x": 1094,
+        "x": 1110,
         "y": 0,
         "w": 32,
         "h": 50
@@ -1068,7 +1088,7 @@
     },
     "candyCart": {
       "frame": {
-        "x": 1126,
+        "x": 1142,
         "y": 0,
         "w": 32,
         "h": 37
@@ -1088,7 +1108,7 @@
     },
     "hydrant": {
       "frame": {
-        "x": 1158,
+        "x": 1174,
         "y": 0,
         "w": 10,
         "h": 18
@@ -1108,7 +1128,7 @@
     },
     "bollard": {
       "frame": {
-        "x": 1168,
+        "x": 1184,
         "y": 0,
         "w": 6,
         "h": 16
@@ -1128,7 +1148,7 @@
     },
     "planter": {
       "frame": {
-        "x": 1174,
+        "x": 1190,
         "y": 0,
         "w": 20,
         "h": 18
@@ -1148,7 +1168,7 @@
     },
     "aBoard": {
       "frame": {
-        "x": 1194,
+        "x": 1210,
         "y": 0,
         "w": 18,
         "h": 20
@@ -1168,7 +1188,7 @@
     },
     "boxOffice": {
       "frame": {
-        "x": 1212,
+        "x": 1228,
         "y": 0,
         "w": 32,
         "h": 48
@@ -1188,7 +1208,7 @@
     },
     "posterCase": {
       "frame": {
-        "x": 1244,
+        "x": 1260,
         "y": 0,
         "w": 24,
         "h": 48
@@ -1208,7 +1228,7 @@
     },
     "cinemaDoors": {
       "frame": {
-        "x": 1268,
+        "x": 1284,
         "y": 0,
         "w": 96,
         "h": 48
@@ -1228,7 +1248,7 @@
     },
     "candyStand": {
       "frame": {
-        "x": 1364,
+        "x": 1380,
         "y": 0,
         "w": 32,
         "h": 48
@@ -1248,7 +1268,7 @@
     },
     "signBulb": {
       "frame": {
-        "x": 1396,
+        "x": 1412,
         "y": 0,
         "w": 8,
         "h": 8
@@ -1266,9 +1286,89 @@
       "rotated": false,
       "trimmed": false
     },
+    "roofTank": {
+      "frame": {
+        "x": 1420,
+        "y": 0,
+        "w": 20,
+        "h": 20
+      },
+      "sourceSize": {
+        "w": 20,
+        "h": 20
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 20,
+        "h": 20
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "roofVent": {
+      "frame": {
+        "x": 1440,
+        "y": 0,
+        "w": 12,
+        "h": 10
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 10
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 10
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "roofHatch": {
+      "frame": {
+        "x": 1452,
+        "y": 0,
+        "w": 16,
+        "h": 8
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 8
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 8
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "roofDuct": {
+      "frame": {
+        "x": 1468,
+        "y": 0,
+        "w": 24,
+        "h": 8
+      },
+      "sourceSize": {
+        "w": 24,
+        "h": 8
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 8
+      },
+      "rotated": false,
+      "trimmed": false
+    },
     "posterShip": {
       "frame": {
-        "x": 1404,
+        "x": 1492,
         "y": 0,
         "w": 32,
         "h": 17
@@ -1288,7 +1388,7 @@
     },
     "posterKaiju": {
       "frame": {
-        "x": 1436,
+        "x": 1524,
         "y": 0,
         "w": 26,
         "h": 21
@@ -1310,7 +1410,7 @@
   "meta": {
     "image": "tiles.png",
     "size": {
-      "w": 1462,
+      "w": 1550,
       "h": 64
     },
     "scale": 1

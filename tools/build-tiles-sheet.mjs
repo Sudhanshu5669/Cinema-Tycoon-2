@@ -43,6 +43,12 @@ const OUT = path.join(ROOT, 'public/assets');
  */
 const RELIEF_STRENGTH = {
   cornice: 1, corniceEdge: 1,
+  // The far parapet reads by its coping standing off the deck, the same
+  // raised-lip shape the cornice uses and at the same strength.
+  roofBack: 1,
+  // Roof furniture: boxes and cylinders of sheet metal standing on a deck --
+  // the same shallow, hard relief the street's own ironwork takes.
+  roofTank: 0.7, roofVent: 0.7, roofHatch: 0.7, roofDuct: 0.6,
   beltCourse: 0.5,
   brick: 0.6, brickEdge: 0.6, brickDark: 0.6,
   corniceDark: 1, plinthDark: 0.5,

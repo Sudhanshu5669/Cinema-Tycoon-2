@@ -512,6 +512,33 @@ const badTileErr = await page.evaluate(() => {
 check('an unknown tile name fails loudly against the live atlas',
   badTileErr && /not-a-real-tile/.test(badTileErr), badTileErr?.split('\n')[1]);
 
+// Roof furniture is placed in roof space and baked into the roof image, so a
+// piece authored past the edge of the deck does not error -- it clips, and
+// half a water tank appears. Both bounds need the live atlas, because only it
+// knows how big a frame is.
+const badRoofErr = await page.evaluate(() => {
+  try {
+    window.__dev.loadCityMap({ w: 8, h: 8, buildings: [{
+      x: 0, y: 0, w: 2, h: 4, storeys: 2, roofDepth: 4,
+      roof: [{ tile: 'roofTank', rx: 1, ry: 2 }],
+    }] });
+    return null;
+  } catch (e) { return e.message; }
+});
+check('a roof item hanging off the side of its deck fails loudly',
+  badRoofErr && /roof\[0\].*wide/.test(badRoofErr), badRoofErr?.split('\n')[1]);
+const tallRoofErr = await page.evaluate(() => {
+  try {
+    window.__dev.loadCityMap({ w: 8, h: 8, buildings: [{
+      x: 0, y: 0, w: 6, h: 4, storeys: 2, roofDepth: 4,
+      roof: [{ tile: 'roofTank', rx: 0, ry: 0 }],
+    }] });
+    return null;
+  } catch (e) { return e.message; }
+});
+check('...and one standing too close to the back of it does too',
+  tallRoofErr && /roof\[0\].*back of the deck/.test(tallRoofErr), tallRoofErr?.split('\n')[1]);
+
 // --- the city's own street frame (CITY_PLAN phase 1a) -----------------------
 // Pure geometry, read off the real city.json rather than the running scene:
 // these are facts about the map file, and a browser adds nothing to checking
