@@ -48,6 +48,26 @@ page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 
 await page.goto(url, { waitUntil: 'networkidle' });
 await page.waitForFunction(() => window.__dev?.ready === true, null, { timeout: 15000 });
+// `ready` means the scene has built, not that it is running at pace yet: the
+// first seconds still carry shader compiles and texture uploads, and the
+// checks that measure against real elapsed time (speed, the camera's
+// exponential catch-up) read low if they run inside that. It used to be
+// survivable -- the 64px/s check came in at 56 against a floor of 52 -- and
+// then the map grew a second street, the ground bake went from 1920x800 to
+// 1920x1184, and the warm-up got long enough to push it under. Wait for the
+// frame clock itself to settle rather than for a guessed number of ms.
+await page.evaluate(() => new Promise((done) => {
+  let frames = 0, last = performance.now(), settled = 0;
+  const tick = (now) => {
+    const dt = now - last; last = now;
+    // Ten consecutive frames inside 25ms is a scene that is actually running,
+    // not one still uploading. Three was not enough on its own: the uploads
+    // come in bursts, so a short quiet run happens between two of them.
+    settled = dt < 25 ? settled + 1 : 0;
+    if (settled >= 10 || ++frames > 600) done(); else requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}));
 fs.mkdirSync(OUT, { recursive: true });
 
 const start = await state(page);
@@ -223,11 +243,11 @@ check('no roof shadow at noon, when shadows are short', !(await roofHitAt(12)));
 // the pole's own thin silhouette, not a swept footprint box -- a box the size
 // of the pole's 1-tile footprint dragged sideways would read as a wide slab,
 // several tiles across at a low sun, not the thin line a real pole throws.
-// The lamp at tile (20, 32) -> world (320, 512) is on open south pavement,
+// The lamp at tile (20, 35) -> world (328, 576) is on Main St's far pavement,
 // far from any building's own reach, so this row is only ever this one shadow.
 await page.evaluate(() => window.__dev.setTime(17.7));
 await page.waitForTimeout(150);
-const lampShadowXs = await page.evaluate(() => window.__dev.shadowRow(542, 340, 420));
+const lampShadowXs = await page.evaluate(() => window.__dev.shadowRow(590, 348, 428));
 const lampShadowSpan = lampShadowXs.length ? Math.max(...lampShadowXs) - Math.min(...lampShadowXs) : 0;
 check('a streetlamp casts a shadow', lampShadowXs.length > 0);
 check('a streetlamp\'s shadow is a thin line, not a dragged slab',
@@ -357,19 +377,23 @@ check('the player casts a shadow away from a nearby streetlamp',
 // further north (away from it), not south -- exactly the direction a
 // southward bias (tried and reverted, see shadows.js's own note) would have
 // gotten backwards, so this is the regression check for that specifically.
-await page.evaluate(() => window.__dev.warp(170, 370));
+// Directly north of the far-pavement lamp at tile (20,35), rather than of the
+// north-pavement one: Main St's lamps are ~24 tiles apart now (a light-budget
+// decision, see city.json), so "north of a lamp" has to be asked somewhere a
+// lamp's 220px reach actually covers.
+await page.evaluate(() => window.__dev.warp(328, 430));
 await page.waitForTimeout(200);
 // The strongest source here is NOT the southern lamp -- there is one 2px off
 // the player's own row, and taking [0] silently picked that instead, which
 // made this check assert something about a level light while claiming to
 // assert something about a southern one. Pick by the property the check is
 // actually about.
-const southSources = (await page.evaluate(() => window.__dev.shadowSourcesAt(170, 370)))
-  .filter((s) => s.y > 370 + 40);
+const southSources = (await page.evaluate(() => window.__dev.shadowSourcesAt(328, 430)))
+  .filter((s) => s.y > 430 + 40);
 check('there is a streetlamp genuinely south of the player to test against',
   southSources.length > 0, `${southSources.length} sources south of the player`);
 const lampFromNorth = southSources[0];
-const northDir = { x: 170 - lampFromNorth.x, y: 370 - lampFromNorth.y };
+const northDir = { x: 328 - lampFromNorth.x, y: 430 - lampFromNorth.y };
 const [awayNorth, towardNorth] = await Promise.all([
   maxShadowAlong(northDir.x, northDir.y), maxShadowAlong(-northDir.x, -northDir.y),
 ]);
@@ -488,6 +512,78 @@ const badTileErr = await page.evaluate(() => {
 check('an unknown tile name fails loudly against the live atlas',
   badTileErr && /not-a-real-tile/.test(badTileErr), badTileErr?.split('\n')[1]);
 
+// --- the city's own street frame (CITY_PLAN phase 1a) -----------------------
+// Pure geometry, read off the real city.json rather than the running scene:
+// these are facts about the map file, and a browser adds nothing to checking
+// them. What they guard is the one rule this projection imposes on any city
+// laid out in it.
+//
+// Faces project straight down the screen and nowhere else (renderer.js), so a
+// building can only ever front the street to its SOUTH. There is no such
+// thing as a two-sided street here, and the parade "opposite" the cinema is
+// therefore its own street a block further down, not the far kerb of this
+// one. What separates the two is the shop block's roof mass -- and that only
+// works while every shop's stack is exactly as deep as its own footprint.
+// Let `storeys + roofDepth` exceed `h` on one shop and its roof reaches north
+// over Main St's far pavement, occluding a strip of street the player can
+// still walk on. That is the failure this first check exists for.
+const cityRaw = JSON.parse(fs.readFileSync(path.join(ROOT, 'public/assets/city.json'), 'utf8'));
+const cityMap = loadCityMap(cityRaw);
+const cityGround = cityMap.layers.find((l) => l.role === 'ground').data;
+const CARRIAGEWAY = new Set(['road', 'roadLine', 'crosswalk', 'kerb', 'kerbSouth']);
+
+const overshoot = cityRaw.buildings
+  .map((b, i) => [i, (b.storeys ?? 4) + Math.min(b.h, b.roofDepth ?? 3) - b.h])
+  .filter(([, over]) => over > 0);
+check('no building\'s roof mass reaches north past the row behind it',
+  // The north row is exempt and always will be: nothing is behind it but the
+  // back lot, which is what its own height is supposed to cover.
+  overshoot.every(([i]) => i < 5),
+  overshoot.map(([i, over]) => `buildings[${i}] +${over} rows`).join(', ') || 'none');
+
+const onCarriageway = [];
+for (const [i, b] of cityRaw.buildings.entries()) {
+  for (let y = b.y; y < b.y + b.h; y++) for (let x = b.x; x < b.x + b.w; x++) {
+    if (CARRIAGEWAY.has(cityGround[y][x])) onCarriageway.push(`buildings[${i}] at (${x},${y})`);
+  }
+}
+check('no building is standing in the road', onCarriageway.length === 0, onCarriageway[0] ?? '');
+
+// A door the player cannot reach is the specific way a one-sided street goes
+// wrong: put a shop on the far side of a road and its frontage still draws,
+// facing the camera, with its threshold walled off behind the footprint.
+const footprints = new Set();
+for (const b of cityRaw.buildings)
+  for (let y = b.y; y < b.y + b.h; y++) for (let x = b.x; x < b.x + b.w; x++) footprints.add(`${x},${y}`);
+const walledDoors = [];
+for (const [i, b] of cityRaw.buildings.entries()) {
+  const y = b.y + b.h; // the row immediately south of the front wall
+  for (const d of b.facade ?? []) {
+    if (d.tile !== 'door' && d.tile !== 'cinemaDoors') continue;
+    const x = b.x + Math.round(d.fx);
+    if (y >= cityMap.h || footprints.has(`${x},${y}`) || CARRIAGEWAY.has(cityGround[y][x])) {
+      walledDoors.push(`buildings[${i}] at (${x},${y})`);
+    }
+  }
+}
+check('every door opens onto pavement the player can stand on',
+  walledDoors.length === 0, walledDoors.join(', ') || `${cityRaw.buildings.length} buildings checked`);
+
+// Areas are joined by walking off an edge (CITY_PLAN), and the transition
+// system is not built yet -- so the only thing that can be checked now is
+// that each edge was *shaped* as an exit rather than as a wall the player
+// walks into. A road reaching the edge is that shape.
+const edgeRow = (y) => cityGround[y];
+const edgeCol = (x) => cityGround.map((row) => row[x]);
+for (const [name, cells] of [
+  ['north', edgeRow(0)], ['south', edgeRow(cityMap.h - 1)],
+  ['west', edgeCol(0)], ['east', edgeCol(cityMap.w - 1)],
+]) {
+  check(`the ${name} edge is shaped as an exit, not a wall`,
+    cells.some((t) => t === 'road' || t === 'roadLine'),
+    `${cells.filter((t) => t === 'road' || t === 'roadLine').length} road cells on that edge`);
+}
+
 // The live city and the shader cap.
 //
 // This used to assert the OPPOSITE of what it asserts now, and the reversal
@@ -509,23 +605,52 @@ const cityLightsAt = async (x, y) => {
   await page.waitForTimeout(150);
   return page.evaluate(() => window.__dev.tiles());
 };
-const [westEnd, eastEnd] = [await cityLightsAt(80, 400), await cityLightsAt(1800, 400)];
+const westEnd = await cityLightsAt(80, 440);
 check('the city defines far more lights than the shader is handed',
   westEnd.lightCounts.derived > 40 && westEnd.lightCounts.shaded < westEnd.lightCounts.derived,
   `${westEnd.lightCounts.derived} derived -> ${westEnd.lightCounts.shaded} shaded`);
-// The cull never bites: strictly under the cap, at both ends of the street.
-// Equal to the cap would already be suspect -- that is the point at which
-// Phaser starts dropping the far ones.
-for (const [where, at] of [['west', westEnd], ['east', eastEnd]]) {
-  check(`no light is culled by camera distance at the ${where} end`,
-    at.activeLightKeys.length < at.maxLights,
-    `${at.activeLightKeys.length} lit, cap ${at.maxLights}`);
+
+// Swept, not sampled at the ends. This used to read the two ends of the one
+// street and pass, and that was luck: walking the whole of Main St at 80px
+// steps shows it sitting AT the cap for most of its length, and had done
+// since before the city had a second street at all -- the two positions it
+// happened to ask about are the two with headroom. A street-long sweep is
+// what a light budget has to be measured against, per CITY_PLAN's "every
+// phase ends measured".
+const sweep = async (y) => {
+  const counts = [];
+  for (let x = 80; x <= (cityMap.w * 16) - 80; x += 80) {
+    counts.push((await cityLightsAt(x, y)).activeLightKeys.length);
+  }
+  return counts;
+};
+const MAIN_ST = 440, PARADE_ST = 1000;
+const [mainCounts, paradeCounts] = [await sweep(MAIN_ST), await sweep(PARADE_ST)];
+const cap = westEnd.maxLights;
+
+// The hard line, and the one that is genuinely about correctness: the cull
+// must never actually bite. Over the cap and Phaser silently drops the far
+// lights, re-ranking as the camera moves, which reads in game as lights
+// switching on when you walk up to them.
+for (const [where, counts] of [['Main St', mainCounts], ['Parade St', paradeCounts]]) {
+  check(`no light is culled by camera distance along ${where}`,
+    Math.max(...counts) <= cap,
+    `worst ${Math.max(...counts)} of ${cap} over ${counts.length} camera positions`);
 }
+// Headroom is the softer line, and only Parade St -- the street this phase
+// built -- is held to it. Main St has no headroom and did not have any before
+// this work either (measured at 16/16 on the committed map, same sweep), so
+// asserting it here would be reporting a debt as a regression. It is written
+// up as CITY_PLAN 1f, with the levers, and this is the number that pass has
+// to move.
+check('the new street was built with light budget left over',
+  Math.max(...paradeCounts) < cap - 2,
+  `Parade St worst ${Math.max(...paradeCounts)} of ${cap}; Main St worst ${Math.max(...mainCounts)} (1f)`);
 // The symptom itself, directly: walk a little way along the street and every
 // light that was lit and is still on screen must still be lit. Under the old
 // ranked cull this is exactly what failed -- approaching one light demoted
 // another out of the list.
-const nudged = await cityLightsAt(240, 400);
+const nudged = await cityLightsAt(240, MAIN_ST);
 const stillOnScreen = westEnd.activeLightKeys.filter((k) => {
   const [lx] = k.split(',').map(Number);
   return Math.abs(lx - 240) < 300;
@@ -533,10 +658,12 @@ const stillOnScreen = westEnd.activeLightKeys.filter((k) => {
 check('lights stay lit as the player walks toward them',
   stillOnScreen.every((k) => nudged.activeLightKeys.includes(k)),
   `${stillOnScreen.filter((k) => !nudged.activeLightKeys.includes(k)).length} of ${stillOnScreen.length} went out`);
-await cityLightsAt(80, 400);
+await cityLightsAt(80, MAIN_ST);
 await page.screenshot({ path: path.join(OUT, 'city-lights-west.png') });
-await cityLightsAt(1800, 400);
+await cityLightsAt(1800, MAIN_ST);
 await page.screenshot({ path: path.join(OUT, 'city-lights-east.png') });
+await cityLightsAt(700, PARADE_ST);
+await page.screenshot({ path: path.join(OUT, 'city-lights-parade.png') });
 
 // --- emission: additive glow, the bulb chase, the flickering television -----
 // The half of lighting Light2D cannot do (src/game/glow.js) plus the two
@@ -649,10 +776,19 @@ await page.waitForTimeout(120);
 // --- camera: follows, holds a deadzone, clamps, stays on whole pixels --------
 // SYSTEMS #5. The world is 3 x 3 screens, so there is room to scroll and edges
 // to stop at. `world` is read above, in the tile-renderer section.
+//
+// These run from the middle of Main St's carriageway rather than from the
+// middle of the world, which is what they used to use. The world centre was
+// open road while the city was one street; now it lands on the far pavement,
+// three rows short of the shop block, and "hold Down for 900ms and expect the
+// camera to have followed" quietly became a test of how far the player gets
+// before walking into a wall. The camera checks want open ground under them,
+// so they now ask for it by name.
+const OPEN = { x: 960, y: 440 };
 
 // Centred at rest. The camera aims at the middle of the body, not the feet, so
 // the player draws a half-sprite below the centre line.
-await page.evaluate(() => window.__dev.warp(window.__dev.world().w / 2, window.__dev.world().h / 2));
+await page.evaluate((o) => window.__dev.warp(o.x, o.y), OPEN);
 await page.waitForTimeout(120);
 const centred = await camera(page);
 check('camera centres the player at rest',

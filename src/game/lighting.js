@@ -138,26 +138,44 @@ const MERGE_RADIUS_BOOST_MAX = { window: 220, fixture: 90, streetlamp: 40, defau
  *
  * A merged light sits at its members' centroid and grows its radius by how far
  * they spread, so the cluster still reaches everything its members reached.
- * @param {{x:number,y:number,gx?:number,gy?:number,kind:string}[]} points
+ *
+ * `group` is the second half of the merge rule, and it is what keeps that
+ * radius honest. The justification for merging at all (see MERGE_DIST) is
+ * per-facade: several lit windows in one wall wash the same brick from the
+ * same direction, so one light standing in for them lights the same thing.
+ * A cluster that spans TWO buildings has no such thing to stand in for, and
+ * the covering radius it takes -- `r + spread` -- is isotropic while the
+ * spread that produced it is horizontal. A run of shopfront windows 400px
+ * long therefore buys 200px of *vertical* reach that not one of its members
+ * had, and spends it on whatever is behind the block.
+ *
+ * That is not hypothetical: it is what put the shop parade's upper windows
+ * onto Main St's carriageway, a street they do not face and cannot see, a
+ * full nine tiles of roof away -- and, more expensively, took two of the
+ * sixteen shader slots on that street to do it. Points with different groups
+ * never merge. Ungrouped points (streetlamps, freestanding props) still
+ * merge with each other, which is unchanged: they have no facade to belong
+ * to, and their own kinds are capped in MERGE_DIST already.
+ * @param {{x:number,y:number,gx?:number,gy?:number,kind:string,group?:string}[]} points
  */
 export function mergeForShading(points) {
   const clusters = [];
   for (const p of points) {
     const d = MERGE_DIST[p.kind] ?? 0;
-    const near = d > 0 && clusters.find((c) => c.kind === p.kind
+    const near = d > 0 && clusters.find((c) => c.kind === p.kind && c.group === p.group
       && Math.hypot(c.members[0].x - p.x, c.members[0].y - p.y) <= d);
     if (near) near.members.push(p);
-    else clusters.push({ kind: p.kind, members: [p] });
+    else clusters.push({ kind: p.kind, group: p.group, members: [p] });
   }
 
-  return clusters.map(({ kind, members }) => {
+  return clusters.map(({ kind, group, members }) => {
     if (members.length === 1) return { ...members[0], count: 1 };
     const n = members.length;
     const mean = (f) => members.reduce((a, m) => a + (m[f] ?? 0), 0) / n;
     const x = mean('x'), y = mean('y');
     const spread = Math.max(...members.map((m) => Math.hypot(m.x - x, m.y - y)));
     return {
-      x, y, kind, count: n,
+      x, y, kind, group, count: n,
       gx: members[0].gx === undefined ? undefined : mean('gx'),
       gy: members[0].gy === undefined ? undefined : mean('gy'),
       radiusBoost: Math.min(spread, MERGE_RADIUS_BOOST_MAX[kind] ?? MERGE_RADIUS_BOOST_MAX.default),

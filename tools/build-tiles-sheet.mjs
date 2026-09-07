@@ -47,7 +47,7 @@ const RELIEF_STRENGTH = {
   brick: 0.6, brickEdge: 0.6, brickDark: 0.6,
   corniceDark: 1, plinthDark: 0.5,
   plinth: 0.5, plinthEdge: 0.5,
-  kerb: 0.7,
+  kerb: 0.7, kerbSouth: 0.7,
   window: 0.8, windowWide: 0.8, windowLit: 0.8, windowWarm: 0.8,
   windowStair: 0.8, windowTv: 0.8, windowOpen: 0.8,
   door: 0.6,

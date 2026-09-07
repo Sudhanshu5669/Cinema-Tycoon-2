@@ -611,6 +611,12 @@ export class TileMapRenderer {
             // streetlamp below for the same mistake, actually made once.
             gx: b.x * TILE + localX + size.w / 2, gy: frontY,
             kind: emits,
+            // Which facade this window is in. lighting.js merges same-kind
+            // neighbours to fit the shader's light cap, and this is what
+            // keeps that merge inside one building -- see its `group` note
+            // for why a cluster that spans two of them reaches somewhere
+            // none of its members did.
+            group: `b${b.x},${b.y}`,
           });
         }
 

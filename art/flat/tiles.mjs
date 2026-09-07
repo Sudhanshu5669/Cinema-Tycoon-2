@@ -173,6 +173,38 @@ export const KERB = [
   'aaaaaaaaaaaaaaaa',
 ];
 
+/**
+ * The same kerb seen from the other side of the road -- the far kerb of a
+ * street, where the pavement is BELOW the carriageway on screen.
+ *
+ * Not a flip of KERB, because the two are not mirror images of each other in
+ * this projection. On the near kerb the drop faces the camera, so its shaded
+ * vertical face (`C`) is the whole point of the tile. On the far kerb that
+ * same face turns away and is never seen: what reads instead is the lit top
+ * edge with the road running off behind it, and a band of gutter grime along
+ * the base where the carriageway meets the stone. Flipping KERB instead would
+ * light the far side of the street from the wrong direction and paint two
+ * rows of a face that physically cannot be visible from here.
+ */
+export const KERB_SOUTH = [
+  'aaaaaaaaaaaaaaaa',
+  'aaaaAaaaaaaaazaa',
+  'aaaaaaaaaaaaaaaa',
+  'zzzzzzzzzzzzzzzz',
+  'cccccccccccccccc',
+  'cccccccccccccccc',
+  'qqqqqqqqqqqqqqqq',
+  'qpppppppqppppppp',
+  'qppPppppqppppppp',
+  'qpppppppqppppppp',
+  'qpppppppqppPpppp',
+  'qpppppppqppppppp',
+  'qpppppppqppppppp',
+  'qppppPppqppppppp',
+  'qpppppppqpppppPp',
+  'qpppppppqppppppp',
+];
+
 export const GRASS = [
   'gggggggggggggggg',
   'ggggGgggggggggGg',
@@ -2357,7 +2389,7 @@ export const POSTER_KAIJU = [
 
 export const TILES = {
   road: ROAD, roadLine: ROAD_LINE, crosswalk: CROSSWALK, pave: PAVE, paveCrack: PAVE_CRACK, paveStain: PAVE_STAIN,
-  kerb: KERB, grass: GRASS, trashCan: TRASH_CAN, newsBox: NEWS_BOX, sidewalkStar: SIDEWALK_STAR,
+  kerb: KERB, kerbSouth: KERB_SOUTH, grass: GRASS, trashCan: TRASH_CAN, newsBox: NEWS_BOX, sidewalkStar: SIDEWALK_STAR,
   lobbyCarpet: LOBBY_CARPET,
   manhole: MANHOLE, drainGrate: DRAIN_GRATE, pavePatch: PAVE_PATCH, paveLitter: PAVE_LITTER,
   wall: WALL, wallEdge: WALL_EDGE, brick: BRICK, brickEdge: BRICK_EDGE,
