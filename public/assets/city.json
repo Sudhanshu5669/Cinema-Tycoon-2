@@ -786,18 +786,7 @@
   ]
  },
  "overhead": {
-  "cells": [
-   {
-    "x": 43,
-    "y": 53,
-    "tile": "awning"
-   },
-   {
-    "x": 44,
-    "y": 53,
-    "tile": "awning"
-   }
-  ]
+  "cells": []
  },
  "props": [
   {
@@ -1865,32 +1854,60 @@
    "y": 39,
    "w": 14,
    "h": 14,
-   "storeys": 5,
-   "roofDepth": 9,
+   "storeys": 8,
+   "roofDepth": 6,
    "top": "roof",
    "face": "wall",
    "base": "brick",
    "facade": [
     {
-     "tile": "door",
-     "fx": 6,
+     "tile": "antiqueFront",
+     "fx": 0,
+     "fy": 1
+    },
+    {
+     "tile": "windowBay",
+     "fx": 1,
+     "fy": 1,
+     "room": "roomAntiquesBay"
+    },
+    {
+     "tile": "windowCabinet",
+     "fx": 11,
+     "fy": 1,
+     "room": "roomAntiquesCabinet"
+    },
+    {
+     "tile": "antiqueDoor",
+     "fx": 8,
      "fy": 0
     },
     {
-     "tile": "window",
-     "fx": 1,
+     "tile": "bareBulb",
+     "fx": 7,
+     "fy": 3
+    },
+    {
+     "tile": "bareBulb",
+     "fx": 10,
      "fy": 3
     },
     {
      "tile": "window",
-     "fx": 4,
-     "fy": 3
+     "fx": 2,
+     "fy": 6
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 6,
+     "fy": 6,
+     "room": "roomDark"
     },
     {
      "tile": "windowOpen",
      "fx": 10,
-     "fy": 3,
-     "room": "roomPlant"
+     "fy": 6,
+     "room": "roomLamp"
     }
    ],
    "roof": [
@@ -1907,12 +1924,12 @@
     {
      "tile": "roofVent",
      "rx": 11,
-     "ry": 6
+     "ry": 5
     },
     {
      "tile": "acUnit",
      "rx": 1,
-     "ry": 7
+     "ry": 5
     },
     {
      "tile": "roofDuct",
@@ -1922,12 +1939,36 @@
     {
      "tile": "roofVent",
      "rx": 7,
-     "ry": 8
+     "ry": 5
     },
     {
      "tile": "roofHatch",
      "rx": 12,
      "ry": 4
+    }
+   ],
+   "panels": [
+    {
+     "style": "board",
+     "fx": 1,
+     "fw": 12,
+     "h": 2,
+     "up": 6,
+     "frame": "#2f3b33",
+     "trim": "#b08d45",
+     "field": "#16201b",
+     "color": "#e2cf98",
+     "lines": [
+      {
+       "text": "RETRO ANTIQUES",
+       "scale": 2
+      },
+      {
+       "text": "CLOCKS - CHINA - CURIOS",
+       "scale": 1,
+       "color": "#b08d45"
+      }
+     ]
     }
    ]
   },

@@ -266,6 +266,19 @@ export const TILE_PALETTE = {
   ';': '#c99a5c', // frosted door glass, lit from inside
   '?': '#9a7444', // the same, deepening toward the floor
   '(': '#8e2f2a', // lacquer red
+
+  // --- Retro Antiques ------------------------------------------------------
+  // Same rule as the Bento Box: one new material and one new light. The
+  // material is the painted joinery of an old shopfront -- a green-black with
+  // 10% saturation, close enough to the neutrals around it that it is read as
+  // "old paint" and not as a colour. The light is the door's glass, a dim
+  // yellow well short of the Bento Box's amber, since a bare bulb is not a
+  // paper lantern.
+  '!': '#2e3b35', // shopfront paint
+  '[': '#4d5f55', // paint, the lit arris and the top of a rail
+  ']': '#1e2823', // paint, in shadow -- a groove, and the underside of a rail
+  '}': '#c2ac62', // door glass, lit from inside
+  ',': '#8f7d44', // the same, deepening toward the floor -- and the net curtain
 };
 
 /**
@@ -330,6 +343,21 @@ export const ROOM_PALETTE = {
   h: '#5f7a45', // greens
   i: '#c9843c', // something orange
   k: '#c89870', // a face
+
+  // Retro Antiques: dim, warm wallpaper, and the things a dealer keeps.
+  y: '#7d6f5d', // wallpaper
+  z: '#65594b', // wallpaper stripe, and the wall down toward the dado
+  v: '#3f3730', // floorboards
+  q: '#6a3a2c', // mahogany
+  Q: '#8a5540', // mahogany where the light catches an edge
+  j: '#b08c3e', // brass
+  J: '#6b5424', // brass, in shadow
+  c: '#8a97a3', // mirror and glass-fronted door
+  C: '#56616c', // the same, in shadow
+  m: '#c8d0da', // porcelain
+  M: '#5f7396', // porcelain, blue
+  p: '#cdbf9c', // a lampshade
+  P: '#8f8264', // its shaded side
 };
 
 /**
@@ -411,4 +439,6 @@ export const TILE_HEIGHT = {
   // Bento Box: boards are separate planks with a groove between, a lantern's
   // ribs stand proud of its paper, the noren's fold is a step back.
   '3': 1, '8': -1, ':': 1, '_': -1, '/': 1,
+  // Retro Antiques: raised panels and fluting, lit above and shaded below.
+  '[': 1, ']': -1, ',': -1,
 };

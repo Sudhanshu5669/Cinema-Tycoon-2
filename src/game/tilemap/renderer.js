@@ -169,6 +169,7 @@ const LIT_ROOMS = {
   roomStair: 'window', roomLamp: 'window', roomPlant: 'window',
   // A shop's rooms are lit by the shopkeeper's own light, not a resident's.
   roomBento: 'lantern', roomBentoKitchen: 'lantern',
+  roomAntiquesBay: 'bulb', roomAntiquesCabinet: 'bulb',
 };
 
 const LIT_FACADE = {
@@ -184,6 +185,8 @@ const LIT_FACADE = {
   // The Bento Box. Its door is glazed and lit from behind the noren, and each
   // lantern is its own small emitter -- both the shopkeeper's warm light.
   norenDoor: 'lantern', lantern: 'lantern',
+  // Retro Antiques: the door's glass, and the two bare bulbs hung beside it.
+  antiqueDoor: 'bulb', bareBulb: 'bulb',
 };
 
 /**
@@ -195,7 +198,10 @@ const LIT_FACADE = {
  * The door is left as the shop's caster, so the shadow still points away from
  * the shop, once.
  */
-const NO_SHADOW = new Set(['lantern', 'roomBento', 'roomBentoKitchen']);
+const NO_SHADOW = new Set([
+  'lantern', 'roomBento', 'roomBentoKitchen',
+  'bareBulb', 'roomAntiquesBay', 'roomAntiquesCabinet',
+]);
 
 export class TileMapRenderer {
   static preload(scene) { preloadTiles(scene); }
@@ -893,11 +899,14 @@ export class TileMapRenderer {
    * mark -- at either end. Text is laid out with the same helpers the bulb
    * boards use (see sign.js's BOARD_INSET for the one number that differs), so
    * the loader has already checked the name fits.
+   * A panel may carry its own `frame`, `trim` and `field` colours; without
+   * them the board is the Bento Box's timber. Lettering colour is the panel's
+   * ordinary `color`.
    */
   _paintBoard(g, w, h, p) {
-    g.rect(BOARD_FRAME, 0, 0, w, h);
-    g.rect(BOARD_TRIM, BOARD_INSET - 1, BOARD_INSET - 1, w - (BOARD_INSET - 1) * 2, h - (BOARD_INSET - 1) * 2);
-    g.rect(BOARD_FIELD, BOARD_INSET, BOARD_INSET, w - BOARD_INSET * 2, h - BOARD_INSET * 2);
+    g.rect(p.frame ?? BOARD_FRAME, 0, 0, w, h);
+    g.rect(p.trim ?? BOARD_TRIM, BOARD_INSET - 1, BOARD_INSET - 1, w - (BOARD_INSET - 1) * 2, h - (BOARD_INSET - 1) * 2);
+    g.rect(p.field ?? BOARD_FIELD, BOARD_INSET, BOARD_INSET, w - BOARD_INSET * 2, h - BOARD_INSET * 2);
 
     const pad = signArtPad(p, (t) => frameSize(this.scene, t));
     for (const a of p.art ?? []) {

@@ -80,6 +80,11 @@ const RELIEF_STRENGTH = {
   // ribs; the rooms stay shallow like every other room.
   bentoFront: 0.5, windowShop: 0.8, norenDoor: 0.6, lantern: 0.7, bentoIcon: 0.3,
   roomBento: 0.5, roomBentoKitchen: 0.5,
+  // Retro Antiques. Panelled joinery and fluted pilasters, so the same middling
+  // relief as every other piece of woodwork; the bulb is a glass bubble on a
+  // brass cap, like the lantern's ribs; the rooms stay shallow.
+  antiqueFront: 0.6, windowBay: 0.8, windowCabinet: 0.8, antiqueDoor: 0.6, bareBulb: 0.7,
+  roomAntiquesBay: 0.5, roomAntiquesCabinet: 0.5,
 };
 
 /**

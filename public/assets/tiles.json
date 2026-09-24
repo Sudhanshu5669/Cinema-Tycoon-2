@@ -1551,12 +1551,164 @@
       },
       "rotated": false,
       "trimmed": false
+    },
+    "antiqueFront": {
+      "frame": {
+        "x": 1974,
+        "y": 0,
+        "w": 224,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 48
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "windowBay": {
+      "frame": {
+        "x": 2198,
+        "y": 0,
+        "w": 96,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 96,
+        "h": 48
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 96,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "opening": {
+        "x": 3,
+        "y": 6,
+        "w": 90,
+        "h": 31
+      }
+    },
+    "windowCabinet": {
+      "frame": {
+        "x": 2294,
+        "y": 0,
+        "w": 32,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 48
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false,
+      "opening": {
+        "x": 3,
+        "y": 5,
+        "w": 26,
+        "h": 31
+      }
+    },
+    "antiqueDoor": {
+      "frame": {
+        "x": 2326,
+        "y": 0,
+        "w": 32,
+        "h": 64
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 64
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 64
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "bareBulb": {
+      "frame": {
+        "x": 2358,
+        "y": 0,
+        "w": 16,
+        "h": 20
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 20
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 20
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "roomAntiquesBay": {
+      "frame": {
+        "x": 2374,
+        "y": 0,
+        "w": 112,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 112,
+        "h": 48
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 112,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "roomAntiquesCabinet": {
+      "frame": {
+        "x": 2486,
+        "y": 0,
+        "w": 48,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 48,
+        "h": 48
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 48,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false
     }
   },
   "meta": {
     "image": "tiles.png",
     "size": {
-      "w": 1974,
+      "w": 2534,
       "h": 64
     },
     "scale": 1

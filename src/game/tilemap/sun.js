@@ -266,6 +266,12 @@ const GLOW_CURVES = {
   // emitter and a shop front is several of them merged into one shaded light
   // (lighting.js), which sums their reach rather than their brightness.
   lantern: { from: DUSK - 1.5, to: DAWN + 0.5, color: 0xffa25a, intensity: 1.6 },
+  // A bare bulb through a dealer's window. The other shopkeeper's light, and
+  // told apart from the lanterns by exactly two things: it is yellow, not
+  // orange -- no paper between the filament and the glass -- and it is dim,
+  // because one low-wattage bulb in a room full of furniture is all the light
+  // there is.
+  bulb: { from: DUSK - 1.5, to: DAWN + 0.5, color: 0xffd472, intensity: 1.5 },
 };
 
 /**

@@ -270,6 +270,12 @@ check('a shop lights its lanterns before the residents light their windows, and 
     && glowFor(12, 'lantern').intensity === 0 && glowFor(5, 'lantern').intensity > 0,
   `17:00 lantern ${glowFor(17, 'lantern').intensity.toFixed(2)} window ${glowFor(17, 'window').intensity.toFixed(2)}`);
 
+check('a dealer\'s bulb is dimmer and yellower than a shop lantern, and follows the same hours',
+  glowFor(21, 'bulb').intensity > 0 && glowFor(21, 'bulb').intensity < glowFor(21, 'lantern').intensity
+    && ((glowFor(21, 'bulb').color >> 8) & 0xff) > ((glowFor(21, 'lantern').color >> 8) & 0xff)
+    && glowFor(12, 'bulb').intensity === 0 && glowFor(17, 'bulb').intensity > 0,
+  `21:00 bulb ${glowFor(21, 'bulb').intensity.toFixed(2)} lantern ${glowFor(21, 'lantern').intensity.toFixed(2)}`);
+
 // In the browser: the live Phaser Light2D pipeline (a real per-fragment
 // shader, not a bespoke one -- see src/game/lighting.js) actually engaged,
 // and its ambient/window/marquee state tracks the same hour as the shadows.

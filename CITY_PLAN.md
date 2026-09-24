@@ -129,6 +129,49 @@ lanterns and both rooms now light and glow but do not cast (`NO_SHADOW` in
 `renderer.js`); the door is the shop's caster. A shop with many emitters should
 do the same.
 
+### 1c-2 — Retro Antiques  ✅ second shop done
+The building at x36 on Parade St, east of the service alley. Built the way the
+Bento Box was — a `city.json` edit plus art in `art/flat/antiques.mjs` — and it
+is the shop that says whether the kit idea holds, because it is the Bento Box's
+opposite: told apart by **silhouette** first, and by the colour of its light
+second.
+
+- **Bay window** (`windowBay`, 96x48): a three-sided bay under its own lead roof
+  and lip, a row of top lights over a transom, the middle pane twice the width
+  of the two that turn away, a brass rail, a projecting cill and a panelled
+  riser. One see-through opening onto `roomAntiquesBay` — a case clock, a gilt
+  mirror over a chest of drawers, a round table and chairs, a globe, a rug, and a
+  bare bulb hung in the middle of it. Too much furniture is the drawing.
+- **Cabinet window** (`windowCabinet`) beside the door: the same construction at
+  a fifth of the size, onto shelves of porcelain and a carriage clock.
+- **Door** (`antiqueDoor`, 32x64): a fanlight of radial bars over a glazed leaf
+  behind a net curtain, brass letterbox and pull, an OPEN card in the glass.
+- **Joinery** (`antiqueFront`): fluted pilasters and a panelled stall riser in
+  one new material — a green-black shopfront paint at ~10% saturation, where the
+  Bento Box is timber. It is read as old paint and does not compete with the
+  light.
+- **Fascia**: the same `board` panel as the Bento Box's, and the first use of
+  its new `frame`, `trim` and `field` colours — the kit part the second shop
+  needed. Lettering colour is the panel's ordinary `color`.
+- **A new light kind, `bulb`**: yellow (0xffd472), not the lanterns' orange,
+  and lower in intensity. Emitters are the door, both rooms and two `bareBulb`s
+  hung either side of it, all one kind so the front merges into a single shaded
+  light; the bulbs and both rooms do not cast (`NO_SHADOW`), the door does.
+- Taller than its neighbours (`storeys` 8, `roofDepth` 6), with the fascia at
+  rows 4–6 so the 48-tall bay sits directly under it.
+
+`canvas` moved out of `bento.mjs` into `art/flat/canvas.mjs`, since a second
+shop is the second user. The placeholder awning from 1a's blockout, which sat on
+the old door's tile, is gone.
+
+Two things went wrong on the way and are worth keeping. The bulbs were first
+round with a dark filament mark, and read as pocket watches — the wrong shop; a
+bulb is a pear with a warm filament. And the door's dark glazing bar over the
+net-curtain checker read as a zipper.
+
+**Light budget:** Parade St's worst case went from 11 to **12 of 16**, one slot
+for the whole shop. Smoke is 106/106.
+
 ### 1b — Shopfront kit
 The main art investment, and the thing that decides whether this scales. Rather
 than eight bespoke buildings, build **parts that combine**: fascia bands, awning
