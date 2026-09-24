@@ -1047,6 +1047,20 @@
    "y": 69,
    "w": 1,
    "tile": "planter"
+  },
+  {
+   "x": 72,
+   "y": 54,
+   "w": 2,
+   "tile": "cafeSet",
+   "solid": true
+  },
+  {
+   "x": 77,
+   "y": 54,
+   "w": 2,
+   "tile": "cafeSet",
+   "solid": true
   }
  ],
  "platforms": [
@@ -2106,31 +2120,53 @@
    "y": 39,
    "w": 14,
    "h": 14,
-   "storeys": 5,
-   "roofDepth": 9,
+   "storeys": 8,
+   "roofDepth": 6,
    "top": "roof",
    "face": "brick",
    "base": "brick",
    "facade": [
     {
-     "tile": "door",
-     "fx": 6,
+     "tile": "coffeeFront",
+     "fx": 0,
+     "fy": 1
+    },
+    {
+     "tile": "windowCafe",
+     "fx": 4,
+     "fy": 1,
+     "room": "roomCoffeeBar"
+    },
+    {
+     "tile": "windowCafe",
+     "fx": 9,
+     "fy": 1,
+     "room": "roomCoffeeSeat"
+    },
+    {
+     "tile": "coffeeDoor",
+     "fx": 1,
      "fy": 0
     },
     {
-     "tile": "window",
-     "fx": 1,
+     "tile": "coffeeAwning",
+     "fx": 0,
      "fy": 3
+    },
+    {
+     "tile": "window",
+     "fx": 2,
+     "fy": 6
+    },
+    {
+     "tile": "window",
+     "fx": 5,
+     "fy": 6
     },
     {
      "tile": "windowWarm",
-     "fx": 4,
-     "fy": 3
-    },
-    {
-     "tile": "window",
      "fx": 10,
-     "fy": 3
+     "fy": 6
     }
    ],
    "roof": [
@@ -2147,12 +2183,7 @@
     {
      "tile": "roofHatch",
      "rx": 4,
-     "ry": 6
-    },
-    {
-     "tile": "roofDuct",
-     "rx": 11,
-     "ry": 7
+     "ry": 5
     },
     {
      "tile": "acUnit",
@@ -2166,8 +2197,38 @@
     },
     {
      "tile": "roofDuct",
-     "rx": 1,
-     "ry": 8
+     "rx": 11,
+     "ry": 4
+    }
+   ],
+   "panels": [
+    {
+     "style": "board",
+     "fx": 1,
+     "fw": 12,
+     "h": 2,
+     "up": 6,
+     "frame": "#2f544d",
+     "trim": "#c9b998",
+     "field": "#1d3531",
+     "color": "#efe0c2",
+     "lines": [
+      {
+       "text": "RETRO COFFEE",
+       "scale": 2
+      },
+      {
+       "text": "OPEN FROM DAWN",
+       "scale": 1,
+       "color": "#78b0a3"
+      }
+     ],
+     "art": [
+      {
+       "tile": "cupIcon",
+       "at": "left"
+      }
+     ]
     }
    ]
   },
@@ -2432,15 +2493,11 @@
    "y": 70
   },
   {
-   "x": 50,
+   "x": 58,
    "y": 70
   },
   {
-   "x": 74,
-   "y": 70
-  },
-  {
-   "x": 98,
+   "x": 90,
    "y": 70
   }
  ]

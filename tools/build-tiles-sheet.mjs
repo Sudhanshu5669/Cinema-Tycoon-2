@@ -89,6 +89,10 @@ const RELIEF_STRENGTH = {
   // proud LED tube down each jamb; the rooms stay shallow like every room.
   gamerFront: 0.5, windowGlass: 0.8, gamerDoor: 0.6, ledBar: 0.7, padIcon: 0.3,
   roomGamerPcs: 0.5, roomGamerLounge: 0.5,
+  // Retro Coffee. Boarding, tile courses and a canvas fold, all shallow; chrome
+  // and the bistro set are hard-edged like the street's other ironwork.
+  coffeeFront: 0.5, windowCafe: 0.8, coffeeDoor: 0.6, coffeeAwning: 0.5, cafeSet: 0.7, cupIcon: 0.3,
+  roomCoffeeBar: 0.5, roomCoffeeSeat: 0.5,
 };
 
 /**

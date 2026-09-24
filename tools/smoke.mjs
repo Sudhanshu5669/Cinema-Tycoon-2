@@ -282,6 +282,12 @@ check('the cafe\'s LEDs are the one cold, steady shop light: bluer than any lant
     && !flickers('led') && glowFor(12, 'led').intensity === 0 && glowFor(21, 'led').intensity > 0,
   `21:00 led ${glowFor(21, 'led').intensity.toFixed(2)}`);
 
+check('the coffee shop is lit after the other shops have gone dark, and is dark by noon',
+  glowFor(7, 'cafe').intensity > 0 && glowFor(7, 'lantern').intensity === 0
+    && glowFor(7, 'bulb').intensity === 0 && glowFor(12, 'cafe').intensity === 0
+    && glowFor(21, 'cafe').intensity > 0,
+  `07:00 cafe ${glowFor(7, 'cafe').intensity.toFixed(2)} lantern ${glowFor(7, 'lantern').intensity.toFixed(2)}`);
+
 // In the browser: the live Phaser Light2D pipeline (a real per-fragment
 // shader, not a bespoke one -- see src/game/lighting.js) actually engaged,
 // and its ambient/window/marquee state tracks the same hour as the shadows.

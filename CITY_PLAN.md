@@ -209,6 +209,50 @@ took it to 12 and this one to 13. Three shops in, that is a slot each, and it is
 the number to watch: five more shops at that rate does not fit, so the merge
 distances are the first thing to look at (1f), before anything is cut.
 
+### 1c-4 — Retro Coffee  ✅ fourth shop done
+The brick building at x66, on the corner of the cross street. The soft one: where
+the other three are timber, paint and flat black, this has a **striped canvas
+awning** across its whole front, a cream tiled riser, a teal frame — and it is
+the only shop that puts anything of its own in the street.
+
+- **Awning** (`coffeeAwning`, 224x16): teal and cream stripes eight pixels wide,
+  a lit slope, a shaded fold, and a scalloped valance with a transparent gap
+  under each scallop so the top lights show through. A facade tile, not the
+  engine's `awning` strip: that is a flat repeat with no valance, and a facade
+  entry is data. It is the shop's silhouette and its one bold colour.
+- **Pavement seating** (`cafeSet`, twice, as solid props): a chrome bistro table
+  with a cup on it and a teal chair each side. Cast shadows, blocks the player,
+  lights nothing — a table on a pavement does not light a street.
+- **Windows** (`windowCafe`, twice) onto two rooms: the bar (`roomCoffeeBar`) —
+  cups on shelves, a chrome espresso machine, a barista behind it in a teal apron
+  and the only person in these windows who faces you, a case of cakes, two
+  pendant globes — and the seating (`roomCoffeeSeat`), booths, two diners seen
+  from behind, a steaming cup on each table, on a chequered floor.
+- **Door** (`coffeeDoor`) lit warm, an OPEN card in the glass, a bell above it.
+- **Light kind `cafe`**: a peach-cream (0xffc99a), low, and the one warm shop
+  light on until **1.5 hours after dawn** — the lanterns and the dealer's bulbs
+  are off by then and this is still lit. Its hours are what tell it from the
+  other warm ones, since its colour sits between theirs. The fascia carries the
+  cup icon; a cup decal on the glass was tried and was a white blob whose steam
+  read as crossbones.
+- The first shop built on scoped palettes from the start: nine tile colours and
+  thirteen room colours of its own, and none of them cost a shared letter.
+
+**The light-budget tripwire went off, and this is the first time.** Parade St's
+worst case reached **14 of 16**, and the smoke suite's headroom check
+(`< cap - 2`) failed, correctly — the hard cap still passed. Four shops in, the
+cost has been one slot each. The fix was 1f's second lever: **the far side of
+Parade St had four lamps 24 tiles apart; it has three, 32 apart** (x26, 58, 90).
+Those light a pavement nobody walks and the road's far kerb, and the result is
+what the plan predicted — pools of light with real dark between them, not an even
+wash. Worst case is back to **13**.
+
+That buys exactly one shop. It is the same tripwire, the same threshold, and the
+next shop will fail it again. The remaining levers are the ones 1f lists and they
+are not free: merging a building's shop light with its neighbour's (currently
+bounded per building, on purpose), and thinning the lit upper windows. **Decide
+which before shop five.**
+
 ### 1b — Shopfront kit
 The main art investment, and the thing that decides whether this scales. Rather
 than eight bespoke buildings, build **parts that combine**: fascia bands, awning

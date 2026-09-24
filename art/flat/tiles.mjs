@@ -19,6 +19,7 @@
 import { BENTO } from './bento.mjs';
 import { ANTIQUES } from './antiques.mjs';
 import { GAMER } from './gamer.mjs';
+import { COFFEE } from './coffee.mjs';
 import { TILE_PALETTE, ROOM_PALETTE, TILE_HEIGHT, ROOM_HEIGHT } from './palette.mjs';
 
 /**
@@ -26,7 +27,7 @@ import { TILE_PALETTE, ROOM_PALETTE, TILE_HEIGHT, ROOM_HEIGHT } from './palette.
  * roomPalette }` -- so its art and the colours that art is drawn in travel
  * together, and adding a shop is one line here.
  */
-const SETS = [BENTO, ANTIQUES, GAMER];
+const SETS = [BENTO, ANTIQUES, GAMER, COFFEE];
 
 export const W = 16, H = 16;
 

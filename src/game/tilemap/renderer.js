@@ -171,6 +171,7 @@ const LIT_ROOMS = {
   roomBento: 'lantern', roomBentoKitchen: 'lantern',
   roomAntiquesBay: 'bulb', roomAntiquesCabinet: 'bulb',
   roomGamerPcs: 'led', roomGamerLounge: 'led',
+  roomCoffeeBar: 'cafe', roomCoffeeSeat: 'cafe',
 };
 
 const LIT_FACADE = {
@@ -190,6 +191,8 @@ const LIT_FACADE = {
   antiqueDoor: 'bulb', bareBulb: 'bulb',
   // The Gamer Cafe: the door's glass, and an LED bar at each end of the front.
   gamerDoor: 'led', ledBar: 'led',
+  // Retro Coffee: the door's glass. The awning and the pavement set emit nothing.
+  coffeeDoor: 'cafe',
 };
 
 /**
@@ -205,6 +208,7 @@ const NO_SHADOW = new Set([
   'lantern', 'roomBento', 'roomBentoKitchen',
   'bareBulb', 'roomAntiquesBay', 'roomAntiquesCabinet',
   'ledBar', 'roomGamerPcs', 'roomGamerLounge',
+  'roomCoffeeBar', 'roomCoffeeSeat',
 ]);
 
 export class TileMapRenderer {

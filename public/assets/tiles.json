@@ -1849,12 +1849,178 @@
       },
       "rotated": false,
       "trimmed": false
+    },
+    "coffeeFront": {
+      "frame": {
+        "x": 3010,
+        "y": 0,
+        "w": 224,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 32
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "windowCafe": {
+      "frame": {
+        "x": 3234,
+        "y": 0,
+        "w": 64,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 32
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "opening": {
+        "x": 3,
+        "y": 3,
+        "w": 58,
+        "h": 22
+      }
+    },
+    "coffeeDoor": {
+      "frame": {
+        "x": 3298,
+        "y": 0,
+        "w": 32,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 48
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "coffeeAwning": {
+      "frame": {
+        "x": 3330,
+        "y": 0,
+        "w": 224,
+        "h": 16
+      },
+      "sourceSize": {
+        "w": 224,
+        "h": 16
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 224,
+        "h": 16
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "cafeSet": {
+      "frame": {
+        "x": 3554,
+        "y": 0,
+        "w": 32,
+        "h": 24
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 24
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 24
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "cupIcon": {
+      "frame": {
+        "x": 3586,
+        "y": 0,
+        "w": 12,
+        "h": 12
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 12
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 12
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "roomCoffeeBar": {
+      "frame": {
+        "x": 3598,
+        "y": 0,
+        "w": 80,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 40
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "roomCoffeeSeat": {
+      "frame": {
+        "x": 3678,
+        "y": 0,
+        "w": 80,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 40
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false
     }
   },
   "meta": {
     "image": "tiles.png",
     "size": {
-      "w": 3010,
+      "w": 3758,
       "h": 64
     },
     "scale": 1

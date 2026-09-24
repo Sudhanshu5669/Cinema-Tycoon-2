@@ -17,17 +17,7 @@
 // door's glass and the two bulbs hung either side of it. All of it is the one
 // `bulb` light kind, so the whole front merges into a single shaded light.
 
-import { canvas } from './canvas.mjs';
-
-/** A filled disc, for the things in here that are round: a fanlight, a globe. */
-function disc(c, cx, cy, r, ch) {
-  for (let y = Math.floor(cy - r); y <= Math.ceil(cy + r); y++) {
-    for (let x = Math.floor(cx - r); x <= Math.ceil(cx + r); x++) {
-      if (Math.hypot(x - cx, y - cy) <= r) c.set(x, y, ch);
-    }
-  }
-  return c;
-}
+import { canvas, disc } from './canvas.mjs';
 
 // --- the shopfront ----------------------------------------------------------
 

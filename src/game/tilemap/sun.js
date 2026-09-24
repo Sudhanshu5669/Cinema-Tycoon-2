@@ -278,6 +278,13 @@ const GLOW_CURVES = {
   // against a street of tungsten is the whole identification, so it is the one
   // shop light allowed to drift toward white.
   led: { from: DUSK - 1.5, to: DAWN + 0.5, color: 0xa6d2ff, intensity: 1.4 },
+  // Retro Coffee: the shop that opens before the sun. Its hours are the whole
+  // difference from the other warm ones -- it stays lit an hour and a half
+  // after dawn, when the lanterns and bulbs have gone off, because the morning
+  // rush is when a coffee shop is busiest. The colour is a peach-cream, less
+  // saturated than the lanterns' orange and paler than the dealer's yellow, and
+  // the intensity is low: a low warm light is what it is called.
+  cafe: { from: DUSK - 1.5, to: DAWN + 1.5, color: 0xffc99a, intensity: 1.3 },
 };
 
 /**
