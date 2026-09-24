@@ -172,6 +172,45 @@ net-curtain checker read as a zipper.
 **Light budget:** Parade St's worst case went from 11 to **12 of 16**, one slot
 for the whole shop. Smoke is 106/106.
 
+### 1c-3 — Gamer Cafe  ✅ third shop done
+The dark-faced building at x50, next door to the antiques shop, so the two
+lights meet on the pavement: yellow to the west, cold blue-white to the east.
+The one **cold** shopfront on the street, told apart by material and by light
+like the other two — and this time the silhouette is the *absence* of one:
+flat black cladding with hairline seams, no pilasters, no mouldings, no bay.
+
+- **Curtain wall** (`windowGlass`, 64x32, twice): a single pane of dark glass in
+  a thin frame with no mullion or transom, and two one-pixel glare streaks
+  drawn opaque over the room so it reads as glass and not as a hole. There
+  were three, two pixels wide, and they fought the room for the glass.
+- **Rooms**, and this is what sells it: nobody in a shop window faces the
+  street, so the gamers are seen **from behind**, silhouetted against walls of
+  monitors (`roomGamerPcs`), and two heads over a sofa back in front of a
+  television, an arcade cabinet and a beanbag beside them (`roomGamerLounge`).
+  Screens are lines of "text", not a scatter of pixels — a scatter at this size
+  is diagonal hatching.
+- **Door** (`gamerDoor`): glass lit cold from inside with a game pad in
+  silhouette, an LED tube down each jamb, a steel push bar.
+- **LED bars** (`ledBar`) at either end of the front, and a `padIcon` on the
+  fascia. The fascia is the same `board` panel in its own colours.
+- **Light kind `led`**: blue-white (0xa6d2ff), steady, and on until dawn. It is
+  the one shop light that does not flicker — `tv` does, and a screen you can see
+  through a window is not the same thing as a television in a flat — and the
+  one allowed to drift toward white. Both rooms and the bars do not cast; the
+  door does.
+- Storeys 7, roofDepth 7, with the fascia at rows 3–5 and upper windows at 5.
+
+**The tile palette is now full.** This shop took the last three free letters
+(`{`, `|`, `)`); Gamer Cafe's glass, hull-grey and reader-board navy were
+already the cold family and are reused, which is the only reason it fit. The
+next shop draws from what exists, or the tile palette gets a second namespace
+the way the rooms did. Decide that before shop four, not during it.
+
+**Light budget:** Parade St's worst case is now **13 of 16** — the antiques shop
+took it to 12 and this one to 13. Three shops in, that is a slot each, and it is
+the number to watch: five more shops at that rate does not fit, so the merge
+distances are the first thing to look at (1f), before anything is cut.
+
 ### 1b — Shopfront kit
 The main art investment, and the thing that decides whether this scales. Rather
 than eight bespoke buildings, build **parts that combine**: fascia bands, awning

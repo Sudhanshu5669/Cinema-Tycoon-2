@@ -170,6 +170,7 @@ const LIT_ROOMS = {
   // A shop's rooms are lit by the shopkeeper's own light, not a resident's.
   roomBento: 'lantern', roomBentoKitchen: 'lantern',
   roomAntiquesBay: 'bulb', roomAntiquesCabinet: 'bulb',
+  roomGamerPcs: 'led', roomGamerLounge: 'led',
 };
 
 const LIT_FACADE = {
@@ -187,6 +188,8 @@ const LIT_FACADE = {
   norenDoor: 'lantern', lantern: 'lantern',
   // Retro Antiques: the door's glass, and the two bare bulbs hung beside it.
   antiqueDoor: 'bulb', bareBulb: 'bulb',
+  // The Gamer Cafe: the door's glass, and an LED bar at each end of the front.
+  gamerDoor: 'led', ledBar: 'led',
 };
 
 /**
@@ -201,6 +204,7 @@ const LIT_FACADE = {
 const NO_SHADOW = new Set([
   'lantern', 'roomBento', 'roomBentoKitchen',
   'bareBulb', 'roomAntiquesBay', 'roomAntiquesCabinet',
+  'ledBar', 'roomGamerPcs', 'roomGamerLounge',
 ]);
 
 export class TileMapRenderer {

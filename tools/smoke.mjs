@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
-import { shadowFor, ambientFor, glowFor } from '../src/game/tilemap/sun.js';
+import { shadowFor, ambientFor, glowFor, flickers } from '../src/game/tilemap/sun.js';
 import { loadCityMap, CityMapError } from '../src/game/tilemap/mapLoader.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -275,6 +275,12 @@ check('a dealer\'s bulb is dimmer and yellower than a shop lantern, and follows 
     && ((glowFor(21, 'bulb').color >> 8) & 0xff) > ((glowFor(21, 'lantern').color >> 8) & 0xff)
     && glowFor(12, 'bulb').intensity === 0 && glowFor(17, 'bulb').intensity > 0,
   `21:00 bulb ${glowFor(21, 'bulb').intensity.toFixed(2)} lantern ${glowFor(21, 'lantern').intensity.toFixed(2)}`);
+
+check('the cafe\'s LEDs are the one cold, steady shop light: bluer than any lantern, and not flickering',
+  (glowFor(21, 'led').color & 0xff) > ((glowFor(21, 'led').color >> 16) & 0xff)
+    && ((glowFor(21, 'lantern').color >> 16) & 0xff) > (glowFor(21, 'lantern').color & 0xff)
+    && !flickers('led') && glowFor(12, 'led').intensity === 0 && glowFor(21, 'led').intensity > 0,
+  `21:00 led ${glowFor(21, 'led').intensity.toFixed(2)}`);
 
 // In the browser: the live Phaser Light2D pipeline (a real per-fragment
 // shader, not a bespoke one -- see src/game/lighting.js) actually engaged,

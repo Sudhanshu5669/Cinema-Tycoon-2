@@ -279,6 +279,17 @@ export const TILE_PALETTE = {
   ']': '#1e2823', // paint, in shadow -- a groove, and the underside of a rail
   '}': '#c2ac62', // door glass, lit from inside
   ',': '#8f7d44', // the same, deepening toward the floor -- and the net curtain
+
+  // --- the Gamer Cafe ------------------------------------------------------
+  // The cold one. A flat near-black with a slight blue in it, the catch-light
+  // on its edges, and one bright cyan for the LED tubes -- the only saturated
+  // thing on the front, and an emitter. Glass, hull-grey and the reader-board
+  // navy (`i`, `4`, `5`, `K`, `6`) are already the cold family and are reused.
+  // **These are the last three free letters in this palette**, so the next shop
+  // draws from what exists or the palette gets a fourth namespace.
+  '{': '#1c2028', // black cladding
+  '|': '#3a4352', // its lit edge
+  ')': '#a8dcff', // LED tube
 };
 
 /**
@@ -358,6 +369,17 @@ export const ROOM_PALETTE = {
   M: '#5f7396', // porcelain, blue
   p: '#cdbf9c', // a lampshade
   P: '#8f8264', // its shaded side
+
+  // The Gamer Cafe: everything is a step off black except what is lit.
+  F: '#1b2029', // wall
+  G: '#293141', // wall slat
+  H: '#3a4150', // desk edge, and the level a game is standing on
+  N: '#2b303b', // furniture and silhouettes
+  S: '#161920', // floor
+  U: '#5b9fd0', // a screen, deep
+  u: '#b4e0ff', // a screen, lit -- the brightest thing in these rooms
+  V: '#c04fa0', // a pink LED, or a player
+  Y: '#57d9b0', // a green one, or what is chasing them
 };
 
 /**
@@ -441,4 +463,6 @@ export const TILE_HEIGHT = {
   '3': 1, '8': -1, ':': 1, '_': -1, '/': 1,
   // Retro Antiques: raised panels and fluting, lit above and shaded below.
   '[': 1, ']': -1, ',': -1,
+  // The Gamer Cafe: panel seams are a groove, and the LED tube stands proud.
+  '|': 1, ')': 1,
 };

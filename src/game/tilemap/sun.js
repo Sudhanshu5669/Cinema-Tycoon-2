@@ -272,6 +272,12 @@ const GLOW_CURVES = {
   // because one low-wattage bulb in a room full of furniture is all the light
   // there is.
   bulb: { from: DUSK - 1.5, to: DAWN + 0.5, color: 0xffd472, intensity: 1.5 },
+  // The Gamer Cafe: LEDs and screens, the one cold shopkeeper's light. Blue-
+  // white, and steady -- unlike `tv` it does not flicker and it does not fall
+  // asleep, because a cafe full of monitors is on until the sun is up. Cold
+  // against a street of tungsten is the whole identification, so it is the one
+  // shop light allowed to drift toward white.
+  led: { from: DUSK - 1.5, to: DAWN + 0.5, color: 0xa6d2ff, intensity: 1.4 },
 };
 
 /**

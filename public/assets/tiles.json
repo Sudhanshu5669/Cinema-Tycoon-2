@@ -1703,12 +1703,158 @@
       },
       "rotated": false,
       "trimmed": false
+    },
+    "gamerFront": {
+      "frame": {
+        "x": 2534,
+        "y": 0,
+        "w": 192,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 192,
+        "h": 32
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 192,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "windowGlass": {
+      "frame": {
+        "x": 2726,
+        "y": 0,
+        "w": 64,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 64,
+        "h": 32
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 64,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false,
+      "opening": {
+        "x": 3,
+        "y": 3,
+        "w": 58,
+        "h": 21
+      }
+    },
+    "gamerDoor": {
+      "frame": {
+        "x": 2790,
+        "y": 0,
+        "w": 32,
+        "h": 48
+      },
+      "sourceSize": {
+        "w": 32,
+        "h": 48
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 32,
+        "h": 48
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "ledBar": {
+      "frame": {
+        "x": 2822,
+        "y": 0,
+        "w": 16,
+        "h": 32
+      },
+      "sourceSize": {
+        "w": 16,
+        "h": 32
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 16,
+        "h": 32
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "padIcon": {
+      "frame": {
+        "x": 2838,
+        "y": 0,
+        "w": 12,
+        "h": 12
+      },
+      "sourceSize": {
+        "w": 12,
+        "h": 12
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 12
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "roomGamerPcs": {
+      "frame": {
+        "x": 2850,
+        "y": 0,
+        "w": 80,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 40
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false
+    },
+    "roomGamerLounge": {
+      "frame": {
+        "x": 2930,
+        "y": 0,
+        "w": 80,
+        "h": 40
+      },
+      "sourceSize": {
+        "w": 80,
+        "h": 40
+      },
+      "spriteSourceSize": {
+        "x": 0,
+        "y": 0,
+        "w": 80,
+        "h": 40
+      },
+      "rotated": false,
+      "trimmed": false
     }
   },
   "meta": {
     "image": "tiles.png",
     "size": {
-      "w": 2534,
+      "w": 3010,
       "h": 64
     },
     "scale": 1

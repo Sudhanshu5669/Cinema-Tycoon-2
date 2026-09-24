@@ -50,7 +50,7 @@ import { DEPTH_SHADOW } from './tilemap/projection.js';
  * means what it says: how far the glow actually reaches. Feeding a shading
  * radius into an additive sprite would wash the whole street flat.
  */
-const RADIUS = { window: 48, marquee: 118, streetlamp: 78, lobby: 80, tv: 54, lantern: 40, bulb: 36 };
+const RADIUS = { window: 48, marquee: 118, streetlamp: 78, lobby: 80, tv: 54, lantern: 40, bulb: 36, led: 44 };
 
 /**
  * Peak alpha at the source, before the hour's own intensity scales it. Low,
@@ -63,7 +63,7 @@ const RADIUS = { window: 48, marquee: 118, streetlamp: 78, lobby: 80, tv: 54, la
  * authored art that already says "lit" only erases the art. The marquee is
  * the one allowed to dominate, because that is what a lit marquee does.
  */
-const PEAK = { window: 0.16, marquee: 0.24, streetlamp: 0.21, lobby: 0.13, tv: 0.19, lantern: 0.22, bulb: 0.18 };
+const PEAK = { window: 0.16, marquee: 0.24, streetlamp: 0.21, lobby: 0.13, tv: 0.19, lantern: 0.22, bulb: 0.18, led: 0.2 };
 
 /**
  * How far a light can sit above its own ground anchor before it stops

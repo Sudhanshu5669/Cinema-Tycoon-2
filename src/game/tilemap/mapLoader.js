@@ -59,7 +59,7 @@ const TILE_PX = 16;
  *  sun.js is renderer-side. A kind missing here is a loud error rather than a
  *  silent fall back to `window`, because "my kiosk glows the wrong colour" is
  *  exactly the kind of typo that otherwise gets shipped. */
-const LIGHT_KINDS = ['window', 'marquee', 'streetlamp', 'lobby', 'tv', 'lantern', 'bulb'];
+const LIGHT_KINDS = ['window', 'marquee', 'streetlamp', 'lobby', 'tv', 'lantern', 'bulb', 'led'];
 
 export class CityMapError extends Error {
   constructor(errs) {

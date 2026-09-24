@@ -60,7 +60,7 @@ const { LIGHT_PIPELINE } = Phaser.Renderer.WebGL.Pipelines;
  * enough to overlap and blend its edge away, so it alone needs a big enough
  * radius to go soft on its own.
  */
-const RADIUS = { window: 110, marquee: 300, streetlamp: 220, lobby: 150, tv: 120, fixture: 110, lantern: 120, bulb: 110 };
+const RADIUS = { window: 110, marquee: 300, streetlamp: 220, lobby: 150, tv: 120, fixture: 110, lantern: 120, bulb: 110, led: 120 };
 
 /**
  * How close two lights of the same kind have to be before they are handed to
@@ -104,7 +104,7 @@ const RADIUS = { window: 110, marquee: 300, streetlamp: 220, lobby: 150, tv: 120
  * MAP problem, and the answer is to space them like a real street rather than
  * to average them together.
  */
-const MERGE_DIST = { window: 400, fixture: 250, lantern: 300, bulb: 300, streetlamp: 0, marquee: 0, lobby: 0, tv: 0 };
+const MERGE_DIST = { window: 400, fixture: 250, lantern: 300, bulb: 300, led: 300, streetlamp: 0, marquee: 0, lobby: 0, tv: 0 };
 
 /**
  * Ceiling on how far a merged light may grow its radius to cover its members.
@@ -129,7 +129,7 @@ const MERGE_DIST = { window: 400, fixture: 250, lantern: 300, bulb: 300, streetl
  * light does anyway, and the glow layer still marks every source individually
  * so nothing reads as unlit.
  */
-const MERGE_RADIUS_BOOST_MAX = { window: 220, fixture: 90, lantern: 90, bulb: 90, streetlamp: 40, default: 48 };
+const MERGE_RADIUS_BOOST_MAX = { window: 220, fixture: 90, lantern: 90, bulb: 90, led: 90, streetlamp: 40, default: 48 };
 
 /**
  * Greedy same-kind clustering. Order-dependent by nature -- a different input

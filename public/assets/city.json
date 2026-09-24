@@ -1977,8 +1977,8 @@
    "y": 39,
    "w": 12,
    "h": 14,
-   "storeys": 6,
-   "roofDepth": 8,
+   "storeys": 7,
+   "roofDepth": 7,
    "top": "roof",
    "face": "wallDark",
    "base": "brickDark",
@@ -1986,19 +1986,51 @@
    "plinth": "plinthDark",
    "facade": [
     {
-     "tile": "door",
+     "tile": "gamerFront",
+     "fx": 0,
+     "fy": 1
+    },
+    {
+     "tile": "windowGlass",
+     "fx": 1,
+     "fy": 1,
+     "room": "roomGamerPcs"
+    },
+    {
+     "tile": "windowGlass",
+     "fx": 7,
+     "fy": 1,
+     "room": "roomGamerLounge"
+    },
+    {
+     "tile": "gamerDoor",
      "fx": 5,
      "fy": 0
     },
     {
-     "tile": "windowTv",
-     "fx": 1,
-     "fy": 3
+     "tile": "ledBar",
+     "fx": 0,
+     "fy": 1
+    },
+    {
+     "tile": "ledBar",
+     "fx": 11,
+     "fy": 1
     },
     {
      "tile": "window",
-     "fx": 8,
-     "fy": 3
+     "fx": 2,
+     "fy": 5
+    },
+    {
+     "tile": "window",
+     "fx": 5,
+     "fy": 5
+    },
+    {
+     "tile": "windowTv",
+     "fx": 9,
+     "fy": 5
     }
    ],
    "roof": [
@@ -2025,7 +2057,7 @@
     {
      "tile": "roofTank",
      "rx": 7,
-     "ry": 7
+     "ry": 6
     },
     {
      "tile": "roofHatch",
@@ -2036,6 +2068,36 @@
      "tile": "roofVent",
      "rx": 1,
      "ry": 1
+    }
+   ],
+   "panels": [
+    {
+     "style": "board",
+     "fx": 1,
+     "fw": 10,
+     "h": 2,
+     "up": 5,
+     "frame": "#151a22",
+     "trim": "#5aa8d8",
+     "field": "#0b0e14",
+     "color": "#c4e8ff",
+     "lines": [
+      {
+       "text": "GAMER CAFE",
+       "scale": 2
+      },
+      {
+       "text": "OPEN LATE - CONSOLES",
+       "scale": 1,
+       "color": "#5aa8d8"
+      }
+     ],
+     "art": [
+      {
+       "tile": "padIcon",
+       "at": "left"
+      }
+     ]
     }
    ]
   },

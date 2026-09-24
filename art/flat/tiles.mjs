@@ -18,6 +18,7 @@
 
 import { BENTO_TILES, BENTO_FEATURES } from './bento.mjs';
 import { ANTIQUE_TILES, ANTIQUE_FEATURES } from './antiques.mjs';
+import { GAMER_TILES, GAMER_FEATURES } from './gamer.mjs';
 
 export const W = 16, H = 16;
 
@@ -2504,7 +2505,7 @@ export const TILES = {
   roof: ROOF, roofBack: ROOF_BACK, cornice: CORNICE, corniceEdge: CORNICE_EDGE,
   plinth: PLINTH, plinthEdge: PLINTH_EDGE, beltCourse: BELT_COURSE,
   awning: AWNING, marquee: MARQUEE, signTower: SIGN_TOWER, signCap: SIGN_CAP,
-  ...BENTO_TILES, ...ANTIQUE_TILES,
+  ...BENTO_TILES, ...ANTIQUE_TILES, ...GAMER_TILES,
 };
 
 /** Multi-tile. Each is a whole number of tiles and slices cleanly. */
@@ -2523,5 +2524,5 @@ export const FEATURES = {
   signBulb: SIGN_BULB,
   roofTank: ROOF_TANK, roofVent: ROOF_VENT, roofHatch: ROOF_HATCH, roofDuct: ROOF_DUCT,
   posterShip: POSTER_SHIP, posterKaiju: POSTER_KAIJU,
-  ...BENTO_FEATURES, ...ANTIQUE_FEATURES,
+  ...BENTO_FEATURES, ...ANTIQUE_FEATURES, ...GAMER_FEATURES,
 };

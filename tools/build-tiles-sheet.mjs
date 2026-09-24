@@ -85,6 +85,10 @@ const RELIEF_STRENGTH = {
   // brass cap, like the lantern's ribs; the rooms stay shallow.
   antiqueFront: 0.6, windowBay: 0.8, windowCabinet: 0.8, antiqueDoor: 0.6, bareBulb: 0.7,
   roomAntiquesBay: 0.5, roomAntiquesCabinet: 0.5,
+  // The Gamer Cafe. Flat black panels with a shallow seam, glass, a door with a
+  // proud LED tube down each jamb; the rooms stay shallow like every room.
+  gamerFront: 0.5, windowGlass: 0.8, gamerDoor: 0.6, ledBar: 0.7, padIcon: 0.3,
+  roomGamerPcs: 0.5, roomGamerLounge: 0.5,
 };
 
 /**
