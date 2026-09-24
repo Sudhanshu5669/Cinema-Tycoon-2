@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { chromium } from 'playwright';
-import { shadowFor, ambientFor, glowFor, flickers } from '../src/game/tilemap/sun.js';
+import { shadowFor, ambientFor, glowFor, flickers, HOME_CLOSE } from '../src/game/tilemap/sun.js';
 import { loadCityMap, CityMapError } from '../src/game/tilemap/mapLoader.js';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -260,7 +260,7 @@ check('ambient is brighter at noon than at midnight',
   luma(ambientFor(12)) > luma(ambientFor(0)),
   `noon ${luma(ambientFor(12)).toFixed(0)} midnight ${luma(ambientFor(0)).toFixed(0)}`);
 check('windows are unlit at noon and lit at midnight',
-  glowFor(12, 'window').intensity === 0 && glowFor(0, 'window').intensity > 0);
+  glowFor(12, 'window').intensity === 0 && glowFor(22, 'window').intensity > 0);
 check('the marquee switches on before ordinary windows do',
   glowFor(16.5, 'marquee').intensity > 0 && glowFor(16.5, 'window').intensity === 0,
   `marquee ${glowFor(16.5, 'marquee').intensity.toFixed(2)} window ${glowFor(16.5, 'window').intensity.toFixed(2)}`);
@@ -282,6 +282,21 @@ check('the cafe\'s LEDs are the one cold, steady shop light: bluer than any lant
     && !flickers('led') && glowFor(12, 'led').intensity === 0 && glowFor(21, 'led').intensity > 0,
   `21:00 led ${glowFor(21, 'led').intensity.toFixed(2)}`);
 
+check('the homes close at 11 PM -- windows and televisions -- and stay dark until the next dusk',
+  ['window', 'tv'].every((k) => glowFor(HOME_CLOSE - 1, k).intensity > 0
+    && glowFor(HOME_CLOSE + 0.25, k).intensity === 0 && glowFor(2, k).intensity === 0
+    && glowFor(5.5, k).intensity === 0 && glowFor(7, k).intensity === 0),
+  `22:00 window ${glowFor(22, 'window').intensity.toFixed(2)}, 23:15 ${glowFor(23.25, 'window').intensity.toFixed(2)}, 02:00 ${glowFor(2, 'window').intensity.toFixed(2)}`);
+check('...and they go out over a quarter of an hour, not on a single frame',
+  glowFor(HOME_CLOSE - 0.5, 'window').intensity > glowFor(HOME_CLOSE - 0.1, 'window').intensity
+    && glowFor(HOME_CLOSE - 0.1, 'window').intensity > glowFor(HOME_CLOSE - 0.01, 'window').intensity
+    && glowFor(HOME_CLOSE - 0.01, 'window').intensity > 0,
+  `22:30 ${glowFor(22.5, 'window').intensity.toFixed(2)}, 22:54 ${glowFor(22.9, 'window').intensity.toFixed(2)}, 22:59 ${glowFor(22.99, 'window').intensity.toFixed(2)}`);
+check('...while every shop and the street itself are still lit at 1 AM',
+  ['lantern', 'bulb', 'led', 'cafe', 'marquee', 'streetlamp', 'lobby', 'fixture']
+    .every((k) => glowFor(1, k).intensity > 0),
+  `01:00 ${['lantern', 'bulb', 'led', 'cafe', 'marquee', 'streetlamp'].map((k) => `${k} ${glowFor(1, k).intensity.toFixed(2)}`).join(', ')}`);
+
 check('the coffee shop is lit after the other shops have gone dark, and is dark by noon',
   glowFor(7, 'cafe').intensity > 0 && glowFor(7, 'lantern').intensity === 0
     && glowFor(7, 'bulb').intensity === 0 && glowFor(12, 'cafe').intensity === 0
@@ -296,7 +311,9 @@ const lightAt = async (h) => {
   await page.waitForTimeout(120);
   return page.evaluate(() => window.__dev.tiles());
 };
-const [litNoon, litNight] = [await lightAt(12), await lightAt(23)];
+// 22:00, not later: the homes close at HOME_CLOSE (23:00), and this is the
+// evening these checks are about -- every kind lit at once, the busiest count.
+const [litNoon, litNight] = [await lightAt(12), await lightAt(22)];
 check('the Light2D pipeline is actually active, not silently degraded', litNoon.lightingActive === true);
 
 // Phaser culls to render.maxLights by sorting on distance from the camera

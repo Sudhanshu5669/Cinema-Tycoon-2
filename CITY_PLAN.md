@@ -117,7 +117,7 @@ as a `city.json` edit plus new art, not new code per shop:
   bulbs, no light of its own. The same panel, laid out and validated by the same
   code as the cinema's marquee; only the frame width differs (`BOARD_INSET`).
 - **Paper lanterns** (`lantern`) hung under it. A new light kind, `lantern`:
-  on an hour before residents' windows and off with them at dawn, deeper and redder than a window.
+  on an hour before residents' windows and off at dawn, when the homes have been dark for hours, deeper and redder than a window.
   Everything that emits from the shop — lanterns, door, both rooms — is that one
   kind, so the whole front merges into a single shaded light.
 - Taller than its neighbours (8 storeys, `roofDepth` 6 to keep `storeys +
@@ -362,6 +362,33 @@ letters (grids stop being readable, which is the reason they are ASCII).
 **A colour goes in the shared palette when a second shop wants it**, not before.
 The antiques rugs and the Bento Box's boxes already share `e`, `E` and `g` in
 the room palette, which is why they are still there.
+
+## Hours
+
+The street has two kinds of light, and they keep different hours — which is a
+large part of why it reads as a place at night and not a lighting demo.
+
+- **Homes** (`window`, `tv`): on toward dusk and building through the evening,
+  then **out at 23:00**, easing off over the last quarter hour, and dark until
+  the next dusk. A home's light does not come back before dawn.
+- **Shops and the street** (`lantern`, `bulb`, `led`, `cafe`, the marquee, the
+  lobby, kiosk fixtures, streetlamps): on through the small hours. After 23:00
+  they are the only light in the upper half of the frame, which is what makes a
+  lit shop read as *open*.
+- **Retro Coffee** stays lit until 07:30, an hour and a half after dawn, after
+  every other shop has gone off. It opens before the sun.
+
+`GLOW_CURVES` in `sun.js` carries this: every kind is a hump between `from` and
+`to`, and a kind may add a `close` hour, which only the two residential kinds
+do. The ramp is the hump and the close is a fifteen-minute ease to zero — a hard
+cutoff would pop, and the hump alone would fade the homes all evening instead of
+holding them until the switch. `HOME_CLOSE` is one exported constant.
+
+The lit rooms behind a window (`roomLamp` and the like) are painted art, not
+light, so they do not change at 23:00: a home whose light has gone out still
+shows its room, dimly, as it does at noon. Only what the window *emits* closes.
+If that ever reads wrong at night, the fix is to tint the painted lit windows
+with the hour, not to touch the curves.
 
 ## Later phases
 

@@ -20,6 +20,12 @@
 
 export const DAWN = 6;
 export const DUSK = 18;
+/** The hour the homes turn their lights off. Shops do not -- see GLOW_CURVES's
+ *  `close`, which only the two residential kinds carry. */
+export const HOME_CLOSE = 23;
+/** How long, in hours, a home's light takes to go out ahead of `close`: someone
+ *  reaching for the switch, not the whole street going dark on one frame. */
+const CLOSE_FADE = 0.25;
 
 /**
  * @param {number} hours  0..24, wraps
@@ -205,8 +211,13 @@ function hump(h, from, to) {
  * these could come down this far without the street losing its warmth.
  */
 const GLOW_CURVES = {
-  // Ordinary windows: on a little before dusk, off a little after dawn.
-  window: { from: DUSK - 0.5, to: DAWN + 0.5, color: 0xffcfa0, intensity: 2.5 },
+  // Ordinary windows -- people's homes: on a little before dusk and building
+  // toward the evening, then OUT at HOME_CLOSE and dark until the next dusk.
+  // `to` still shapes the ramp (the hump peaks between the two), but nothing
+  // lights after `close`: the shops are what stays lit through the small hours,
+  // and a street whose homes are dark at midnight is what lets them read as
+  // the only thing open.
+  window: { from: DUSK - 0.5, to: DAWN + 0.5, close: HOME_CLOSE, color: 0xffcfa0, intensity: 2.5 },
   // The cinema marquee, on its own timer -- switched on earlier than
   // residents turn their lights on, brighter once lit.
   //
@@ -250,15 +261,16 @@ const GLOW_CURVES = {
   // Streetlamps: on a photocell, not a resident's hand -- a sharper, earlier
   // on/off than windows and the palest colour of the lamp kinds.
   streetlamp: { from: DUSK - 1, to: DAWN + 0.25, color: 0xffdfb2, intensity: 0.7 },
-  // A television through a window. The only cold light source on the street,
+  // A television through a window. The only cold light source in the homes,
   // and the only one that flickers (see `flickers` below) -- both facts are
   // the point of it. Every other lit window on this street is tungsten, so a
   // single blue-white one in a row of amber ones reads instantly as a
-  // different kind of evening happening behind that particular pane. Off
-  // earlier than the rest come on, because someone sitting down in front of
-  // the television does it before the street lights up, and off well before
-  // dawn because they fall asleep.
-  tv: { from: DUSK - 1.5, to: DAWN - 1.5, color: 0x8fb4ff, intensity: 0.85 },
+  // different kind of evening happening behind that particular pane. On
+  // earlier than the rest, because someone sitting down in front of the
+  // television does it before the street lights up -- and a home like any
+  // other at the end of it: it goes out at HOME_CLOSE with the windows. (It
+  // used to fall asleep at 04:30. Nobody is up to watch it at that hour now.)
+  tv: { from: DUSK - 1.5, to: DAWN - 1.5, close: HOME_CLOSE, color: 0x8fb4ff, intensity: 0.85 },
   // Paper lanterns and the lit room behind a shop's glass: a shopkeeper's
   // light, so on an hour before residents put theirs on and off with them at
   // dawn. Deeper and redder than `window` -- a paper shade
@@ -323,6 +335,19 @@ export function flickerAt(timeMs, phase) {
  */
 export function glowFor(hours, kind) {
   const cfg = GLOW_CURVES[kind] ?? GLOW_CURVES.window;
-  const t = hump(wrapHour(hours), cfg.from, cfg.to);
+  const h = wrapHour(hours);
+  let t = hump(h, cfg.from, cfg.to);
+  if (cfg.close !== undefined) {
+    // Closed from `close` until the light next comes on, and easing out over
+    // CLOSE_FADE before that. A hard cutoff on the hump would pop; the hump
+    // alone would fade the whole evening, when the homes are meant to stay lit
+    // until the moment they close.
+    const sinceClose = (h - cfg.close + 24) % 24;
+    if (sinceClose < (cfg.from - cfg.close + 24) % 24) t = 0;
+    else {
+      const untilClose = (cfg.close - h + 24) % 24;
+      if (untilClose < CLOSE_FADE) t *= smooth(untilClose / CLOSE_FADE);
+    }
+  }
   return { color: cfg.color, intensity: cfg.intensity * t };
 }
