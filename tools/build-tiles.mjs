@@ -11,8 +11,7 @@ import path from 'node:path';
 import { Bitmap, hexToRGBA } from './png.mjs';
 import { drawText, textWidth } from './font.mjs';
 import { raster, validateGrid } from './flat.mjs';
-import { TILE_PALETTE } from '../art/flat/palette.mjs';
-import { TILES, FEATURES, W as TW, H as TH } from '../art/flat/tiles.mjs';
+import { TILES, FEATURES, W as TW, H as TH, styleOf, checkStyles } from '../art/flat/tiles.mjs';
 import { DOWN, W as PW, H as PH } from '../art/flat/player.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
@@ -21,7 +20,7 @@ const DIM = hexToRGBA('#8e8d92');
 const BG = hexToRGBA('#14171e');
 
 // --- validate and raster ----------------------------------------------------
-const errs = [];
+const errs = [...checkStyles()];
 const art = {};
 for (const [name, grid] of Object.entries({ ...TILES, ...FEATURES })) {
   const h = grid.length;
@@ -33,8 +32,10 @@ for (const [name, grid] of Object.entries({ ...TILES, ...FEATURES })) {
     if (h % TH !== 0) errs.push(`${name}: ${h} rows, not a whole number of ${TH}px tiles`);
     if (w % TW !== 0) errs.push(`${name}: ${w} cols, not a whole number of ${TW}px tiles`);
   }
-  errs.push(...validateGrid(name, grid, w, h, TILE_PALETTE));
-  art[name] = raster(grid, TILE_PALETTE);
+  // A grid is drawn against its own palette -- rooms and shops have theirs.
+  const { palette } = styleOf(name);
+  errs.push(...validateGrid(name, grid, w, h, palette));
+  art[name] = raster(grid, palette);
 }
 if (errs.length) { console.error('FAILED:\n  ' + errs.join('\n  ')); process.exit(1); }
 const player = raster(DOWN);

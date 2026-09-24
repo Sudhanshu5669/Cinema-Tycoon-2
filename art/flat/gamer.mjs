@@ -231,9 +231,40 @@ export const ROOM_GAMER_LOUNGE = (() => {
   return c.rows();
 })();
 
-export const GAMER_TILES = {};
-export const GAMER_FEATURES = {
-  gamerFront: GAMER_FRONT, windowGlass: WINDOW_GLASS, gamerDoor: GAMER_DOOR,
-  ledBar: LED_BAR, padIcon: PAD_ICON,
-  roomGamerPcs: ROOM_GAMER_PCS, roomGamerLounge: ROOM_GAMER_LOUNGE,
+/**
+ * Everything this shop adds to the set: its art, and the colours that art is
+ * drawn in -- scoped to it, as the other shops' are (see tiles.mjs's `styleOf`).
+ */
+export const GAMER = {
+  name: 'the Gamer Cafe',
+  tiles: {},
+  features: {
+    gamerFront: GAMER_FRONT, windowGlass: WINDOW_GLASS, gamerDoor: GAMER_DOOR,
+    ledBar: LED_BAR, padIcon: PAD_ICON,
+    roomGamerPcs: ROOM_GAMER_PCS, roomGamerLounge: ROOM_GAMER_LOUNGE,
+  },
+
+  // The cold one. A flat near-black with a slight blue in it, the catch-light
+  // on its edges, and one bright cyan for the LED tubes -- the only saturated
+  // thing on the front, and an emitter. Glass, hull-grey and the reader-board
+  // navy (`i`, `4`, `5`, `K`, `6`) are already the cold family and are shared.
+  palette: {
+    '{': '#1c2028', // black cladding
+    '|': '#3a4352', // its lit edge
+    ')': '#a8dcff', // LED tube
+  },
+  // Panel seams are a groove, and the LED tube stands proud.
+  height: { '|': 1, ')': 1 },
+  // Everything is a step off black except what is lit.
+  roomPalette: {
+    F: '#1b2029', // wall
+    G: '#293141', // wall slat
+    H: '#3a4150', // desk edge, and the level a game is standing on
+    N: '#2b303b', // furniture and silhouettes
+    S: '#161920', // floor
+    U: '#5b9fd0', // a screen, deep
+    u: '#b4e0ff', // a screen, lit -- the brightest thing in these rooms
+    V: '#c04fa0', // a pink LED, or a player
+    Y: '#57d9b0', // a green one, or what is chasing them
+  },
 };

@@ -378,9 +378,48 @@ export const ROOM_ANTIQUES_CABINET = (() => {
   return c.rows();
 })();
 
-export const ANTIQUE_TILES = {};
-export const ANTIQUE_FEATURES = {
-  antiqueFront: ANTIQUE_FRONT, windowBay: WINDOW_BAY, windowCabinet: WINDOW_CABINET,
-  antiqueDoor: ANTIQUE_DOOR, bareBulb: BARE_BULB,
-  roomAntiquesBay: ROOM_ANTIQUES_BAY, roomAntiquesCabinet: ROOM_ANTIQUES_CABINET,
+/**
+ * Everything this shop adds to the set: its art, and the colours that art is
+ * drawn in -- scoped to it, as the Bento Box's are (see tiles.mjs's `styleOf`).
+ */
+export const ANTIQUES = {
+  name: 'Retro Antiques',
+  tiles: {},
+  features: {
+    antiqueFront: ANTIQUE_FRONT, windowBay: WINDOW_BAY, windowCabinet: WINDOW_CABINET,
+    antiqueDoor: ANTIQUE_DOOR, bareBulb: BARE_BULB,
+    roomAntiquesBay: ROOM_ANTIQUES_BAY, roomAntiquesCabinet: ROOM_ANTIQUES_CABINET,
+  },
+
+  // Same rule as the Bento Box: one new material and one new light. The
+  // material is the painted joinery of an old shopfront -- a green-black with
+  // 10% saturation, close enough to the neutrals around it that it is read as
+  // "old paint" and not as a colour. The light is the door's glass, a dim
+  // yellow well short of the Bento Box's amber, since a bare bulb is not a
+  // paper lantern.
+  palette: {
+    '!': '#2e3b35', // shopfront paint
+    '[': '#4d5f55', // paint, the lit arris and the top of a rail
+    ']': '#1e2823', // paint, in shadow -- a groove, and the underside of a rail
+    '}': '#c2ac62', // door glass, lit from inside
+    ',': '#8f7d44', // the same, deepening toward the floor -- and the net curtain
+  },
+  // Raised panels and fluting, lit above and shaded below.
+  height: { '[': 1, ']': -1, ',': -1 },
+  // Dim, warm wallpaper, and the things a dealer keeps.
+  roomPalette: {
+    y: '#7d6f5d', // wallpaper
+    z: '#65594b', // wallpaper stripe, and the wall down toward the dado
+    v: '#3f3730', // floorboards
+    q: '#6a3a2c', // mahogany
+    Q: '#8a5540', // mahogany where the light catches an edge
+    j: '#b08c3e', // brass
+    J: '#6b5424', // brass, in shadow
+    c: '#8a97a3', // mirror and glass-fronted door
+    C: '#56616c', // the same, in shadow
+    m: '#c8d0da', // porcelain
+    M: '#5f7396', // porcelain, blue
+    p: '#cdbf9c', // a lampshade
+    P: '#8f8264', // its shaded side
+  },
 };

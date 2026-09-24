@@ -246,50 +246,14 @@ export const TILE_PALETTE = {
   '~': '#2a1418', // leaf panel, rebated -- and the bottom rail's own shadow
   '^': '#55292c', // top rail, the one edge the marquee above actually reaches
 
-  // --- the Bento Box -------------------------------------------------------
-  // A shop is told apart by material and by the light it makes, not by painting
-  // its bricks a different colour (CITY_PLAN rule 1). So this is one new
-  // material -- dark timber, where the whole street is masonry -- one cold
-  // note (the noren's indigo, desaturated so it sits beside the glass family
-  // and does not compete with it) and one warm one, the paper lantern, which
-  // is the only saturated thing here and is an emitter. Scoped like the
-  // signage tones above: they appear on this shop and nowhere else.
-  '0': '#33261f', // timber cladding
-  '3': '#5a4535', // timber, the lit arris and the top rail
-  '8': '#211915', // timber joint, and the shadow under a rail
-  '-': '#33426a', // noren cloth
-  '_': '#232e4b', // noren, the shaded fold and the hem
-  '/': '#d9c9a0', // the mon on the noren -- cream, not white
-  '<': '#b8482c', // lantern paper
-  '>': '#e58548', // lantern paper over the flame
-  ':': '#3a1d16', // lantern caps and ribs; the rod; a lacquer edge
-  ';': '#c99a5c', // frosted door glass, lit from inside
-  '?': '#9a7444', // the same, deepening toward the floor
-  '(': '#8e2f2a', // lacquer red
 
-  // --- Retro Antiques ------------------------------------------------------
-  // Same rule as the Bento Box: one new material and one new light. The
-  // material is the painted joinery of an old shopfront -- a green-black with
-  // 10% saturation, close enough to the neutrals around it that it is read as
-  // "old paint" and not as a colour. The light is the door's glass, a dim
-  // yellow well short of the Bento Box's amber, since a bare bulb is not a
-  // paper lantern.
-  '!': '#2e3b35', // shopfront paint
-  '[': '#4d5f55', // paint, the lit arris and the top of a rail
-  ']': '#1e2823', // paint, in shadow -- a groove, and the underside of a rail
-  '}': '#c2ac62', // door glass, lit from inside
-  ',': '#8f7d44', // the same, deepening toward the floor -- and the net curtain
-
-  // --- the Gamer Cafe ------------------------------------------------------
-  // The cold one. A flat near-black with a slight blue in it, the catch-light
-  // on its edges, and one bright cyan for the LED tubes -- the only saturated
-  // thing on the front, and an emitter. Glass, hull-grey and the reader-board
-  // navy (`i`, `4`, `5`, `K`, `6`) are already the cold family and are reused.
-  // **These are the last three free letters in this palette**, so the next shop
-  // draws from what exists or the palette gets a fourth namespace.
-  '{': '#1c2028', // black cladding
-  '|': '#3a4352', // its lit edge
-  ')': '#a8dcff', // LED tube
+  // Colours that belong to one shop -- the Bento Box's timber, the antiques
+  // shop's paint, the Gamer Cafe's LEDs -- live in that shop's own module
+  // (art/flat/bento.mjs and friends) and are drawn from a palette of its own,
+  // scoped to its grids. A letter here is a colour SHARED across the set.
+  // tiles.mjs's `styleOf` resolves a grid's palette; a shop's local letter may
+  // not shadow one from here (`checkStyles`), which is what keeps a letter
+  // meaning one thing everywhere it is legal.
 };
 
 /**
@@ -347,39 +311,11 @@ export const ROOM_PALETTE = {
   x: '#191417', // an unlit doorway, or a room with nobody home
   X: '#241e22', // the same, a step off it, so a dark room still has shape
 
-  // The Bento Box's two rooms: lacquerware, and someone at work.
-  e: '#8e2f2c', // lacquer box, red
-  E: '#5a1d1c', // its lid edge
-  g: '#e3d3ab', // rice
-  h: '#5f7a45', // greens
-  i: '#c9843c', // something orange
-  k: '#c89870', // a face
-
-  // Retro Antiques: dim, warm wallpaper, and the things a dealer keeps.
-  y: '#7d6f5d', // wallpaper
-  z: '#65594b', // wallpaper stripe, and the wall down toward the dado
-  v: '#3f3730', // floorboards
-  q: '#6a3a2c', // mahogany
-  Q: '#8a5540', // mahogany where the light catches an edge
-  j: '#b08c3e', // brass
-  J: '#6b5424', // brass, in shadow
-  c: '#8a97a3', // mirror and glass-fronted door
-  C: '#56616c', // the same, in shadow
-  m: '#c8d0da', // porcelain
-  M: '#5f7396', // porcelain, blue
-  p: '#cdbf9c', // a lampshade
-  P: '#8f8264', // its shaded side
-
-  // The Gamer Cafe: everything is a step off black except what is lit.
-  F: '#1b2029', // wall
-  G: '#293141', // wall slat
-  H: '#3a4150', // desk edge, and the level a game is standing on
-  N: '#2b303b', // furniture and silhouettes
-  S: '#161920', // floor
-  U: '#5b9fd0', // a screen, deep
-  u: '#b4e0ff', // a screen, lit -- the brightest thing in these rooms
-  V: '#c04fa0', // a pink LED, or a player
-  Y: '#57d9b0', // a green one, or what is chasing them
+  // Lacquer and cream, shared: the Bento Box's boxes, and a rug and a clock face
+  // elsewhere. Room colours private to one shop live in that shop's module.
+  e: '#8e2f2c', // lacquer red
+  E: '#5a1d1c', // its edge
+  g: '#e3d3ab', // rice, or cream
 };
 
 /**
@@ -458,11 +394,5 @@ export const TILE_HEIGHT = {
   // The lobby glow sits deepest of all -- it is light coming from further
   // back inside the building than the door plane itself.
   '@': -3,
-  // Bento Box: boards are separate planks with a groove between, a lantern's
-  // ribs stand proud of its paper, the noren's fold is a step back.
-  '3': 1, '8': -1, ':': 1, '_': -1, '/': 1,
-  // Retro Antiques: raised panels and fluting, lit above and shaded below.
-  '[': 1, ']': -1, ',': -1,
-  // The Gamer Cafe: panel seams are a groove, and the LED tube stands proud.
-  '|': 1, ')': 1,
+  // Heights for a shop's own colours live in its module, beside the colours.
 };

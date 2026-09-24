@@ -253,9 +253,48 @@ export const ROOM_BENTO_KITCHEN = (() => {
   return c.rows();
 })();
 
-export const BENTO_TILES = {};
-export const BENTO_FEATURES = {
-  bentoFront: BENTO_FRONT, windowShop: WINDOW_SHOP, norenDoor: NOREN_DOOR,
-  lantern: LANTERN, bentoIcon: BENTO_ICON,
-  roomBento: ROOM_BENTO, roomBentoKitchen: ROOM_BENTO_KITCHEN,
+/**
+ * Everything this shop adds to the set, as one value: its art, and the colours
+ * that art is drawn in. The colours are the shop's own -- no other grid uses
+ * them -- so they are scoped here rather than spent from the global palette
+ * (see tiles.mjs's `styleOf`), where a letter means one shared colour.
+ */
+export const BENTO = {
+  name: 'the Bento Box',
+  tiles: {},
+  features: {
+    bentoFront: BENTO_FRONT, windowShop: WINDOW_SHOP, norenDoor: NOREN_DOOR,
+    lantern: LANTERN, bentoIcon: BENTO_ICON,
+    roomBento: ROOM_BENTO, roomBentoKitchen: ROOM_BENTO_KITCHEN,
+  },
+
+  // A shop is told apart by material and by the light it makes, not by painting
+  // its bricks a different colour (CITY_PLAN rule 1). So this is one new
+  // material -- dark timber, where the whole street is masonry -- one cold
+  // note (the noren's indigo, desaturated so it sits beside the glass family
+  // and does not compete with it) and one warm one, the paper lantern, which
+  // is the only saturated thing here and is an emitter.
+  palette: {
+    '0': '#33261f', // timber cladding
+    '3': '#5a4535', // timber, the lit arris and the top rail
+    '8': '#211915', // timber joint, and the shadow under a rail
+    '-': '#33426a', // noren cloth
+    '_': '#232e4b', // noren, the shaded fold and the hem
+    '/': '#d9c9a0', // the mon on the noren -- cream, not white
+    '<': '#b8482c', // lantern paper
+    '>': '#e58548', // lantern paper over the flame
+    ':': '#3a1d16', // lantern caps and ribs; the rod; a lacquer edge
+    ';': '#c99a5c', // frosted door glass, lit from inside
+    '?': '#9a7444', // the same, deepening toward the floor
+    '(': '#8e2f2a', // lacquer red
+  },
+  // Boards are separate planks with a groove between, a lantern's ribs stand
+  // proud of its paper, the noren's fold is a step back.
+  height: { '3': 1, '8': -1, ':': 1, '_': -1, '/': 1 },
+  // The two rooms: lacquerware, and someone at work.
+  roomPalette: {
+    h: '#5f7a45', // greens
+    i: '#c9843c', // something orange
+    k: '#c89870', // a face
+  },
 };

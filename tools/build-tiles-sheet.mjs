@@ -4,7 +4,8 @@
 //
 // Same authoring model as the player sheet: the art lives as indexed-colour
 // ASCII grids in art/flat/tiles.mjs, this step validates every grid against
-// TILE_PALETTE and rasters it. Single 16x16 tiles, taller multi-tile features
+// its palette -- the shared one, plus its shop's own colours; see tiles.mjs's
+// `styleOf` -- and rasters it. Single 16x16 tiles, taller multi-tile features
 // (WINDOW 16x32, DOOR 16x48) and wider ones (WINDOW_WIDE 32x32) are packed into
 // one horizontal strip; the JSON is Phaser's atlas-hash format so a frame can be
 // any size. A grid's own first row gives its width -- only height was ever
@@ -26,8 +27,7 @@ import path from 'node:path';
 import { Bitmap } from './png.mjs';
 import { raster, validateGrid } from './flat.mjs';
 import { normalRaster } from './normals.mjs';
-import { TILE_PALETTE, TILE_HEIGHT, ROOM_PALETTE, ROOM_HEIGHT } from '../art/flat/palette.mjs';
-import { TILES, FEATURES, W as TW, H as TH } from '../art/flat/tiles.mjs';
+import { TILES, FEATURES, W as TW, H as TH, styleOf, checkStyles } from '../art/flat/tiles.mjs';
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 const OUT = path.join(ROOT, 'public/assets');
@@ -163,7 +163,7 @@ function openingOf(grid) {
 }
 
 // --- validate + raster -----------------------------------------------------
-const errs = [];
+const errs = [...checkStyles()];
 const frames = [];
 for (const [name, grid] of Object.entries({ ...TILES, ...FEATURES })) {
   const h = grid.length;
@@ -177,12 +177,11 @@ for (const [name, grid] of Object.entries({ ...TILES, ...FEATURES })) {
     if (h % TH !== 0) errs.push(`${name}: ${h} rows, not a whole number of ${TH}px tiles`);
     if (w % TW !== 0) errs.push(`${name}: ${w} cols, not a whole number of ${TW}px tiles`);
   }
-  // Interiors are authored against their own palette -- see ROOM_PALETTE.
-  // `raster` and `validateGrid` already take the palette to draw against, for
-  // exactly this reason, so this is a lookup rather than a second code path.
-  const isRoom = name.startsWith('room');
-  const palette = isRoom ? ROOM_PALETTE : TILE_PALETTE;
-  const heights = isRoom ? ROOM_HEIGHT : TILE_HEIGHT;
+  // Interiors are authored against their own palette, and a shop's own colours
+  // sit over whichever palette that is -- `styleOf` says which. `raster` and
+  // `validateGrid` already take the palette to draw against, for exactly this
+  // reason, so this is a lookup rather than a second code path.
+  const { palette, heights } = styleOf(name);
   errs.push(...validateGrid(name, grid, w, h, palette));
   frames.push({
     name, w, h,

@@ -16,9 +16,17 @@
 // shaded right-hand return is WALL_EDGE, a separate tile. A shaded edge baked
 // into every wall tile would repeat every 16px and read as stripes.
 
-import { BENTO_TILES, BENTO_FEATURES } from './bento.mjs';
-import { ANTIQUE_TILES, ANTIQUE_FEATURES } from './antiques.mjs';
-import { GAMER_TILES, GAMER_FEATURES } from './gamer.mjs';
+import { BENTO } from './bento.mjs';
+import { ANTIQUES } from './antiques.mjs';
+import { GAMER } from './gamer.mjs';
+import { TILE_PALETTE, ROOM_PALETTE, TILE_HEIGHT, ROOM_HEIGHT } from './palette.mjs';
+
+/**
+ * The shops. Each is one value -- `{ name, tiles, features, palette, height,
+ * roomPalette }` -- so its art and the colours that art is drawn in travel
+ * together, and adding a shop is one line here.
+ */
+const SETS = [BENTO, ANTIQUES, GAMER];
 
 export const W = 16, H = 16;
 
@@ -2505,7 +2513,7 @@ export const TILES = {
   roof: ROOF, roofBack: ROOF_BACK, cornice: CORNICE, corniceEdge: CORNICE_EDGE,
   plinth: PLINTH, plinthEdge: PLINTH_EDGE, beltCourse: BELT_COURSE,
   awning: AWNING, marquee: MARQUEE, signTower: SIGN_TOWER, signCap: SIGN_CAP,
-  ...BENTO_TILES, ...ANTIQUE_TILES, ...GAMER_TILES,
+  ...Object.assign({}, ...SETS.map((s) => s.tiles)),
 };
 
 /** Multi-tile. Each is a whole number of tiles and slices cleanly. */
@@ -2524,5 +2532,75 @@ export const FEATURES = {
   signBulb: SIGN_BULB,
   roofTank: ROOF_TANK, roofVent: ROOF_VENT, roofHatch: ROOF_HATCH, roofDuct: ROOF_DUCT,
   posterShip: POSTER_SHIP, posterKaiju: POSTER_KAIJU,
-  ...BENTO_FEATURES, ...ANTIQUE_FEATURES, ...GAMER_FEATURES,
+  ...Object.assign({}, ...SETS.map((s) => s.features)),
 };
+
+// --- which palette a grid is drawn in ----------------------------------------
+
+/** Room art is drawn against its own palette, told apart by the `room` prefix
+ *  -- the same rule the sheet builder has always used. */
+const isRoom = (name) => name.startsWith('room');
+
+const setOf = new Map();
+for (const set of SETS) for (const name of Object.keys({ ...set.tiles, ...set.features })) setOf.set(name, set);
+
+const styles = new Map();
+
+/**
+ * The palette and the height table a grid is drawn and normal-mapped against:
+ * the shared one, with its shop's own colours laid over it.
+ *
+ * A letter in the shared palette is one colour everywhere. A shop's private
+ * colours used to be spent from it too, and the tile palette ran out of
+ * letters at the third shop -- with twenty of its eighty-nine held by colours
+ * no other shop's art used. They are scoped now, so two shops may each use `{`
+ * for a different colour, and the shared palette only grows when a colour is
+ * genuinely shared.
+ *
+ * @param {string} name a key of TILES or FEATURES
+ * @returns {{ palette: Record<string,string>, heights: Record<string,number> }}
+ */
+export function styleOf(name) {
+  const room = isRoom(name);
+  const set = setOf.get(name);
+  const key = `${room ? 'r' : 't'}${SETS.indexOf(set)}`;
+  let style = styles.get(key);
+  if (!style) {
+    style = {
+      palette: { ...(room ? ROOM_PALETTE : TILE_PALETTE), ...(room ? set?.roomPalette : set?.palette) },
+      heights: { ...(room ? ROOM_HEIGHT : TILE_HEIGHT), ...(room ? set?.roomHeight : set?.height) },
+    };
+    styles.set(key, style);
+  }
+  return style;
+}
+
+/**
+ * Errors in how the shops scope their colours, for the sheet builder to fail
+ * on. A local letter that is also a shared one would mean two things in one
+ * grid -- the shared colour, and the shop's -- and which wins would be a fact
+ * about merge order, not about the art. So it is an error to do it, and this is
+ * the only thing standing between a scoped palette and a silent recolour.
+ * @returns {string[]}
+ */
+export function checkStyles() {
+  const errs = [];
+  SETS.forEach((set, i) => {
+    const label = set.name ?? `set ${i}`;
+    for (const [what, local, shared] of [
+      ['palette', set.palette, TILE_PALETTE], ['roomPalette', set.roomPalette, ROOM_PALETTE],
+    ]) {
+      for (const ch of Object.keys(local ?? {})) {
+        if (ch in shared) errs.push(`${label}: ${what} redefines "${ch}", which is already a shared colour`);
+      }
+    }
+    for (const [what, local, colours] of [
+      ['height', set.height, set.palette], ['roomHeight', set.roomHeight, set.roomPalette],
+    ]) {
+      for (const ch of Object.keys(local ?? {})) {
+        if (!(ch in (colours ?? {}))) errs.push(`${label}: ${what} names "${ch}", which is not one of its own colours`);
+      }
+    }
+  });
+  return errs;
+}

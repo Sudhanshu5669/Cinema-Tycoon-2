@@ -200,11 +200,9 @@ flat black cladding with hairline seams, no pilasters, no mouldings, no bay.
   door does.
 - Storeys 7, roofDepth 7, with the fascia at rows 3–5 and upper windows at 5.
 
-**The tile palette is now full.** This shop took the last three free letters
-(`{`, `|`, `)`); Gamer Cafe's glass, hull-grey and reader-board navy were
-already the cold family and are reused, which is the only reason it fit. The
-next shop draws from what exists, or the tile palette gets a second namespace
-the way the rooms did. Decide that before shop four, not during it.
+**The tile palette ran out of letters here, and that is fixed** — see "Shop
+palettes" below. This shop took the last three free letters and only fit
+because its glass, hull-grey and navy already existed.
 
 **Light budget:** Parade St's worst case is now **13 of 16** — the antiques shop
 took it to 12 and this one to 13. Three shops in, that is a slot each, and it is
@@ -285,6 +283,41 @@ author now, and it means the transition system arrives to a city already
 wired for it.
 
 ---
+
+## Shop palettes
+
+A tile grid is characters against a palette, and the tile palette is one
+character each — so it has a fixed number of colours, and the third shop spent
+the last of them. Measured at that point: of 89 letters, **20 were held by
+colours no other module's art used** (Bento 12, Antiques 5, Gamer 3), and 49
+more belonged to the base set. The palette was full of private colours.
+
+So a shop's own colours are scoped to it. Each shop module exports one value —
+`{ name, tiles, features, palette, roomPalette, height }` — and `styleOf(name)`
+in `tiles.mjs` lays the shop's colours over the shared palette for exactly its
+own grids. Two shops may now each use `{` for a different colour. The shared
+palette went from 89 letters to 69 and now only holds colours that are shared;
+**20 tile letters and 65 room letters are free**, and a shop can spend as many
+of its own as it needs.
+
+Two rules, both enforced by the sheet build (`checkStyles`), not by discipline:
+
+- **A local letter may not shadow a shared one.** A grid could then mean two
+  things by one letter, and which won would be a fact about merge order. It
+  fails the build instead, which also keeps a letter meaning one thing
+  everywhere it is legal.
+- **A shop's height table may only name its own colours.**
+
+The change was verified the only way that counts: the built `tiles.png`,
+`tiles-normal.png` and `tiles.json` are **byte-identical** before and after.
+Nothing visible moved; only where the colours are defined did.
+
+Not taken: a fourth global namespace (the same problem, later), and non-ASCII
+letters (grids stop being readable, which is the reason they are ASCII).
+
+**A colour goes in the shared palette when a second shop wants it**, not before.
+The antiques rugs and the Bento Box's boxes already share `e`, `E` and `g` in
+the room palette, which is why they are still there.
 
 ## Later phases
 
