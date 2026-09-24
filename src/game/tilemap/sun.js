@@ -259,6 +259,13 @@ const GLOW_CURVES = {
   // the television does it before the street lights up, and off well before
   // dawn because they fall asleep.
   tv: { from: DUSK - 1.5, to: DAWN - 1.5, color: 0x8fb4ff, intensity: 0.85 },
+  // Paper lanterns and the lit room behind a shop's glass: a shopkeeper's
+  // light, so on an hour before residents put theirs on and off with them at
+  // dawn. Deeper and redder than `window` -- a paper shade
+  // filters the flame -- and lower in intensity, because a lantern is a small
+  // emitter and a shop front is several of them merged into one shaded light
+  // (lighting.js), which sums their reach rather than their brightness.
+  lantern: { from: DUSK - 1.5, to: DAWN + 0.5, color: 0xffa25a, intensity: 1.6 },
 };
 
 /**

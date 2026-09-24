@@ -75,6 +75,11 @@ const RELIEF_STRENGTH = {
   // row of them should catch each one. Strongest value in the table for that
   // reason -- everything else here is a ledge or a groove, this is a sphere.
   signBulb: 1.2,
+  // The Bento Box. Cladding is flat boarding with grooves; the window takes the
+  // same relief every window does; the door and lantern are joinery and paper
+  // ribs; the rooms stay shallow like every other room.
+  bentoFront: 0.5, windowShop: 0.8, norenDoor: 0.6, lantern: 0.7, bentoIcon: 0.3,
+  roomBento: 0.5, roomBentoKitchen: 0.5,
 };
 
 /**

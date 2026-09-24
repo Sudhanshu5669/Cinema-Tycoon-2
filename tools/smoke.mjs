@@ -265,6 +265,11 @@ check('the marquee switches on before ordinary windows do',
   glowFor(16.5, 'marquee').intensity > 0 && glowFor(16.5, 'window').intensity === 0,
   `marquee ${glowFor(16.5, 'marquee').intensity.toFixed(2)} window ${glowFor(16.5, 'window').intensity.toFixed(2)}`);
 
+check('a shop lights its lanterns before the residents light their windows, and both are off by day',
+  glowFor(17, 'lantern').intensity > 0 && glowFor(17, 'window').intensity === 0
+    && glowFor(12, 'lantern').intensity === 0 && glowFor(5, 'lantern').intensity > 0,
+  `17:00 lantern ${glowFor(17, 'lantern').intensity.toFixed(2)} window ${glowFor(17, 'window').intensity.toFixed(2)}`);
+
 // In the browser: the live Phaser Light2D pipeline (a real per-fragment
 // shader, not a bespoke one -- see src/game/lighting.js) actually engaged,
 // and its ambient/window/marquee state tracks the same hour as the shadows.

@@ -35,6 +35,20 @@ export const SIGN_GOLD = '#f2c451';
 export const SIGN_FIELD_COLOR = '#5a161c';
 export const SIGN_BACK_COLOR = '#3a0d12';
 
+/**
+ * A `board` is the other kind of shop sign: painted timber with no bulbs, the
+ * fascia over an ordinary shopfront rather than a cinema's marquee. It is a
+ * style of the same panel, not a second list, so everything that measures a
+ * panel -- the loader's overflow check, the art padding, the text layout --
+ * stays one code path; the only thing that differs is how much of the board
+ * its own frame takes, which is this.
+ */
+export const BOARD_INSET = 3;
+export const BOARD_FRAME = '#4a382c';
+export const BOARD_FIELD = '#241a16';
+export const BOARD_TRIM = '#8a6a3c';
+export const BOARD_INK = '#efdfb8';
+
 /** Breathing room kept clear at each end of a line, inside the bulb frame. */
 export const SIGN_TEXT_MARGIN = 4;
 
@@ -73,7 +87,7 @@ export function signLines(p) {
   return raw.map((l) => ({
     text: l.text,
     scale: l.scale ?? p.scale ?? SIGN_SCALE,
-    color: l.color ?? p.color ?? SIGN_GOLD,
+    color: l.color ?? p.color ?? (p.style === 'board' ? BOARD_INK : SIGN_GOLD),
     font: l.font ?? p.font ?? SIGN_FONT,
   }));
 }
@@ -108,8 +122,8 @@ export function signArtPad(panel, sizeOf) {
  *  number mapLoader validates a name against before anything is drawn, and a
  *  board that splays, or that carries a spaceship at one end, has genuinely
  *  less room for its text. */
-export function signFieldWidth(fw, splay = 0, artPad = { left: 0, right: 0 }) {
-  return fw * TILE - splay * 2 - BULB * 2 - SIGN_TEXT_MARGIN * 2
+export function signFieldWidth(fw, splay = 0, artPad = { left: 0, right: 0 }, inset = BULB) {
+  return fw * TILE - splay * 2 - inset * 2 - SIGN_TEXT_MARGIN * 2
     - artPad.left - artPad.right;
 }
 

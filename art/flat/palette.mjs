@@ -245,6 +245,27 @@ export const TILE_PALETTE = {
   '#': '#3c1e22', // door leaf
   '~': '#2a1418', // leaf panel, rebated -- and the bottom rail's own shadow
   '^': '#55292c', // top rail, the one edge the marquee above actually reaches
+
+  // --- the Bento Box -------------------------------------------------------
+  // A shop is told apart by material and by the light it makes, not by painting
+  // its bricks a different colour (CITY_PLAN rule 1). So this is one new
+  // material -- dark timber, where the whole street is masonry -- one cold
+  // note (the noren's indigo, desaturated so it sits beside the glass family
+  // and does not compete with it) and one warm one, the paper lantern, which
+  // is the only saturated thing here and is an emitter. Scoped like the
+  // signage tones above: they appear on this shop and nowhere else.
+  '0': '#33261f', // timber cladding
+  '3': '#5a4535', // timber, the lit arris and the top rail
+  '8': '#211915', // timber joint, and the shadow under a rail
+  '-': '#33426a', // noren cloth
+  '_': '#232e4b', // noren, the shaded fold and the hem
+  '/': '#d9c9a0', // the mon on the noren -- cream, not white
+  '<': '#b8482c', // lantern paper
+  '>': '#e58548', // lantern paper over the flame
+  ':': '#3a1d16', // lantern caps and ribs; the rod; a lacquer edge
+  ';': '#c99a5c', // frosted door glass, lit from inside
+  '?': '#9a7444', // the same, deepening toward the floor
+  '(': '#8e2f2a', // lacquer red
 };
 
 /**
@@ -301,6 +322,14 @@ export const ROOM_PALETTE = {
 
   x: '#191417', // an unlit doorway, or a room with nobody home
   X: '#241e22', // the same, a step off it, so a dark room still has shape
+
+  // The Bento Box's two rooms: lacquerware, and someone at work.
+  e: '#8e2f2c', // lacquer box, red
+  E: '#5a1d1c', // its lid edge
+  g: '#e3d3ab', // rice
+  h: '#5f7a45', // greens
+  i: '#c9843c', // something orange
+  k: '#c89870', // a face
 };
 
 /**
@@ -379,4 +408,7 @@ export const TILE_HEIGHT = {
   // The lobby glow sits deepest of all -- it is light coming from further
   // back inside the building than the door plane itself.
   '@': -3,
+  // Bento Box: boards are separate planks with a groove between, a lantern's
+  // ribs stand proud of its paper, the noren's fold is a step back.
+  '3': 1, '8': -1, ':': 1, '_': -1, '/': 1,
 };

@@ -102,6 +102,33 @@ piece's own **pixels** fit the deck, not just the cell it names — a tank is
 wider and taller than a tile, so a legal `rx` can still hang it off the edge,
 where the bake clips it and half a tank appears.
 
+### 1c-1 — Bento Box  ✅ first shop done
+The building at x20 on Parade St, and the pattern the other seven follow. Built
+as a `city.json` edit plus new art, not new code per shop:
+
+- **Timber cladding** (`bentoFront`) where every neighbour is masonry — a
+  shop is a wooden frame with holes in it. One new material, not a recoloured
+  brick.
+- **Noren door** (`norenDoor`): glazed and lit from behind, indigo cloth in four
+  panels, the slits showing the light. **Two see-through display windows**
+  (`windowShop`) onto their own rooms: shelves of packed boxes, and a cook at the
+  pass. Neither is a copy of the other.
+- **Fascia board** — a `panels` entry with `style: "board"`: painted timber, no
+  bulbs, no light of its own. The same panel, laid out and validated by the same
+  code as the cinema's marquee; only the frame width differs (`BOARD_INSET`).
+- **Paper lanterns** (`lantern`) hung under it. A new light kind, `lantern`:
+  on an hour before residents' windows and off with them at dawn, deeper and redder than a window.
+  Everything that emits from the shop — lanterns, door, both rooms — is that one
+  kind, so the whole front merges into a single shaded light.
+- Taller than its neighbours (8 storeys, `roofDepth` 6 to keep `storeys +
+  roofDepth === h`), which is what gave the fascia somewhere to hang.
+
+**Shadows.** Every light touching the player throws its own shadow, and a shop
+front is seven emitters, so the first build put seven spokes on the player. The
+lanterns and both rooms now light and glow but do not cast (`NO_SHADOW` in
+`renderer.js`); the door is the shop's caster. A shop with many emitters should
+do the same.
+
 ### 1b — Shopfront kit
 The main art investment, and the thing that decides whether this scales. Rather
 than eight bespoke buildings, build **parts that combine**: fascia bands, awning

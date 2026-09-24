@@ -34,6 +34,7 @@ import {
   BULB, SIGN_LINE_GAP, SIGN_GOLD, SIGN_FIELD_COLOR, SIGN_BACK_COLOR,
   signLines, signBlockHeight, signLineWidth, signArtPad, SIGN_TEXT_MARGIN,
   SIGN_SPLAY_TAPER, SIGN_SPLAY_BAND, SIGN_SPLAY_LIGHT, SIGN_SPLAY_DARK, SIGN_SPLAY_EDGE,
+  BOARD_INSET, BOARD_FRAME, BOARD_FIELD, BOARD_TRIM,
 } from './sign.js';
 import { ShadowLayer } from './shadows.js';
 import { LightingLayer, wireLight } from '../lighting.js';
@@ -166,6 +167,8 @@ const DEFAULT_ROOM = 'roomDark';
  */
 const LIT_ROOMS = {
   roomStair: 'window', roomLamp: 'window', roomPlant: 'window',
+  // A shop's rooms are lit by the shopkeeper's own light, not a resident's.
+  roomBento: 'lantern', roomBentoKitchen: 'lantern',
 };
 
 const LIT_FACADE = {
@@ -178,7 +181,21 @@ const LIT_FACADE = {
   // Not 'window': a television is cold and it moves, and both of those are
   // properties of the light rather than of the glass -- see sun.js's `tv`.
   windowTv: 'tv',
+  // The Bento Box. Its door is glazed and lit from behind the noren, and each
+  // lantern is its own small emitter -- both the shopkeeper's warm light.
+  norenDoor: 'lantern', lantern: 'lantern',
 };
+
+/**
+ * Emitters that light and glow but never throw the player's shadow -- named by
+ * tile, or by the room behind a see-through window. Every light touching the
+ * player casts its own (see light.js), which is right for a lamp and wrong for
+ * one shop front made of seven: four lanterns and two lit windows a few tiles
+ * from its door put seven shadow spokes on one person and read as a starburst.
+ * The door is left as the shop's caster, so the shadow still points away from
+ * the shop, once.
+ */
+const NO_SHADOW = new Set(['lantern', 'roomBento', 'roomBentoKitchen']);
 
 export class TileMapRenderer {
   static preload(scene) { preloadTiles(scene); }
@@ -630,6 +647,7 @@ export class TileMapRenderer {
             // streetlamp below for the same mistake, actually made once.
             gx: b.x * TILE + localX + size.w / 2, gy: frontY,
             kind: emits,
+            castsShadow: !NO_SHADOW.has(d.tile) && !NO_SHADOW.has(d.room),
             // Which facade this window is in. lighting.js merges same-kind
             // neighbours to fit the shader's light cap, and this is what
             // keeps that merge inside one building -- see its `group` note
@@ -697,6 +715,14 @@ export class TileMapRenderer {
     // across a street.
     for (const p of b.panels ?? []) {
       const pw = p.fw * TILE, ph = (p.h ?? 1) * STEP;
+      // A `board` is painted timber: no bulbs to chase and no light of its own
+      // -- a shop's fascia is lit by the lanterns hanging under it, which are
+      // facade entries and register themselves.
+      if (p.style === 'board') {
+        const boardKey = bake(this.scene, pw, ph, (g) => this._paintBoard(g, pw, ph, p));
+        this._place(boardKey, (b.x + p.fx) * TILE, frontY - (p.up ?? storeys) * TILE, DEPTH_OVERHEAD);
+        continue;
+      }
       let bulbs = [];
       const panelKey = bake(this.scene, pw, ph, (g) => { bulbs = this._paintSign(g, pw, ph, p); });
       const pTop = frontY - (p.up ?? storeys) * TILE;
@@ -859,6 +885,39 @@ export class TileMapRenderer {
       ty += (signBlockHeight([l])) + SIGN_LINE_GAP;
     }
     return bulbs;
+  }
+
+  /**
+   * A shop fascia: a dark timber board in a lighter frame with a thin gilt
+   * line just inside it, the name in cream and any `art` -- the shop's own
+   * mark -- at either end. Text is laid out with the same helpers the bulb
+   * boards use (see sign.js's BOARD_INSET for the one number that differs), so
+   * the loader has already checked the name fits.
+   */
+  _paintBoard(g, w, h, p) {
+    g.rect(BOARD_FRAME, 0, 0, w, h);
+    g.rect(BOARD_TRIM, BOARD_INSET - 1, BOARD_INSET - 1, w - (BOARD_INSET - 1) * 2, h - (BOARD_INSET - 1) * 2);
+    g.rect(BOARD_FIELD, BOARD_INSET, BOARD_INSET, w - BOARD_INSET * 2, h - BOARD_INSET * 2);
+
+    const pad = signArtPad(p, (t) => frameSize(this.scene, t));
+    for (const a of p.art ?? []) {
+      const sz = frameSize(this.scene, a.tile);
+      if (!sz) continue;
+      const ax = a.at === 'right'
+        ? w - BOARD_INSET - SIGN_TEXT_MARGIN - sz.w
+        : BOARD_INSET + SIGN_TEXT_MARGIN;
+      g.tile(a.tile, ax, Math.round((h - sz.h) / 2));
+    }
+
+    const lines = signLines(p);
+    if (!lines.length) return;
+    const tx0 = BOARD_INSET + pad.left;
+    const tw = w - BOARD_INSET * 2 - pad.left - pad.right;
+    let ty = Math.round((h - signBlockHeight(lines)) / 2);
+    for (const l of lines) {
+      g.text(l.text, tx0 + Math.round((tw - signLineWidth(l)) / 2), ty, l.scale, l.color, l.font);
+      ty += signBlockHeight([l]) + SIGN_LINE_GAP;
+    }
   }
 
   /**

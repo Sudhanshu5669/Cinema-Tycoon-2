@@ -1740,27 +1740,70 @@
    "y": 39,
    "w": 12,
    "h": 14,
-   "storeys": 6,
-   "roofDepth": 8,
+   "storeys": 8,
+   "roofDepth": 6,
    "top": "roof",
-   "face": "brick",
+   "face": "wall",
    "base": "brick",
    "facade": [
     {
-     "tile": "door",
+     "tile": "bentoFront",
+     "fx": 0,
+     "fy": 1
+    },
+    {
+     "tile": "windowShop",
+     "fx": 1,
+     "fy": 1,
+     "room": "roomBento"
+    },
+    {
+     "tile": "windowShop",
+     "fx": 8,
+     "fy": 1,
+     "room": "roomBentoKitchen"
+    },
+    {
+     "tile": "norenDoor",
      "fx": 5,
      "fy": 0
     },
     {
+     "tile": "lantern",
+     "fx": 0,
+     "fy": 2
+    },
+    {
+     "tile": "lantern",
+     "fx": 4,
+     "fy": 2
+    },
+    {
+     "tile": "lantern",
+     "fx": 7,
+     "fy": 2
+    },
+    {
+     "tile": "lantern",
+     "fx": 11,
+     "fy": 2
+    },
+    {
      "tile": "window",
      "fx": 1,
-     "fy": 3
+     "fy": 5
     },
     {
      "tile": "windowOpen",
-     "fx": 8,
-     "fy": 3,
+     "fx": 5,
+     "fy": 5,
      "room": "roomLamp"
+    },
+    {
+     "tile": "windowOpen",
+     "fx": 9,
+     "fy": 5,
+     "room": "roomDark"
     }
    ],
    "roof": [
@@ -1777,22 +1820,43 @@
     {
      "tile": "roofHatch",
      "rx": 5,
-     "ry": 6
-    },
-    {
-     "tile": "acUnit",
-     "rx": 9,
-     "ry": 7
+     "ry": 5
     },
     {
      "tile": "roofTank",
      "rx": 9,
-     "ry": 1
+     "ry": 2
     },
     {
      "tile": "roofVent",
      "rx": 1,
      "ry": 5
+    }
+   ],
+   "panels": [
+    {
+     "style": "board",
+     "fx": 1,
+     "fw": 10,
+     "h": 2,
+     "up": 5,
+     "lines": [
+      {
+       "text": "BENTO BOX",
+       "scale": 2
+      },
+      {
+       "text": "HOT MEALS TO GO",
+       "scale": 1,
+       "color": "#d9805a"
+      }
+     ],
+     "art": [
+      {
+       "tile": "bentoIcon",
+       "at": "left"
+      }
+     ]
     }
    ]
   },

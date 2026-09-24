@@ -45,7 +45,7 @@
 // than one mistake at a time and deserves to hear about all of them.
 
 import { TILES_KEY, frameSize } from './atlas.js';
-import { signLines, signFieldWidth, signLineWidth, signArtPad } from './sign.js';
+import { signLines, signFieldWidth, signLineWidth, signArtPad, BOARD_INSET } from './sign.js';
 
 const LAYER_ROLES = ['ground', 'flat', 'object', 'overhead'];
 
@@ -59,7 +59,7 @@ const TILE_PX = 16;
  *  sun.js is renderer-side. A kind missing here is a loud error rather than a
  *  silent fall back to `window`, because "my kiosk glows the wrong colour" is
  *  exactly the kind of typo that otherwise gets shipped. */
-const LIGHT_KINDS = ['window', 'marquee', 'streetlamp', 'lobby', 'tv'];
+const LIGHT_KINDS = ['window', 'marquee', 'streetlamp', 'lobby', 'tv', 'lantern'];
 
 export class CityMapError extends Error {
   constructor(errs) {
@@ -172,7 +172,8 @@ export function loadCityMap(raw, scene) {
     // Without a scene there are no frames to measure, so a board validates as
     // though it carried no art -- see signArtPad.
     const sizeOf = scene ? (t) => frameSize(scene, t) : () => null;
-    const avail = signFieldWidth(bandTiles, panel.splay ?? 0, signArtPad(panel, sizeOf));
+    const avail = signFieldWidth(bandTiles, panel.splay ?? 0, signArtPad(panel, sizeOf),
+      panel.style === 'board' ? BOARD_INSET : undefined);
     lines.forEach((line, i) => {
       const where = lines.length > 1 ? `${label}.lines[${i}]` : label;
       if (typeof line.text !== 'string' || !line.text.length) {
